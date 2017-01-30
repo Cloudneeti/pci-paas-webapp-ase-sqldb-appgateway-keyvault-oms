@@ -23,7 +23,7 @@
 - [7. Deployment Steps](#7-deployment-steps)
 - [8. Configuration](#8-configuration)
     - [8.1 Configuration Guides](#81-configuration-guides)
-- [9. Support](#10-support)
+- [9. Support](#9-support)
 
 <!-- /TOC -->
 
@@ -39,7 +39,7 @@ An integrated ARM Template (<a href="https://azure.microsoft.com/en-us/documenta
 Customers benefit greatly from solution templates because of the ease with which they can stand up enterprise-grade, fully integrated stacks on Azure. The extensive automation and testing of these solutions will allow them to spin up pre-production environments with minimal manual steps and customization.  Most importantly, customers now have the confidence to transition the solution into a fully production-ready environment with confidence.
 
 Per Gartner, 
-> ### @icon-info-circle Through 2020, 95 percent of cloud security failures will be the customer's fault
+> ### ⚠ Through 2020, 95 percent of cloud security failures will be the customer's fault
 > - Gartner Predictions for 2016 and Beyond.  http://www.gartner.com/newsroom/id/3143718
 
 even through the platform vendors (like Microsoft Azure) are compliant, a customer might not know how to build and manage their applications at scale. Through this solution, our attempt is to simplify the quick deployment of infrastructure.
@@ -49,7 +49,7 @@ Here's the Gartner's reference
 
 
 **Disclaimer:**
-> This solution is intended as pilot solutions and is not production ready.
+> This solution is intended as a pilot and is not production ready.
 > Please contact  **<a href="mailto:azurepcisamples@avyanconsulting.com" target="_blank">azurepcisamples@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
 
 
