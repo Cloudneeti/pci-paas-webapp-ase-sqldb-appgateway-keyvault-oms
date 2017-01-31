@@ -62,6 +62,7 @@ The only component that requires Azure Marketplace purchase is Tinfoil Web Vulne
 We have kept the template disabled in the solution. Please follow instructions in the deployment guide to purchase and enable Tinfoil subscription.
 
 ##  4. Target Audience
+
 The target audience for these solution templates are 
 * **Business Decision Maker, IT Data Analyst** - or anybody w/i the organization who cares for the managing risk on Business transactions
 * **IT Decision Maker & Infrastructure Architects** - or any personnel w/i the organization that's responsible for managing Infrastructure risk
