@@ -1,10 +1,10 @@
 
 <h1> PCI Compliance Reference Architecture for Azure PaaS Line of Business Application </h1>
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fazure-quickstart-templates%2Fmaster%2Fpci-pass-webapp-ase-sqldb-appgateway-keyvault-oms%2Fazuredeploy.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fazure-quickstart-templates%2Fmaster%2Fpci-pass-webapp-ase-sqldb-appgateway-keyvault-oms%2Fazuredeploy.json" target="_blank">
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
@@ -50,7 +50,7 @@ Here's the Gartner's reference
 
 **Disclaimer:**
 > This solution is intended as a pilot and is not production ready.
-> Please contact  **<a href="mailto:azurepcisamples@avyanconsulting.com" target="_blank">azurepcisamples@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
+> Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurepcisamples@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
 
 
 This template is currently going through a review with Microsoft's security and compliance team and post review will be updated with changes.
@@ -62,7 +62,6 @@ The only component that requires Azure Marketplace purchase is Tinfoil Web Vulne
 We have kept the template disabled in the solution. Please follow instructions in the deployment guide to purchase and enable Tinfoil subscription.
 
 ##  4. Target Audience
-
 The target audience for these solution templates are 
 * **Business Decision Maker, IT Data Analyst** - or anybody w/i the organization who cares for the managing risk on Business transactions
 * **IT Decision Maker & Infrastructure Architects** - or any personnel w/i the organization that's responsible for managing Infrastructure risk
@@ -133,5 +132,5 @@ You can use [this detailed guide](documents/DeploymentGuide.docx) to configure t
 ## 9. Support
 For any support-related issues or questions, please contact us for assistance.
 ```sh
-azurepcisamples@avyanconsulting.com
+azurecompliance@avyanconsulting.com
 ```

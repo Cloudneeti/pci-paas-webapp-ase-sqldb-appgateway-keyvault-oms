@@ -1,0 +1,1038 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+    // General Parametes
+    "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master",
+      //"defaultValue": "",
+      "metadata": {
+        "description": "Publicly accessible location of all deployment artifacts."
+      }
+    },
+    "_artifactsLocationSasToken": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Reserved for deploying using Visual Studio. Please keep it as an empty string"
+      }
+    },
+    // Virtual Network Parameters
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "vNet-pci-paas",
+      "metadata": {
+        "description": "Name of the Virtual Network"
+      }
+    },
+
+    //Key Vault Parameters
+    "keyVaultName": {
+      "type": "string",
+      "defaultValue": "kv-pcisamples",
+      "metadata": {
+        "description": "Name of the Key Vault"
+      }
+    },
+    "userObjectID": {
+      "type": "string"
+    },
+    "ApplicationObjectId": {
+      "type": "string"
+    },
+    "secrets": {
+      "type": "array",
+      "defaultValue": "{}",
+      "metadata": {
+        "description": "all secrets {\"secretName\":\"\",\"secretValue\":\"\"}"
+      }
+    },
+
+    //ASE Parameters
+    "aseName": {
+      "type": "string",
+      "defaultValue": "ase-PCI",
+      "metadata": {
+        "description": "Name of the App Service Environment"
+      }
+    },
+    "aseLocation": {
+      "type": "string",
+      "allowedValues": [
+        "Central US",
+        "East US",
+        "East US 2",
+        "North Central US",
+        "South Central US",
+        "West US",
+        "Canada Central",
+        "North Europe",
+        "West Europe",
+        "East Asia",
+        "Southeast Asia",
+        "Japan East",
+        "Japan West",
+        "Brazil South",
+        "Australia East",
+        "Australia Southeast",
+        "West India",
+        "Central India",
+        "South India"
+      ],
+      "metadata": {
+        "description": "Location of the App Service Environment"
+      }
+    },
+    "ipSslAddressCount": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Number of IP addresses for the IP-SSL address pool."
+      }
+    },
+    "frontEndSize": {
+      "type": "string",
+      "allowedValues": [
+        "Medium",
+        "Large",
+        "ExtraLarge"
+      ],
+      "defaultValue": "Medium",
+      "metadata": {
+        "description": "Instance size for the front-end pool.  Maps to P2,P3,P4."
+      }
+    },
+    "frontEndCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of instances in the front-end pool.  Minimum of two."
+      }
+    },
+    "workerPoolOneInstanceSize": {
+      "type": "string",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "ExtraLarge"
+      ],
+      "defaultValue": "Small",
+      "metadata": {
+        "description": "Instance size for worker pool one.  Maps to P1,P2,P3,P4."
+      }
+    },
+    "workerPoolOneInstanceCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of instances in worker pool one.  Minimum of two."
+      }
+    },
+    "workerPoolTwoInstanceSize": {
+      "type": "string",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "ExtraLarge"
+      ],
+      "defaultValue": "Small",
+      "metadata": {
+        "description": "Instance size for worker pool two.  Maps to P1,P2,P3,P4."
+      }
+    },
+    "workerPoolTwoInstanceCount": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Number of instances in worker pool two.  Can be zero if not using worker pool two."
+      }
+    },
+    "workerPoolThreeInstanceSize": {
+      "type": "string",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "ExtraLarge"
+      ],
+      "defaultValue": "Large",
+      "metadata": {
+        "description": "Instance size for worker pool three.  Maps to P1,P2,P3,P4."
+      }
+    },
+    "workerPoolThreeInstanceCount": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Number of instances in worker pool three.  Can be zero if not using worker pool three."
+      }
+    },
+
+    // App Gateway Parameters
+
+    "skuName": {
+      "type": "string",
+      "allowedValues": [
+        "WAF_Medium"
+      ],
+      "defaultValue": "WAF_Medium",
+      "metadata": {
+        "description": "Sku Name"
+      }
+    },
+    "capacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of instances"
+      }
+    },
+    "certData": {
+      "type": "string",
+      "metadata": {
+        "description": "Base-64 encoded form of the .pfx file"
+      }
+    },
+    "certPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for .pfx certificate"
+      }
+    },
+
+    // Bastion Host Paratmers
+
+    "bastionHostAdministrator": {
+      "type": "string",
+      "defaultValue": "testuser",
+      "metadata": {
+        "description": "The account name to use for the bastion host VM administrator."
+      }
+    },
+    "bastionHostAdministratorPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password to use for the bastion host VM administrator."
+      }
+    },
+    // SQL Template Parameters
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "defaultValue": "testuser",
+      "metadata": {
+        "description": "The account name to use for the database server administrator."
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password to use for the database server administrator."
+      }
+    },
+
+    "emailAddresses": {
+      "type": "string",
+      "defaultValue": "mca.lakshman@gmail.com",
+      "metadata": {
+        "description": "Email Address"
+      }
+    },
+    "AadLoginUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The account name to use for the application's connections to the database server (low-privileged)."
+      }
+    },
+    "AadLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The account name to use for the application's connections to the database server (low-privileged)."
+      }
+    },
+    //Web App Parameters
+    "ClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The application ID within AAD; See the Generate Application ID and Secret Step in the readme"
+      }
+    },
+    "ActiveDirectoryAppSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The application's secret to allow access to AKV"
+      }
+    },
+    //OMS Paremeters
+    "automationAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide the name of an existing Automation Account with SPN."
+      }
+    },
+    "automationRegion": {
+      "type": "string",
+      "defaultValue": "East US 2",
+      "allowedValues": [
+        "Japan East",
+        "East US 2",
+        "Southeast Asia",
+        "South Central US",
+        "West Europe"
+      ],
+      "metadata": {
+        "description": "Location of the existing Automation Account."
+      }
+    },
+    "omsWorkspaceName": {
+      "type": "string",
+      "defaultValue": "oms-WS-pci-paas",
+      "metadata": {
+        "description": "Provide the OMS Workspace Name."
+      }
+    },
+    "omsRegion": {
+      "type": "string",
+      "defaultValue": "East US",
+      "allowedValues": [
+        "Australia Southeast",
+        "East US",
+        "Southeast Asia",
+        "West Europe"
+      ],
+      "metadata": {
+        "description": "Location of the OMS regions."
+      }
+    }
+
+  },
+  "variables": {
+    // Storage Account Variables
+    "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
+    "storageAccountPreRelease": "stgpcipaasreleases",
+    "WebContainerName": "pci-paas-web-container",
+    "WebPackageName": "ContosoClinic.zip",
+
+    "customHostName": "azurepcisamples.com",
+
+    // Public IP Variables
+    "publicIPAddressName": "publicIp-AppGateway",
+    // NSG Variables
+    "ASENSGGroupName": "nsg-ASE",
+    "WAFNSGGroupName": "nsg-WAF-Gateway",
+    "BASTIONNSGGroupName": "nsg-bastionVM",
+    // Virtual Network Variables
+    "WAFsubnetName": "subnet-WAF-Gateway",
+    "BastionSubnetName": "subnet-Bastion",
+    "ASEsubnetName": "subnet-ASE",
+    "addressPrefix": "10.0.0.0/16",
+    "WAFsubnetAddressPrefix": "10.0.1.0/24",
+    "BASTIONsubnetAddressPrefix": "10.0.2.0/24",
+    "ASEsubnetbaseAddress": "10.0.3",
+    "ASEsubnetAddressPrefix": "[concat(variables('ASEsubnetbaseAddress'),'.0','/24')]",
+    "ASEbackendVirtualIP": "[concat(variables('ASEsubnetbaseAddress'),'.8')]",
+
+    "aseName": "[concat(parameters('aseName'),'-', uniqueString(resourceGroup().id))]",
+
+    //SQL Template Variables
+    "sqlFirewallIPs": {
+      "startIP": "[concat(variables('ASEsubnetbaseAddress'), '.1')]",
+      "endIP": "[concat(variables('ASEsubnetbaseAddress'), '.255')]"
+    },
+    //Web App Variables
+    "webSiteName": "[concat('webapp', '-pciwebapp')]",
+    "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('WebContainerName'),'/',variables('WebPackageName'))]",
+    //Nested Templates Variables
+    "RootTemplateFolder": "PCI-PAAS",
+    "NestedTemplateFolder": "PCI-PAAS/nested",
+    "ASETemplateFileName": "asedeploy.json",
+    "GatewayTemplateFileName": "appgatewaydeploy.json",
+    "SQLServerTemplateFileName": "sqlserverdeploy.json",
+    "commonTemplateFileName": "common.json",
+    "WebAppTemplateFileName": "webappdeploy.json",
+    "VMBastionTemplateFileName": "vmBastion.json",
+    "dnsTemplateFileName": "dnsZone.json",
+
+    // DNS Zone Variables
+    "NewZoneName": "azurepcisamples.com",
+
+    // OMS Variables
+    "OMSTemplateFileName": "omsworkspace.json",
+    "omsWorkspaceName": "[concat(parameters('omsWorkspaceName'), '-', uniqueString(resourceGroup().id))]",
+    "OMSSolutionsTemplateFileName": "omsSolutions.json",
+    "AutomationAccountTemplateFileName": "automationAccount.json",
+    "tagvalues": {
+      "layer": "dummy",
+      "environment": "Pilot",
+      "projectname": "PCI PaaS Reference Architecture",
+      "dataprofile": "CPNI",
+      "department": "IT - Avyan Consulting",
+      "businessUnit": "Cloud - IT COE"
+    }
+  },
+  "resources": [
+    // Common Template
+    {
+      "name": "deploy-CommonInfrastructure",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-OMSWorkspaceSolutions')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('commonTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[substring(concat(parameters('keyVaultName'),'-',uniquestring(resourceGroup().id)),0,22)]"
+          },
+          "userObjectID": {
+            "value": "[parameters('userObjectID')]"
+          },
+          "ApplicationObjectId": {
+            "value": "[parameters('ApplicationObjectId')]"
+          },
+          "secrets": {
+            "value": "[parameters('secrets')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountDiagnostics')]"
+          },
+          "omsWorkspaceName": {
+            "value": "[variables('omsWorkspaceName')]"
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          }
+
+        }
+      }
+    },
+    // Public IP Template
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "layer": "DMZ",
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "mode": "Incremental"
+      }
+    },
+    //NSG Deployments for WAF
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('WAFNSGGroupName')]",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
+      ],
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "layer": "DMZ",
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowHttp",
+            "properties": {
+              "description": "This is the Http inbound rule",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      },
+      "resources": [
+        {
+          "type": "providers/diagnosticSettings",
+          "name": "Microsoft.Insights/service",
+          "dependsOn": [
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('WAFNSGGroupName'))]"
+          ],
+          "apiVersion": "2015-07-01",
+          "properties": {
+            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]",
+            "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountDiagnostics'))]",
+            "logs": [
+              {
+                "category": "NetworkSecurityGroupEvent",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": true
+                }
+              },
+              {
+                "category": "NetworkSecurityGroupRuleCounter",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": false
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('BASTIONNSGGroupName')]",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
+      ],
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "layer": "front-end",
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "Tcp",
+              "destinationPortRange": "3389",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*"
+            }
+          }
+        ]
+      },
+      "resources": [
+        {
+          "type": "providers/diagnosticSettings",
+          "name": "Microsoft.Insights/service",
+          "dependsOn": [
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"            
+          ],
+          "apiVersion": "2015-07-01",
+          "properties": {
+            "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountDiagnostics'))]",
+            "logs": [
+              {
+                "category": "NetworkSecurityGroupEvent",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": true
+                }
+              },
+              {
+                "category": "NetworkSecurityGroupRuleCounter",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": false
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    // Virtual Network with three subnets
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('aseLocation')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('WAFNSGGroupName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('BASTIONNSGGroupName'))]"
+      ],
+      "tags": {
+        "layer": "network",
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('WAFsubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('WAFsubnetAddressPrefix')]"
+            }
+          },
+          {
+            "name": "[variables('ASEsubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('ASEsubnetAddressPrefix')]"
+            }
+          },
+          {
+            "name": "[variables('BastionSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('BASTIONsubnetAddressPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "deploy-AppGatewayWAF",
+      "type": "Microsoft.Resources/deployments",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-CommonInfrastructure')]"
+      ],
+      "apiVersion": "2016-02-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('GatewayTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "publicIPAddressName": {
+            "value": "[variables('publicIPAddressName')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountDiagnostics')]"
+          },
+          "skuName": {
+            "value": "[parameters('skuName')]"
+          },
+          "capacity": {
+            "value": "[parameters('capacity')]"
+          },
+          "backendIpAddress1": {
+            "value": "[variables('ASEbackendVirtualIP')]"
+          },
+          "certData": {
+            "value": "[parameters('certData')]"
+          },
+          "certPassword": {
+            "value": "[parameters('certPassword')]"
+          },
+          "WAFsubnetName": {
+            "value": "[variables('WAFsubnetName')]"
+          },
+          "customprobeHostName": {
+            "value": "[concat(variables('webSiteName'),'.ase.azurepcisamples.com' )]"
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          }
+        }
+      }
+    },
+    //ASE Deployment using nested template
+    {
+      "name": "deploy-ASE",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('ASETemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "aseName": {
+            "value": "[variables('aseName')]"
+          },
+          "aseLocation": {
+            "value": "[parameters('aseLocation')]"
+          },
+          "ipSslAddressCount": {
+            "value": "[parameters('ipSslAddressCount')]"
+          },
+          "existingVnetName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "existingVnetResourceId": {
+            "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+          },
+          "ASEsubnetName": {
+            "value": "[variables('ASEsubnetName')]"
+          },
+          "frontEndSize": {
+            "value": "[parameters('frontEndSize')]"
+          },
+          "frontEndCount": {
+            "value": "[parameters('frontEndCount')]"
+          },
+          "workerPoolOneInstanceSize": {
+            "value": "[parameters('workerPoolOneInstanceSize')]"
+          },
+          "workerPoolOneInstanceCount": {
+            "value": "[parameters('workerPoolOneInstanceCount')]"
+          },
+          "workerPoolTwoInstanceSize": {
+            "value": "[parameters('workerPoolTwoInstanceSize')]"
+          },
+          "workerPoolTwoInstanceCount": {
+            "value": "[parameters('workerPoolTwoInstanceCount')]"
+          },
+          "workerPoolThreeInstanceSize": {
+            "value": "[parameters('workerPoolThreeInstanceSize')]"
+          },
+          "workerPoolThreeInstanceCount": {
+            "value": "[parameters('workerPoolThreeInstanceCount')]"
+          },
+          "ASEsubnetAddressPrefix": {
+            "value": "[variables('ASEsubnetAddressPrefix')]"
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          }
+        }
+      }
+    },
+    //DNS Zone
+    {
+      "name": "deploy-DNSZone",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('dnsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "newZoneName": { "value": "[variables('NewZoneName')]" },
+          "aseVirtualIP": { "value": "[variables('ASEbackendVirtualIP')]" },
+          "tagvalues": { "value": "[variables('tagvalues')]" }
+        }
+      }
+    },
+
+    //VM for Bastion Host
+    {
+      "name": "deploy-BastionVM",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('VMBastionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": { "value": "[parameters('bastionHostAdministrator')]" },
+          "adminPassword": { "value": "[parameters('bastionHostAdministratorPassword')]" },
+          "dnsLabelPrefix": { "value": "[concat('pcisamples',uniqueString(resourceGroup().id))]" },
+          "virtualNetworkName": { "value": "[parameters('virtualNetworkName')]" },
+          "subnetName": { "value": "[variables('BastionSubnetName')]" },
+          "networkSecurityGroupName": { "value": "[variables('BASTIONNSGGroupName')]" },
+          "diagnosticsStorageAccountName": { "value": "[variables('storageAccountDiagnostics')]" },
+          "omsworkspaceName": { "value": "[variables('omsWorkspaceName')]" },
+          "tagvalues": { "value": "[variables('tagvalues')]" }
+        }
+      }
+    },
+    //SQL Server Deployment using nested template
+    {
+      "name": "deploy-SQLServerSQLDb",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('SQLServerTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "administratorLogin": {
+            "value": "[parameters('sqlAdministratorLogin')]"
+          },
+          "administratorLoginPassword": {
+            "value": "[parameters('sqlAdministratorLoginPassword')]"
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          },
+          "storageAccountDiagnostics": {
+            "value": "[variables('storageAccountDiagnostics')]"
+          },
+          "firewallIPs": {
+            "value": "[variables('sqlFirewallIPs')]"
+          },
+          "emailAddresses": {
+            "value": "[parameters('emailAddresses')]"
+          }
+        }
+      }
+    },
+    //Web App Deployment using nested template
+    {
+      "name": "deploy-WebAppAndPackage",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-ASE')]",
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]",
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-SQLServerSQLDb')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('WebAppTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "administratorLogin": {
+            "value": "[parameters('sqlAdministratorLogin')]"
+          },
+          "administratorLoginPassword": {
+            "value": "[parameters('sqlAdministratorLoginPassword')]"
+          },
+          "AadLoginUser": {
+            "value": "[parameters('AadLoginUser')]"
+          },
+          "AadLoginPassword": {
+            "value": "[parameters('AadLoginPassword')]"
+          },
+          "siteName": {
+            "value": "[variables('webSiteName')]"
+          },
+          "location": {
+            "value": "[parameters('aseLocation')]"
+          },
+          "ClientId": {
+            "value": "[parameters('ClientId')]"
+          },
+          "ActiveDirectoryAppSecret": {
+            "value": "[parameters('ActiveDirectoryAppSecret')]"
+          },
+          "aseName": {
+            "value": "[variables('aseName')]"
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          },
+          "storageAccountDiagnostics": {
+            "value": "[variables('storageAccountDiagnostics')]"
+          },
+          "packageURI": {
+            "value": "[variables('packageURI')]"
+          },
+          "customHostName": {
+            "value": "[variables('customHostName')]"
+          }
+        }
+      }
+    },
+    //OMS Workspace And Solutions Deployment using nested template
+    {
+      "name": "deploy-OMSWorkspaceSolutions",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('OMSTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[variables('omsWorkspaceName')]"
+          },
+          "location": {
+            "value": "[parameters('omsRegion')]"
+          },
+          "serviceTier": {
+            "value": "Free"
+          },
+          "resourcegroupName": {
+            "value": "[resourceGroup().name]"
+          },
+          "subscriptionId": {
+            "value": "[subscription().subscriptionId]"
+          },
+          "solutionTypes": {
+            "value": [
+              "AzureNetworking",
+              "KeyVault",
+              "AzureActivity",
+              "ChangeTracking",
+              "ApplicationInsights",
+              "ServiceMap",
+              "Security"
+            ]
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          }
+        }
+      }
+    },
+    //Automation Account Deployment using nested template
+    {
+      "name": "deploy-AutomationAccount",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-OMSWorkspaceSolutions')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('AutomationAccountTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "_artifactsLocation": {
+            "value": "[concat(parameters('_artifactsLocation'), '/', variables('RootTemplateFolder'))]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+
+          "omsId": {
+            "value": "[reference('deploy-OMSWorkspaceSolutions').outputs.workspaceIdOutput.value]"
+          },
+          "omsKey": {
+            "value": "[reference('deploy-OMSWorkspaceSolutions').outputs.sharedKeyOutput.value]"
+          },
+          "omsWorkspaceName": {
+            "value": "[variables('omsWorkspaceName')]"
+          },
+          "automationAccountName": {
+            "value": "[parameters('automationAccountName')]"
+          },
+          "automationRegion": {
+            "value": "[parameters('automationRegion')]"
+          },
+          "omsworkspaceRegion": {
+            "value": "[parameters('omsRegion')]"
+          },
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('ASENSGGroupName')]",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
+      ],
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "layer": "front-end",
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "securityRules": [
+        ]
+      },
+      "resources": [
+        {
+          "type": "providers/diagnosticSettings",
+          "name": "Microsoft.Insights/service",
+          "dependsOn": [
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('ASENSGGroupName'))]"            
+          ],
+          "apiVersion": "2015-07-01",
+          "properties": {
+            "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountDiagnostics'))]",
+            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]",
+            "logs": [
+              {
+                "category": "NetworkSecurityGroupEvent",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": true
+                }
+              },
+              {
+                "category": "NetworkSecurityGroupRuleCounter",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": false
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "fqdn": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).dnsSettings.fqdn]",
+      "type": "string"
+    },
+    "gatewayIpAddress": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).ipAddress]",
+      "type": "string"
+    }
+  }
+}
