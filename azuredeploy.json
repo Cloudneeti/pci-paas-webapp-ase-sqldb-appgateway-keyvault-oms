@@ -347,7 +347,7 @@
     "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('WebContainerName'),'/',variables('WebPackageName'))]",
     //Nested Templates Variables
     "RootTemplateFolder": "PCI-PAAS",
-    "NestedTemplateFolder": "PCI-PAAS/nested",
+    "NestedTemplateFolder": "nested",
     "ASETemplateFileName": "asedeploy.json",
     "GatewayTemplateFileName": "appgatewaydeploy.json",
     "SQLServerTemplateFileName": "sqlserverdeploy.json",
@@ -940,7 +940,7 @@
         },
         "parameters": {
           "_artifactsLocation": {
-            "value": "[concat(parameters('_artifactsLocation'), '/', variables('RootTemplateFolder'))]"
+            "value": "[concat(parameters('_artifactsLocation'))]"
           },
           "_artifactsLocationSasToken": {
             "value": "[parameters('_artifactsLocationSasToken')]"
