@@ -1,5 +1,5 @@
 
-<h1> PCI Compliance Reference Architecture for Azure PaaS Line of Business Application </h1>
+<h1> Management and PCI Compliance Reference Architecture for Azure PaaS Line of Business Application </h1>
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -23,15 +23,27 @@
 - [7. Deployment Steps](#7-deployment-steps)
 - [8. Configuration](#8-configuration)
     - [8.1 Configuration Guides](#81-configuration-guides)
-- [9. Support](#9-support)
+- [9. Management & Operations](#9-Management-Operations)
+- [10. Support](#10-support)
 
 <!-- /TOC -->
 
 ##  1. Solution Overview
 
+> ☛ As this solution is currently going through a formal review, we have kept this GitHub public repo  to be a temporary location. Post review, the solution would be made available in <a href="https://azure.microsoft.com/en-us/resources/templates/" target="_blank">Azure QuickStart</a> repo. For any questions, Please reach out to <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>
+
 
 An integrated ARM Template (<a href="https://azure.microsoft.com/en-us/documentation/articles/resource-group-overview/">Azure Resource Manager</a>) that stitches all the above technology into a single deployment. The following is a feature table that is pulled together for your benefit.
+Customers want
 
+|Features	            |Some Examples from the Solution
+|------                 |------- 
+|Resources on-demand    |<ul> <li> Azure Resource Manager based Templatized Solution  </li> </ul>
+|DevOps Manageability   |<ul> <li> Infrastructure as code </li>  <li> Bastion Host VM for Releases and other management tasks tat can't be done over DMZ network </li> <li> Operations Management Suite and associated solutions</li>  <li>Runbook Automation </li></ul>
+|Solution Scalability   |<ul> <li>Azure PaaS familiarity and Scale </li> <li>Solution can be easily extended for multi-region deployments </li> <li> Each layer can be scaled out appropriately </li> </ul>
+|Built-in Security      | <ul> <li> End-point protection using SSL  </li> <li> Network segmentation based on service roles</li> <li> DMZ and firewalls </li> <li>End-to-end encryption</li> <li>Active Directory Role Based Access </li> <li>Database Encryption features (TDE, Client-side encryption, data-masking, connection encryption and many more) </li> <li>Disabling deprecated TLS 1.0 and 1.1 across the board </li> <li> Diagnostics storage Encryption </li>  <li>and many more... </li></ul>
+|Conforming to compliance standards from get-go|<ul> <li> PCI DSS 3.2 compliance from the outset. Please have your QSA review the conformance to your specific Auditing and Implementation standards </li> </ul>
+|Integration            |<ul> <li>Azure Active Directory Integration </li> <li>Standardized Azure native Monitoring </li>  </ul>
 
 ##  2. Reference Architecture Solution Template Overview
 ***Solution Templates*** provide customers with a highly automated process to launch enterprise ready first and 3rd party ISV solution stacks on Azure in a pre-production environment. These fully baked stacks enable customers to quickly stand up a PoC or Piloting environments and also integrate it with their systems and customization.
@@ -128,8 +140,16 @@ The deployment takes about approximately 45mins. Once it is deployed there are f
 
 You can use [this detailed guide](documents/DeploymentGuide.docx) to configure the components in the solution.
 
+## 9. Management & Operations
+**Operations Dashboard**
 
-## 9. Support
+<nbsp/><nbsp/> ![[] (images/OMS_Workspace_and_Solutions.png)](images/OMS_Workspace_and_Solutions.png)
+
+**SSL Verification**
+
+<nbsp/><nbsp/> ![[] (images/SSL_Gateway.png)](images/SSL_Gateway.png)
+
+## 10. Support
 For any support-related issues or questions, please contact us for assistance.
 ```sh
 azurecompliance@avyanconsulting.com
