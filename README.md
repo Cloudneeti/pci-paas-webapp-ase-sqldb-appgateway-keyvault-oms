@@ -135,6 +135,12 @@ You can click the "deploy to Azure" button at the beginning of this document or 
 ***Please refer to parameter descriptions if you need more information on what needs to be provided as an input.***
 The deployment takes about approximately 45mins. Once it is deployed there are few minor manual steps to 
 
+Deployment Parallalization is acheived through ARM templates dependencies pipeline.
+An example deployment timeline is depicted here
+
+<nbsp/><nbsp/> ![[] (images/ARM_template_deployment_timeline.png)](images/ARM_template_deployment_timeline.png)
+
+
 ## 8. Configuration
 ### 8.1 Configuration Guides
 
