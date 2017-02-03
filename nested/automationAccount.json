@@ -119,7 +119,6 @@
         "businessUnit": "[parameters('tagvalues').businessUnit]"
       },
       "dependsOn": [
-        //"[concat('Microsoft.OperationalInsights/workspaces/', parameters('omsWorkspaceName'))]"
       ],
       "properties": {
         "mode": "Incremental",

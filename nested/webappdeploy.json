@@ -2,19 +2,6 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "administratorLogin": {
-      "type": "string",
-      "defaultValue": "adminLogin",
-      "metadata": {
-        "description": "The account name to use for the database server administrator (high-privileged)."
-      }
-    },
-    "administratorLoginPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password to use for the database server administrator."
-      }
-    },
     "AadLoginUser": {
       "type": "string",
       "metadata": {
@@ -122,22 +109,6 @@
         }
       },
       "resources": [
-        {
-          "apiVersion": "2015-08-01",
-          "type": "config",
-          "name": "appsettings",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('siteName'))]"
-          ],
-          "properties": {
-            "administratorLogin": "[parameters('administratorLogin')]",
-            "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
-            "AadLoginUser": "[parameters('AadLoginUser')]",
-            "AadLoginPassword": "[parameters('AadLoginPassword')]",
-            "applicationADID": "[parameters('ClientId')]",
-            "applicationADSecret": "[parameters('ActiveDirectoryAppSecret')]"
-          }
-        },
         {
           "apiVersion": "2015-08-01",
           "type": "config",
@@ -249,6 +220,19 @@
           },
           "properties": {
             "packageUri": "[parameters('packageURI')]"
+          }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "type": "config",
+          "name": "appsettings",
+          "dependsOn": [
+            "[concat('Microsoft.Web/sites/', parameters('siteName'))]",
+            "MSDeploy"
+          ],
+          "properties": {
+            "applicationADID": "[parameters('ClientId')]",
+            "applicationADSecret": "[parameters('ActiveDirectoryAppSecret')]"
           }
         }
       ]
