@@ -15,8 +15,6 @@ $subscriptionName = 'Visual Studio Enterprise' # Pass Subscription Name we used 
 $ArtifactssubscriptionName = 'Cloudly Dev Visual Studio' # Pass Artifacts Subscription Name
 $KeyVaultName= 'kv-pcisamples-taer4k4q' # Pass Key Vault Created through ARM template
 
-$cloudwiseAppServiceURL = ""          # this is the Unique URL of the Cloudwise App Service deployed by the ARM script. e.g. "http://localcloudniti.sunilklive.onmicrosoft.com"
-$suffix =               ""     #-- Name of the company/deployment. This is used to create a unique website name in your organization. e.g. "MSFT - "
 # ==========================================================================
 $DatabaseName = "ContosoClinicDB"
 $StorageName = "stgpcipaasreleases"

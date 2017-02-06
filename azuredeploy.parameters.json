@@ -1,0 +1,40 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocationSasToken": { "value": "" },
+    "userObjectID": {
+      "value": ""
+    },
+    "ApplicationObjectId": {
+      "value": ""
+    },
+    "certData": {
+      "value": "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"
+    },
+    "certPassword": {
+      "value": "password"
+    },
+    "bastionHostAdministratorPassword": {
+      "value": "GEN-PASSWORD"
+    },
+    "sqlAdministratorLoginPassword": {
+      "value": "GEN-PASSWORD"
+    },
+    "ClientId": {
+      "value": ""
+    },
+    "ActiveDirectoryAppSecret": {
+      "value": "ZbeZtNJbXKal3vpg6QLfEO8ybq5fQ6mA5QA7mkDfm8k="
+    },
+    "automationAccountName": {
+      "value": "automation-pci-oms"
+    },
+    "AadLoginUser": {
+      "value": "<global ad user emailid>"
+    },
+    "AadLoginPassword": {
+      "value": "GEN-PASSWORD"
+    }
+  }
+}

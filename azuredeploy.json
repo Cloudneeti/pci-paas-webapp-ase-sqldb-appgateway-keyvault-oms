@@ -158,7 +158,7 @@
       "layer": "dummy",
       "environment": "Pilot",
       "projectname": "PCI PaaS Reference Architecture",
-      "dataprofile": "CPNI",
+      "dataprofile": "PHI(Protected Health Information)",
       "department": "IT - Avyan Consulting",
       "businessUnit": "Cloud - IT COE"
     }
@@ -323,7 +323,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"            
           ],
           "apiVersion": "2015-07-01",
           "properties": {
