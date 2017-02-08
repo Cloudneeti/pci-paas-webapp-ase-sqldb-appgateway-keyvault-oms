@@ -9,7 +9,6 @@
 </a>
 
 
-
 <!-- TOC -->
 
 - [1. Solution Overview](#1-solution-overview)
@@ -38,12 +37,12 @@ An integrated ARM Template (<a href="https://azure.microsoft.com/en-us/documenta
 Customers want
 
 |Features	            |Some Examples from the Solution
-|------                 |------- 
+|:------                |:------- 
 |Resources on-demand    |<ul> <li> Azure Resource Manager based Templatized Solution  </li> </ul>
 |DevOps Manageability   |<ul> <li> Infrastructure as code </li>  <li> Bastion Host VM for Releases and other management tasks tat can't be done over DMZ network </li> <li> Operations Management Suite and associated solutions</li>  <li>Runbook Automation </li></ul>
 |Solution Scalability   |<ul> <li>Azure PaaS familiarity and Scale </li> <li>Solution can be easily extended for multi-region deployments </li> <li> Each layer can be scaled out appropriately </li> </ul>
 |Built-in Security      | <ul> <li> End-point protection using SSL  </li> <li> Network segmentation based on service roles</li> <li> DMZ and firewalls </li> <li>End-to-end encryption</li> <li>Active Directory Role Based Access </li> <li>Database Encryption features (TDE, Client-side encryption, data-masking, connection encryption and many more) </li> <li>Disabling deprecated TLS 1.0 and 1.1 across the board </li> <li> Diagnostics storage Encryption </li>  <li>and many more... </li></ul>
-|Conforming to compliance standards from get-go|<ul> <li> PCI DSS 3.2 compliance from the outset. Please have your QSA review the conformance to your specific Auditing and Implementation standards </li> </ul>
+|Conforming to compliance standards from get-go|<ul> <li> PCI DSS 3.2 compliance from the outset.<p/> ☛ Please have your QSA review the conformance to your specific Auditing and Implementation standards </li> </ul>
 |Integration            |<ul> <li>Azure Active Directory Integration </li> <li>Standardized Azure native Monitoring </li>  </ul>
 
 ##  2. Reference Architecture Solution Template Overview

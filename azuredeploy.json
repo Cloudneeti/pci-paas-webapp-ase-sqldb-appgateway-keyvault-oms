@@ -19,13 +19,13 @@
     "userObjectID": {
       "type": "string",
       "metadata": {
-        "description": "Provide User Object Id"
+        "description": "Provide User Object Id.Get it from Pre Deployment script output"
       }
     },
     "ApplicationObjectId": {
       "type": "string",
       "metadata": {
-        "description": "Provide User Object Id"
+        "description": "Provide Application Object Id.Get it from Pre Deployment script output"
       }
     },
     "certData": {
@@ -54,7 +54,6 @@
     },
     "emailAddresses": {
       "type": "string",
-      "defaultValue": "mca.lakshman@gmail.com",
       "metadata": {
         "description": "Email Address"
       }
@@ -68,19 +67,19 @@
     "AadLoginPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The account name to use for the application's connections to the database server (low-privileged)."
+        "description": "The account password to use for the application's connections to the database server (low-privileged)."
       }
     },
     "ClientId": {
       "type": "string",
       "metadata": {
-        "description": "The application ID within AAD; See the Generate Application ID and Secret Step in the readme"
+        "description": "Provide Application Client Id.Get it from Pre Deployment script output"
       }
     },
     "ActiveDirectoryAppSecret": {
       "type": "securestring",
       "metadata": {
-        "description": "The application's secret to allow access to AKV"
+        "description": "Provide Application Client Secret.Get it from Pre Deployment script output"
       }
     },
     "automationAccountName": {
@@ -119,8 +118,8 @@
     "aseLocation": "East US",
     "virtualNetworkName": "vNet-pci-paas",
     "keyVaultName": "[substring(concat('kv-pcisamples','-',uniquestring(resourceGroup().id)),0,22)]",
-    "bastionHostAdministrator": "testuser",
-    "sqlAdministratorLogin": "testuser",
+    "bastionHostAdministrator": "bastionadmin",
+    "sqlAdministratorLogin": "sqladmin",
     "ipSslAddressCount": 0,
     "frontEndSize": "Medium",
     "frontEndCount": 2,
@@ -158,7 +157,7 @@
       "layer": "dummy",
       "environment": "Pilot",
       "projectname": "PCI PaaS Reference Architecture",
-      "dataprofile": "CPNI",
+      "dataprofile": "PHI(Protected Health Information)",
       "department": "IT - Avyan Consulting",
       "businessUnit": "Cloud - IT COE"
     }
@@ -323,7 +322,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"            
           ],
           "apiVersion": "2015-07-01",
           "properties": {
@@ -770,7 +769,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('ASENSGGroupName'))]"
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('ASENSGGroupName'))]"            
           ],
           "apiVersion": "2015-07-01",
           "properties": {
