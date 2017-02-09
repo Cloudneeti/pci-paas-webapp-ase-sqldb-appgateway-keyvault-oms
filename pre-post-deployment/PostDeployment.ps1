@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Param(
     [string] [Parameter(Mandatory=$true)] $ResourceGroupName,# Provide Resource Group Name Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $ServerName, # Provide Sql Server name (not required full name) Created through ARM template
@@ -9,26 +8,6 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $subscriptionName,# Provide your Azure subscription
 	[string] [Parameter(Mandatory=$true)] $KeyVaultName# Provide Key Vault Name Created through ARM template
 )
-=======
-#
-# PostDeployment.ps1
-#
-$ResourceGroupName = "01-pci-paas-automation" # Provide Resource Group Name Created through ARM template
-$ServerName = "sqlserver-taer4k4qg5zfa" # Provide only Server name not full name
-$userId = "testuser" # Provide user id of sql server
-$sqlPassword = "PartnerSolutions123" # Provide password of sql server
-$cmkName = "CMK1" # Provide Any Name
-$cekName = "CEK1" # Provide Any Name
-$keyName = "CMK1" # Provide Any Name
-$ClientIPAddress = "168.62.48.129"  # Provide Client IP address
-$ASEOutboundAddress = "13.90.43.202" # Provide ASE Outbound address, we will get it ASE properties in Azure portal
-$ADAdministrator = "globaladmin@sunilklive.onmicrosoft.com" # Pass AD Administrator, same we used for ARM Deployment
-$subscriptionName = 'Visual Studio Enterprise' # Pass Subscription Name we used to create ARM Deployment
-$ArtifactssubscriptionName = 'Cloudly Dev Visual Studio' # Pass Artifacts Subscription Name
-$KeyVaultName= 'kv-pcisamples-taer4k4q' # Pass Key Vault Created through ARM template
-
-# ==========================================================================
->>>>>>> origin/master
 $DatabaseName = "ContosoClinicDB"
 $StorageName = "stgpcipaasreleases"
 $StorageKeyType = "StorageAccessKey"
@@ -131,11 +110,7 @@ foreach($resourceType in $resourceTypes)
 
 # End OMS Diagnostics
 
-<<<<<<< HEAD
 Read-Host -Prompt "The script executed. Press enter to exists."
-=======
-
->>>>>>> origin/master
 
 
 
