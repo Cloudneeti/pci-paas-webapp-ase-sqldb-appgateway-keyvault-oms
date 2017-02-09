@@ -16,18 +16,6 @@
         "description": "Reserved for deploying using Visual Studio. Please keep it as an empty string"
       }
     },
-    "userObjectID": {
-      "type": "string",
-      "metadata": {
-        "description": "Provide User Object Id.Get it from Pre Deployment script output"
-      }
-    },
-    "ApplicationObjectId": {
-      "type": "string",
-      "metadata": {
-        "description": "Provide Application Object Id.Get it from Pre Deployment script output"
-      }
-    },
     "certData": {
       "type": "string",
       "metadata": {
@@ -52,34 +40,10 @@
         "description": "The password to use for the database server administrator."
       }
     },
-    "emailAddresses": {
+    "SqlNotificationEmailAddress": {
       "type": "string",
       "metadata": {
-        "description": "Email Address"
-      }
-    },
-    "AadLoginUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The account name to use for the application's connections to the database server (low-privileged)."
-      }
-    },
-    "AadLoginPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The account password to use for the application's connections to the database server (low-privileged)."
-      }
-    },
-    "ClientId": {
-      "type": "string",
-      "metadata": {
-        "description": "Provide Application Client Id.Get it from Pre Deployment script output"
-      }
-    },
-    "ActiveDirectoryAppSecret": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Provide Application Client Secret.Get it from Pre Deployment script output"
+        "description": "Provide Email Address to send Sql Notifications"
       }
     },
     "automationAccountName": {
@@ -94,7 +58,44 @@
       "metadata": {
         "description": "Provide the Custom Host Name."
       }
+    },
+    "AzureADApplicationClientID": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide Azure AD Application Client ID.Get it from Pre Deployment script output"
+      }
+    },
+    "AzureADApplicationClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Provide Azure AD Application Client Secret.Get it from Pre Deployment script output"
+      }
+    },
+    "AzureADApplicationObjectID": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide Azure AD Application Object ID.Get it from Pre Deployment script output"
+      }
+    },
+    "AzureADAdminUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "The AD User Name to use for the application's connections to the database server."
+      }
+    },
+    "AzureADAdminUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The AD User password to use for the application's connections to the database server."
+      }
+    },
+    "AzureADUserObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide Azure AD User Object Id.Get it from Pre Deployment script output"
+      }
     }
+
   },
   "variables": {
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
@@ -123,11 +124,11 @@
     "ipSslAddressCount": 0,
     "frontEndSize": "Medium",
     "frontEndCount": 2,
-    "workerPoolOneInstanceSize": "Small",
+    "workerPoolOneInstanceSize": "Large",
     "workerPoolOneInstanceCount": 2,
     "workerPoolTwoInstanceSize": "Small",
     "workerPoolTwoInstanceCount": 0,
-    "workerPoolThreeInstanceSize": "Large",
+    "workerPoolThreeInstanceSize": "Small",
     "workerPoolThreeInstanceCount": 0,
     "skuName": "WAF_Medium",
     "capacity": 1,
@@ -181,10 +182,10 @@
             "value": "[variables('keyVaultName')]"
           },
           "userObjectID": {
-            "value": "[parameters('userObjectID')]"
+            "value": "[parameters('AzureADUserObjectId')]"
           },
           "ApplicationObjectId": {
-            "value": "[parameters('ApplicationObjectId')]"
+            "value": "[parameters('AzureADApplicationObjectID')]"
           },
           "storageAccountName": {
             "value": "[variables('storageAccountDiagnostics')]"
@@ -558,8 +559,8 @@
           "networkSecurityGroupName": { "value": "[variables('BASTIONNSGGroupName')]" },
           "diagnosticsStorageAccountName": { "value": "[variables('storageAccountDiagnostics')]" },
           "omsworkspaceName": { "value": "[variables('omsWorkspaceName')]" },
-          "aadClientID": { "value": "[parameters('ClientId')]" },
-          "aadClientSecret": { "value": "[parameters('ActiveDirectoryAppSecret')]" },
+          "aadClientID": { "value": "[parameters('AzureADApplicationClientID')]" },
+          "aadClientSecret": { "value": "[parameters('AzureADApplicationClientSecret')]" },
           "keyVaultName": { "value": "[variables('keyVaultName')]" },
           "tagvalues": { "value": "[variables('tagvalues')]" }
         }
@@ -595,7 +596,7 @@
             "value": "[variables('sqlFirewallIPs')]"
           },
           "emailAddresses": {
-            "value": "[parameters('emailAddresses')]"
+            "value": "[parameters('SqlNotificationEmailAddress')]"
           }
         }
       }
@@ -617,10 +618,10 @@
         },
         "parameters": {
           "AadLoginUser": {
-            "value": "[parameters('AadLoginUser')]"
+            "value": "[parameters('AzureADAdminUserName')]"
           },
           "AadLoginPassword": {
-            "value": "[parameters('AadLoginPassword')]"
+            "value": "[parameters('AzureADAdminUserPassword')]"
           },
           "siteName": {
             "value": "[variables('webSiteName')]"
@@ -629,10 +630,10 @@
             "value": "[variables('aseLocation')]"
           },
           "ClientId": {
-            "value": "[parameters('ClientId')]"
+            "value": "[parameters('AzureADApplicationClientID')]"
           },
           "ActiveDirectoryAppSecret": {
-            "value": "[parameters('ActiveDirectoryAppSecret')]"
+            "value": "[parameters('AzureADApplicationClientSecret')]"
           },
           "aseName": {
             "value": "[variables('aseName')]"
