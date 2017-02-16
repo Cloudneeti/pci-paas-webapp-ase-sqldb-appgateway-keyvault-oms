@@ -2,7 +2,7 @@ Param(
     [string] [Parameter(Mandatory=$true)] $ResourceGroupName, # Provide Resource Group Name Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $SQLServerName, # Provide Sql Server name (not required full name) Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $sqlPassword, # Provide password of sql server
-	[string] [Parameter(Mandatory=$true)] $ClientIPAddress, # Provide Client IP address (get by running ipconfig in cmd prompt)
+	[string] [Parameter(Mandatory=$true)] $ClientIPAddress, # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
 	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress, # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
 	[string] [Parameter(Mandatory=$true)] $SQLADAdministrator, # Provide SQL AD Administrator Name, same we used for ARM Deployment
 	[string] [Parameter(Mandatory=$true)] $subscriptionName, # Provide your Azure subscription
@@ -34,7 +34,7 @@ Catch [System.Management.Automation.PSInvalidOperationException]
 {  
     Login-AzureRmAccount  -SubscriptionName $ArtifactssubscriptionName
 } 
-$subscriptionId = (Get-AzureRmSubscription -SubscriptionName $subscriptionName).SubscriptionId
+$subscriptionId = (Get-AzureRmSubscription -SubscriptionName $ArtifactssubscriptionName).SubscriptionId
 Set-AzureRmContext -SubscriptionId $subscriptionId
 
 
@@ -45,7 +45,8 @@ $PWord = ConvertTo-SecureString -String $sqlPassword -AsPlainText -Force
 
 $credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $sqluserId, $PWord
 
-
+$subscriptionId = (Get-AzureRmSubscription -SubscriptionName $subscriptionName).SubscriptionId
+Set-AzureRmContext -SubscriptionId $subscriptionId
 
 ########################
 Write-Host "SQL Server Updates" -foreground Yellow 

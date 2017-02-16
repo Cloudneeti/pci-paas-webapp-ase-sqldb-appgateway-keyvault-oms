@@ -5,11 +5,14 @@ Param(
 )
 
 ###
-#Imp: This script need to run by Global Administrator 
+#Imp: This script needs to be run by Global AD Administrator (aka Company Administrator)
 ###
+Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Red
 
 $SQLADAdminName = "sqladmin@$azureADDomainName"
 $TestUserName = "user@$azureADDomainName"
+
+Write-Host ("Step 1: Create Azure Active Directory users,  SQLAdmin = " + $SQLADAdminName + " and Test User=" + $TestUserName ) -ForegroundColor Gray
 
 Connect-MsolService
 $cloudwiseAppServiceURL = "http://localcloudneeti6i.$azureADDomainName"
@@ -29,6 +32,7 @@ if ($testUserObjectId -eq $null)
 }
 
 #------------------------------
+Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
 Set-Location ".\"
 $AzureADApplicationClientSecret =        "Password@123" 
 $WebSiteName =         ("cloudwise" + $suffix)
@@ -49,7 +53,7 @@ $displayName =         ($suffix + "Azure PCI PAAS Sample")
 $sub = Get-AzureRmSubscription –SubscriptionName $subscriptionName | Select-AzureRmSubscription 
 
 ### 2. Create Azure Active Directory apps in default directory
-Write-Host ("Step 2: Create Azure Active Directory apps in default directory") -ForegroundColor Gray
+Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -ForegroundColor Gray
     $u = (Get-AzureRmContext).Account
     $u1 = ($u -split '@')[0]
     $u2 = ($u -split '@')[1]
@@ -61,23 +65,25 @@ Write-Host ("Step 2: Create Azure Active Directory apps in default directory") -
     $replyURLs = @( $cloudwiseAppServiceURL, "http://*.azurewebsites.net","http://localhost:62080", "http://localhost:3026/")
     # Create Active Directory Application
     $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $AzureADApplicationClientSecret -ReplyUrls $replyURLs
-    Write-Host ("Step 2.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Gray
+    Write-Host ("`tStep 3.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Gray
 
 ### 3. Create a service principal for the AD Application and add a Reader role to the principal
 
-    Write-Host ("Step 3: Attempting to create Service Principal") -ForegroundColor Gray
+    Write-Host ("`tStep 3.2: Attempting to create Service Principal") -ForegroundColor Gray
     $principal = New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication.ApplicationId
     Start-Sleep -s 30 # Wait till the ServicePrincipal is completely created. Usually takes 20+secs. Needed as Role assignment needs a fully deployed servicePrincipal
-    Write-Host ("Step 3.1: Service Principal creation successful - " + $principal.DisplayName) -ForegroundColor Gray
+    Write-Host ("`tStep 3.3: Service Principal creation successful - " + $principal.DisplayName) -ForegroundColor Gray
     $scopedSubs = ("/subscriptions/" + $sub.Subscription)
-    Write-Host ("Step 3.2: Attempting Reader Role assignment" ) -ForegroundColor Gray
+    Write-Host ("`tStep 3.4: Attempting Reader Role assignment" ) -ForegroundColor Gray
     New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId.Guid -Scope $scopedSubs
-    Write-Host ("Step 3.2: Reader Role assignment successful" ) -ForegroundColor Gray
+    Write-Host ("`tStep 3.5: Reader Role assignment successful" ) -ForegroundColor Gray
 
 
 ### 4. Print out the required project settings parameters
 #############################################################################################
 $AzureADApplicationObjectID = (Get-AzureRmADServicePrincipal -ServicePrincipalName $azureAdApplication.ApplicationId).Id
+
+Write-Host -Prompt "Start copy all the values from below here." -ForegroundColor Yellow
 
 Write-Host ("Parameters to be used in the registration / configuration.") -foreground Green
 Write-Host "Azure AD Application Client ID: " -foreground Green –NoNewLine
@@ -111,4 +117,6 @@ Write-Host ("`t 3) Key Vault ") -foreground Yellow
 Write-Host ("`t 4) Microsoft Graph API ") -foreground Yellow
 Write-Host ("see README.md for details") -foreground Yellow
 
-Read-Host -Prompt "The script executed. Copy all the values above."
+Write-Host -Prompt "End copy all the values from below here." -ForegroundColor Yellow
+
+Read-Host -Prompt "The script completed execution. Press any key to exit"
