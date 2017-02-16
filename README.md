@@ -62,7 +62,7 @@ Here's the Gartner's reference
 
 **Disclaimer:**
 > This solution is intended as a pilot and is not production ready.
-> Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurepcisamples@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
+> Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
 
 
 This template is currently going through a review with Microsoft's security and compliance team and post review will be updated with changes.
@@ -156,7 +156,18 @@ You can use [this detailed guide](documents/DeploymentGuide.docx) to configure t
 <nbsp/><nbsp/> ![[] (images/SSL_Gateway.png)](images/SSL_Gateway.png)
 
 ## 10. Support
+
+> **Disclaimer**  
+> As stated above, these template are only for pilots or tryouts. There are many things that will need to retrofitted for production purposes. Please work with your Microsoft rep or reach out to us for consultations  
+> **e.g**. Configurations for Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions,Key vault rotation policies, existing AD App and ServicePrincipals and many more.
+
+
+To report issues, please use the GitHub Issues listing
+
+> Report Issues <a href="https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/issues" target="_blank">**here**</a>
+> 
+
+
 For any support-related issues or questions, please contact us for assistance.
-```sh
-azurecompliance@avyanconsulting.com
-```
+
+> <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>

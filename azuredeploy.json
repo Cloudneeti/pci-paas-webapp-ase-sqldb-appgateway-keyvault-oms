@@ -77,22 +77,16 @@
         "description": "Provide Azure AD Application Object ID.Get it from Pre Deployment script output"
       }
     },
-    "AzureADAdminUserName": {
+    "SQLADAdminUserName": {
       "type": "string",
       "metadata": {
         "description": "The AD User Name to use for the application's connections to the database server."
       }
     },
-    "AzureADAdminUserPassword": {
+    "SQLADAdminUserPassword": {
       "type": "securestring",
       "metadata": {
         "description": "The AD User password to use for the application's connections to the database server."
-      }
-    },
-    "AzureADUserObjectId": {
-      "type": "string",
-      "metadata": {
-        "description": "Provide Azure AD User Object Id.Get it from Pre Deployment script output"
       }
     }
 
@@ -117,7 +111,7 @@
     "ASEbackendVirtualIP": "[concat(variables('ASEsubnetbaseAddress'),'.8')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
-    "virtualNetworkName": "vNet-pci-paas",
+    "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
     "keyVaultName": "[substring(concat('kv-pcisamples','-',uniquestring(resourceGroup().id)),0,22)]",
     "bastionHostAdministrator": "bastionadmin",
     "sqlAdministratorLogin": "sqladmin",
@@ -180,9 +174,6 @@
         "parameters": {
           "keyVaultName": {
             "value": "[variables('keyVaultName')]"
-          },
-          "userObjectID": {
-            "value": "[parameters('AzureADUserObjectId')]"
           },
           "ApplicationObjectId": {
             "value": "[parameters('AzureADApplicationObjectID')]"
@@ -618,10 +609,10 @@
         },
         "parameters": {
           "AadLoginUser": {
-            "value": "[parameters('AzureADAdminUserName')]"
+            "value": "[parameters('SQLADAdminUserName')]"
           },
           "AadLoginPassword": {
-            "value": "[parameters('AzureADAdminUserPassword')]"
+            "value": "[parameters('SQLADAdminUserPassword')]"
           },
           "siteName": {
             "value": "[variables('webSiteName')]"
@@ -800,13 +791,5 @@
     }
   ],
   "outputs": {
-    "fqdn": {
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).dnsSettings.fqdn]",
-      "type": "string"
-    },
-    "gatewayIpAddress": {
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).ipAddress]",
-      "type": "string"
-    }
   }
 }

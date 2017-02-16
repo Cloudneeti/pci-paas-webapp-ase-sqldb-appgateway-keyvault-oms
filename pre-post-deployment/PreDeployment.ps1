@@ -8,34 +8,31 @@ Param(
 #Imp: This script need to run by Global Administrator 
 ###
 
-$azureADAdministratorID = "adadmin@$azureADDomainName"
-$sqlAdminID = "sqladmin@$azureADDomainName"
-$testUserID = "user1@$azureADDomainName"
+$SQLADAdminName = "sqladmin@$azureADDomainName"
+$TestUserName = "user@$azureADDomainName"
 
 Connect-MsolService
 $cloudwiseAppServiceURL = "http://localcloudneeti6i.$azureADDomainName"
-$AdUserExists = Get-MsolUser -UserPrincipalName $azureADAdministratorID -ErrorAction SilentlyContinue -ErrorVariable errorVariable
-if ($AdUserExists -eq $null)  
+$sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+if ($sqlADAdminObjectId -eq $null)  
 {    
-    $AdUserdetails=New-MsolUser -UserPrincipalName $azureADAdministratorID -DisplayName "AD Administrator PCI Samples" -FirstName "AD Administrator" -LastName "PCI Samples"
-	$AdUserdetails
+    $sqlADAdminDetails = New-MsolUser -UserPrincipalName $SQLADAdminName -DisplayName "SQLADAdministrator PCI Samples" -FirstName "SQL AD Administrator" -LastName "PCI Samples"
+	$sqlADAdminObjectId= $sqlADAdminDetails.ObjectID
+
+	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
 }
-$SQLUserExists = Get-MsolUser -UserPrincipalName $sqlAdminID -ErrorAction SilentlyContinue -ErrorVariable errorVariable
-if ($SQLUserExists -eq $null)  
+$testUserObjectId = (Get-MsolUser -UserPrincipalName $TestUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+if ($testUserObjectId -eq $null)  
 {    
-    New-MsolUser -UserPrincipalName $sqlAdminID -DisplayName "SQLAdministrator PCI Samples" -FirstName "SQL Administrator" -LastName "PCI Samples"
-}
-$AdminUserExists = Get-MsolUser -UserPrincipalName $testUserID -ErrorAction SilentlyContinue -ErrorVariable errorVariable
-if ($AdminUserExists -eq $null)  
-{    
-    New-MsolUser -UserPrincipalName $testUserID -DisplayName "Test User PCI Samples" -FirstName "Test User" -LastName "PCI Samples"
+    $testUserDetails = New-MsolUser -UserPrincipalName $TestUserName -DisplayName "Test User PCI Samples" -FirstName "Test User" -LastName "PCI Samples"
+	$testUserObjectId= $testUserDetails.ObjectID
 }
 
 #------------------------------
 Set-Location ".\"
-$passwordADApp =        "Password@123" 
-$Web1SiteName =         ("cloudwise" + $suffix)
-$displayName1 =         ($suffix + "Azure PCI PAAS Sample")
+$AzureADApplicationClientSecret =        "Password@123" 
+$WebSiteName =         ("cloudwise" + $suffix)
+$displayName =         ($suffix + "Azure PCI PAAS Sample")
 # To login to Azure Resource Manager
 	Try  
 	{  
@@ -63,53 +60,38 @@ Write-Host ("Step 2: Create Azure Active Directory apps in default directory") -
     $homePageURL = ("http://" + $defaultPrincipal + "azurewebsites.net" + "/" + $Web1SiteName)
     $replyURLs = @( $cloudwiseAppServiceURL, "http://*.azurewebsites.net","http://localhost:62080", "http://localhost:3026/")
     # Create Active Directory Application
-    $azureAdApplication1 = New-AzureRmADApplication -DisplayName $displayName1 -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $passwordADApp -ReplyUrls $replyURLs
-    Write-Host ("Step 2.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication1.ApplicationId) -ForegroundColor Gray
+    $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $AzureADApplicationClientSecret -ReplyUrls $replyURLs
+    Write-Host ("Step 2.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Gray
 
 ### 3. Create a service principal for the AD Application and add a Reader role to the principal
 
     Write-Host ("Step 3: Attempting to create Service Principal") -ForegroundColor Gray
-    $principal = New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication1.ApplicationId
+    $principal = New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication.ApplicationId
     Start-Sleep -s 30 # Wait till the ServicePrincipal is completely created. Usually takes 20+secs. Needed as Role assignment needs a fully deployed servicePrincipal
     Write-Host ("Step 3.1: Service Principal creation successful - " + $principal.DisplayName) -ForegroundColor Gray
     $scopedSubs = ("/subscriptions/" + $sub.Subscription)
     Write-Host ("Step 3.2: Attempting Reader Role assignment" ) -ForegroundColor Gray
-    New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication1.ApplicationId.Guid -Scope $scopedSubs
+    New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId.Guid -Scope $scopedSubs
     Write-Host ("Step 3.2: Reader Role assignment successful" ) -ForegroundColor Gray
 
 
 ### 4. Print out the required project settings parameters
 #############################################################################################
-$ADAdminObjectId = (Get-AzureRmADUser -UserPrincipalName $azureADAdministratorID).id
-$SQLAdminObjectId = (Get-AzureRmADUser -UserPrincipalName $sqlAdminID).id
-$AdminUserObjectId = (Get-AzureRmADUser -UserPrincipalName $testUserID).id
-$ApplicationObjectId = (Get-AzureRmADServicePrincipal -ServicePrincipalName $azureAdApplication1.ApplicationId) 
+$AzureADApplicationObjectID = (Get-AzureRmADServicePrincipal -ServicePrincipalName $azureAdApplication.ApplicationId).Id
 
-Write-Host ("AD Application Details:") -foreground Green
-$azureAdApplication1
 Write-Host ("Parameters to be used in the registration / configuration.") -foreground Green
-
 Write-Host "Azure AD Application Client ID: " -foreground Green –NoNewLine
-Write-Host $azureAdApplication1.ApplicationId -foreground Red 
+Write-Host $azureAdApplication.ApplicationId -foreground Red 
 Write-Host "Azure AD Application Client Secret: " -foreground Green –NoNewLine
-Write-Host $passwordADApp -foreground Red 
+Write-Host $AzureADApplicationClientSecret -foreground Red 
 Write-Host "Azure AD Application Object ID: " -foreground Green –NoNewLine
-Write-Host $ApplicationObjectId.Id -foreground Red 
-Write-Host "Created or Updated Users in Active Directory " -foreground Green –NoNewLine
-Write-Host ("`t" + $azureADAdministratorID) -foreground Red 
-Write-Host ("`t" + $sqlAdminID) -foreground Red 
-Write-Host ("`t" + $testUserID) -foreground Red 
-Write-Host "Azure AD Admin User Name: " -foreground Green –NoNewLine
-Write-Host $azureADAdministratorID -foreground Red 
-Write-Host "Azure AD Admin User Password: " -foreground Green –NoNewLine
-Write-Host $AdUserdetails.password -foreground Red 
+Write-Host $AzureADApplicationObjectID -foreground Red 
+Write-Host "SQL AD Admin Name: " -foreground Green –NoNewLine
+Write-Host $SQLADAdminName -foreground Red 
+Write-Host "SQL AD Admin Password:(If user already exists then we have to get password manually) " -foreground Green –NoNewLine
+Write-Host $sqlADAdminDetails.password -foreground Red 
 Write-Host "Azure AD User Object Id: " -foreground Green –NoNewLine
-Write-Host $AdminUserObjectId -foreground Red 
-Write-Host "Azure AD Admin Object Id: " -foreground Green –NoNewLine
-Write-Host $ADAdminObjectId -foreground Red 
-Write-Host "Azure AD SQL Object Id: " -foreground Green –NoNewLine
-Write-Host $SQLAdminObjectId -foreground Red 
-
+Write-Host $testUserObjectId -foreground Red 
 
 
 Write-Host "PostLogoutRedirectUri: " -foreground Green –NoNewLine

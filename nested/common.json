@@ -52,9 +52,6 @@
     "tagvalues": {
       "type": "object"
     },
-    "userObjectID": {
-      "type": "string"
-    },
     "ApplicationObjectId": {
       "type": "string"
     }
@@ -120,14 +117,6 @@
             "permissions": {
               "keys": "[variables('appKeysPermissions')]",
               "secrets": "[variables('appSecretPermissions')]"
-            }
-          },
-          {
-            "tenantId": "[subscription().TenantId]",
-            "objectId": "[parameters('userObjectID')]",
-            "permissions": {
-              "keys": "[variables('userKeysPermissions')]",
-              "secrets": "[variables('userSecretPermissions')]"
             }
           }
         ],

@@ -30,15 +30,11 @@
     "AzureADApplicationObjectID": {
       "value": "<Provide AD Application Object ID>"
     },
-    "AzureADAdminUserName": {
-      "value": "<Provide AD Admin User Name>"
+    "SQLADAdminUserName": {
+      "value": "<Provide SQL AD Admin User Name>"
     },
-    "AzureADAdminUserPassword": {
+    "SQLADAdminUserPassword": {
       "value": "GEN-PASSWORD"
-    },
-    "AzureADUserObjectId": {
-      "value": "<Provide AD User Object ID>"
     }
-
   }
 }
