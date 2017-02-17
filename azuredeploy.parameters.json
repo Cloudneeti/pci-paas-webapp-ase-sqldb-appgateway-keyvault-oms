@@ -2,14 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "_artifactsLocationSasToken": {
+
+    "certData": {
       "value": ""
     },
-    "certData": {
-      "value": "CHANGEME"
-    },
     "certPassword": {
-      "value": "GEN-PASSWORD"
+      "value": ""
     },
     "bastionHostAdministratorPassword": {
       "value": "GEN-PASSWORD"
@@ -24,13 +22,13 @@
       "value": "AUTOMATION-PCI-OMS"
     },
     "AzureADApplicationClientID": {
-      "value": "changeme"
+      "value": ""
     },
     "AzureADApplicationClientSecret": {
       "value": "GEN-PASSWORD"
     },
     "AzureADApplicationObjectID": {
-      "value": "changeme"
+      "value": ""
     },
     "SQLADAdminUserName": {
       "value": "sqladmin"
