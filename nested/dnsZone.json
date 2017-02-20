@@ -9,19 +9,19 @@
         "description": "The name of the DNS zone to be created.  Must have at least 2 segements, e.g. hostname.org"
       }
     },
-    "aseVirtualIp": {
+    "aseVirtualIP": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
         "description": "The VIP of ASE."
       }
     },
-    "tagValues": {
+    "tagvalues": {
       "type": "object"
     }
   },
   "variables": {
-    "hostNames": [
+    "hostnames": [
       "*",
       "ftp",
       "*.scm",
@@ -37,21 +37,21 @@
       "properties": {},
       "tags": {
         "layer": "management",
-        "environment": "[parameters('tagValues').environment]",
-        "projectname": "[parameters('tagValues').projectname]",
-        "dataprofile": "[parameters('tagValues').dataprofile]",
-        "department": "[parameters('tagValues').department]",
-        "businessUnit": "[parameters('tagValues').businessUnit]"
+        "environment": "[parameters('tagvalues').environment]",
+        "projectname": "[parameters('tagvalues').projectname]",
+        "dataprofile": "[parameters('tagvalues').dataprofile]",
+        "department": "[parameters('tagvalues').department]",
+        "businessUnit": "[parameters('tagvalues').businessUnit]"
       }
     },
     {
       "type": "Microsoft.Network/dnszones/A",
-      "name": "[concat(parameters('newZoneName'), '/', variables('hostNames')[copyIndex()])]",
+      "name": "[concat(parameters('newZoneName'), '/', variables('hostnames')[copyIndex()])]",
       "apiVersion": "2016-04-01",
       "location": "global",
       "copy": {
         "name": "ARecordsCopy",
-        "count": "[length(variables('hostNames'))]"
+        "count": "[length(variables('hostnames'))]"
       },
       "dependsOn": [
         "[parameters('newZoneName')]"
@@ -60,7 +60,7 @@
         "TTL": 900,
         "ARecords": [
           {
-            "ipv4Address": "[parameters('aseVirtualIp')]"
+            "ipv4Address": "[parameters('aseVirtualIP')]"
           }
 
         ]

@@ -55,7 +55,7 @@
         "description": "Location of the existing Automation Account."
       }
     },
-    "tagValues": {
+    "tagvalues": {
       "type": "object"
     }
 
@@ -76,6 +76,7 @@
     "scheduleRunbookTemplateFileName": "[concat(parameters('_artifactsLocation'),'/deployRunbookOnSchedule.json')]",
     "runonceJobSchedulerName": "runoncescheduleingestion",
     "sku": "Basic",
+
     "psModules": {
       "AzureRmProfile": {
         "Name": "AzureRm.Profile",
@@ -111,11 +112,11 @@
       "location": "[parameters('automationRegion')]",
       "tags": {
         "layer": "management",
-        "environment": "[parameters('tagValues').environment]",
-        "projectname": "[parameters('tagValues').projectname]",
-        "dataprofile": "[parameters('tagValues').dataprofile]",
-        "department": "[parameters('tagValues').department]",
-        "businessUnit": "[parameters('tagValues').businessUnit]"
+        "environment": "[parameters('tagvalues').environment]",
+        "projectname": "[parameters('tagvalues').projectname]",
+        "dataprofile": "[parameters('tagvalues').dataprofile]",
+        "department": "[parameters('tagvalues').department]",
+        "businessUnit": "[parameters('tagvalues').businessUnit]"
       },
       "dependsOn": [
       ],
@@ -155,14 +156,6 @@
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'))]"
           ],
-          "tags": {
-            "layer": "management",
-            "environment": "[parameters('tagValues').environment]",
-            "projectname": "[parameters('tagValues').projectname]",
-            "dataprofile": "[parameters('tagValues').dataprofile]",
-            "department": "[parameters('tagValues').department]",
-            "businessUnit": "[parameters('tagValues').businessUnit]"
-          },
           "properties": {
             "runbookType": "PowerShell",
             "logProgress": "false",
@@ -182,14 +175,6 @@
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'))]"
           ],
-          "tags": {
-            "layer": "management",
-            "environment": "[parameters('tagValues').environment]",
-            "projectname": "[parameters('tagValues').projectname]",
-            "dataprofile": "[parameters('tagValues').dataprofile]",
-            "department": "[parameters('tagValues').department]",
-            "businessUnit": "[parameters('tagValues').businessUnit]"
-          },
           "properties": {
             "runbookType": "PowerShell",
             "logProgress": "false",
@@ -375,14 +360,6 @@
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'))]"
           ],
-          "tags": {
-            "layer": "management",
-            "environment": "[parameters('tagValues').environment]",
-            "projectname": "[parameters('tagValues').projectname]",
-            "dataprofile": "[parameters('tagValues').dataprofile]",
-            "department": "[parameters('tagValues').department]",
-            "businessUnit": "[parameters('tagValues').businessUnit]"
-          },
           "properties": {
             "runbookType": "PowerShell",
             "logProgress": "false",

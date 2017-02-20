@@ -40,7 +40,7 @@
         "description": "The password to use for the database server administrator."
       }
     },
-    "sqlNotificationEmailAddress": {
+    "SqlNotificationEmailAddress": {
       "type": "string",
       "metadata": {
         "description": "Provide Email Address to send Sql Notifications"
@@ -59,31 +59,31 @@
         "description": "Provide the Custom Host Name."
       }
     },
-    "azureAdApplicationClientId": {
+    "AzureADApplicationClientID": {
       "type": "string",
       "metadata": {
         "description": "Provide Azure AD Application Client ID.Get it from Pre Deployment script output"
       }
     },
-    "azureAdApplicationClientSecret": {
+    "AzureADApplicationClientSecret": {
       "type": "securestring",
       "metadata": {
         "description": "Provide Azure AD Application Client Secret.Get it from Pre Deployment script output"
       }
     },
-    "azureAdApplicationObjectId": {
+    "AzureADApplicationObjectID": {
       "type": "string",
       "metadata": {
         "description": "Provide Azure AD Application Object ID.Get it from Pre Deployment script output"
       }
     },
-    "sqlAdAdminUserName": {
+    "SQLADAdminUserName": {
       "type": "string",
       "metadata": {
         "description": "The AD User Name to use for the application's connections to the database server."
       }
     },
-    "sqlAdAdminUserPassword": {
+    "SQLADAdminUserPassword": {
       "type": "securestring",
       "metadata": {
         "description": "The AD User password to use for the application's connections to the database server."
@@ -94,21 +94,21 @@
   "variables": {
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
     "storageAccountPreRelease": "stgpcipaasreleases",
-    "webContainerName": "pci-paas-web-container",
-    "webPackageName": "ContosoClinic.zip",
-    "publicIpAddressName": "publicIp-AppGateway",
-    "aseNsgGroupName": "nsg-ASE",
-    "wafNsgGroupName": "nsg-WAF-Gateway",
-    "bastionNsgGroupName": "nsg-bastionVM",
-    "wafSubnetName": "subnet-WAF-Gateway",
-    "bastionSubnetName": "subnet-Bastion",
-    "asesubnetName": "subnet-ASE",
+    "WebContainerName": "pci-paas-web-container",
+    "WebPackageName": "ContosoClinic.zip",
+    "publicIPAddressName": "publicIp-AppGateway",
+    "ASENSGGroupName": "nsg-ASE",
+    "WAFNSGGroupName": "nsg-WAF-Gateway",
+    "BASTIONNSGGroupName": "nsg-bastionVM",
+    "WAFsubnetName": "subnet-WAF-Gateway",
+    "BastionSubnetName": "subnet-Bastion",
+    "ASEsubnetName": "subnet-ASE",
     "addressPrefix": "10.0.0.0/16",
-    "wafSubnetAddressPrefix": "10.0.1.0/24",
-    "bastionSubnetAddressPrefix": "10.0.2.0/24",
-    "aseSubnetBaseAddress": "10.0.3",
-    "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
-    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
+    "WAFsubnetAddressPrefix": "10.0.1.0/24",
+    "BASTIONsubnetAddressPrefix": "10.0.2.0/24",
+    "ASEsubnetbaseAddress": "10.0.3",
+    "ASEsubnetAddressPrefix": "[concat(variables('ASEsubnetbaseAddress'),'.0','/24')]",
+    "ASEbackendVirtualIP": "[concat(variables('ASEsubnetbaseAddress'),'.8')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -128,27 +128,27 @@
     "capacity": 1,
     "automationRegion": "East US 2",
     "omsRegion": "East US",
-    "sqlFirewallIps": {
-      "startIp": "[concat(variables('aseSubnetBaseAddress'), '.1')]",
-      "endIp": "[concat(variables('aseSubnetBaseAddress'), '.255')]"
+    "sqlFirewallIPs": {
+      "startIP": "[concat(variables('ASEsubnetbaseAddress'), '.1')]",
+      "endIP": "[concat(variables('ASEsubnetbaseAddress'), '.255')]"
     },
     "webSiteName": "[concat('webapp', '-pciwebapp')]",
-    "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('webContainerName'),'/',variables('webPackageName'))]",
-    "rootTemplateFolder": "PCI-PAAS",
-    "nestedTemplateFolder": "nested",
-    "aseTemplateFileName": "asedeploy.json",
-    "gatewayTemplateFileName": "appgatewaydeploy.json",
-    "sqlServerTemplateFileName": "sqlserverdeploy.json",
+    "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('WebContainerName'),'/',variables('WebPackageName'))]",
+    "RootTemplateFolder": "PCI-PAAS",
+    "NestedTemplateFolder": "nested",
+    "ASETemplateFileName": "asedeploy.json",
+    "GatewayTemplateFileName": "appgatewaydeploy.json",
+    "SQLServerTemplateFileName": "sqlserverdeploy.json",
     "commonTemplateFileName": "common.json",
-    "webAppTemplateFileName": "webappdeploy.json",
-    "vmBastionTemplateFileName": "vmBastion.json",
+    "WebAppTemplateFileName": "webappdeploy.json",
+    "VMBastionTemplateFileName": "vmBastion.json",
     "dnsTemplateFileName": "dnsZone.json",
-    "newZoneName": "azurepcisamples.com",
-    "omsTemplateFileName": "omsworkspace.json",
+    "NewZoneName": "azurepcisamples.com",
+    "OMSTemplateFileName": "omsworkspace.json",
     "omsWorkspaceName": "[concat('oms-WS-pci-paas-', uniqueString(resourceGroup().id))]",
-    "omsSolutionsTemplateFileName": "omsSolutions.json",
-    "automationAccountTemplateFileName": "automationAccount.json",
-    "tagValues": {
+    "OMSSolutionsTemplateFileName": "omsSolutions.json",
+    "AutomationAccountTemplateFileName": "automationAccount.json",
+    "tagvalues": {
       "layer": "dummy",
       "environment": "Pilot",
       "projectname": "PCI PaaS Reference Architecture",
@@ -168,7 +168,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('commonTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('commonTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -176,7 +176,7 @@
             "value": "[variables('keyVaultName')]"
           },
           "ApplicationObjectId": {
-            "value": "[parameters('azureAdApplicationObjectId')]"
+            "value": "[parameters('AzureADApplicationObjectID')]"
           },
           "storageAccountName": {
             "value": "[variables('storageAccountDiagnostics')]"
@@ -184,8 +184,8 @@
           "omsWorkspaceName": {
             "value": "[variables('omsWorkspaceName')]"
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           }
 
         }
@@ -194,15 +194,15 @@
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIpAddressName')]",
+      "name": "[variables('publicIPAddressName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "layer": "DMZ",
-        "environment": "[variables('tagValues').environment]",
-        "projectname": "[variables('tagValues').projectname]",
-        "dataprofile": "[variables('tagValues').dataprofile]",
-        "department": "[variables('tagValues').department]",
-        "businessUnit": "[variables('tagValues').businessUnit]"
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -212,18 +212,18 @@
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('wafNsgGroupName')]",
+      "name": "[variables('WAFNSGGroupName')]",
       "dependsOn": [
         "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
       ],
       "location": "[resourceGroup().location]",
       "tags": {
         "layer": "DMZ",
-        "environment": "[variables('tagValues').environment]",
-        "projectname": "[variables('tagValues').projectname]",
-        "dataprofile": "[variables('tagValues').dataprofile]",
-        "department": "[variables('tagValues').department]",
-        "businessUnit": "[variables('tagValues').businessUnit]"
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
       },
       "properties": {
         "securityRules": [
@@ -248,7 +248,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('wafNsgGroupName'))]"
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('WAFNSGGroupName'))]"
           ],
           "apiVersion": "2015-07-01",
           "properties": {
@@ -279,18 +279,18 @@
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('bastionNsgGroupName')]",
+      "name": "[variables('BASTIONNSGGroupName')]",
       "dependsOn": [
         "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
       ],
       "location": "[resourceGroup().location]",
       "tags": {
         "layer": "front-end",
-        "environment": "[variables('tagValues').environment]",
-        "projectname": "[variables('tagValues').projectname]",
-        "dataprofile": "[variables('tagValues').dataprofile]",
-        "department": "[variables('tagValues').department]",
-        "businessUnit": "[variables('tagValues').businessUnit]"
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
       },
       "properties": {
         "securityRules": [
@@ -314,7 +314,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNsgGroupName'))]"            
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"            
           ],
           "apiVersion": "2015-07-01",
           "properties": {
@@ -347,16 +347,16 @@
       "apiVersion": "2016-03-30",
       "location": "[variables('aseLocation')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('wafNsgGroupName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('bastionNsgGroupName'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('WAFNSGGroupName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('BASTIONNSGGroupName'))]"
       ],
       "tags": {
         "layer": "network",
-        "environment": "[variables('tagValues').environment]",
-        "projectname": "[variables('tagValues').projectname]",
-        "dataprofile": "[variables('tagValues').dataprofile]",
-        "department": "[variables('tagValues').department]",
-        "businessUnit": "[variables('tagValues').businessUnit]"
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
       },
       "properties": {
         "mode": "Incremental",
@@ -367,23 +367,23 @@
         },
         "subnets": [
           {
-            "name": "[variables('wafSubnetName')]",
+            "name": "[variables('WAFsubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('wafSubnetAddressPrefix')]"
+              "addressPrefix": "[variables('WAFsubnetAddressPrefix')]"
             }
           },
           {
-            "name": "[variables('asesubnetName')]",
+            "name": "[variables('ASEsubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('aseSubnetAddressPrefix')]"
+              "addressPrefix": "[variables('ASEsubnetAddressPrefix')]"
             }
           },
           {
-            "name": "[variables('bastionSubnetName')]",
+            "name": "[variables('BastionSubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('bastionSubnetAddressPrefix')]",
+              "addressPrefix": "[variables('BASTIONsubnetAddressPrefix')]",
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNsgGroupName'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('BASTIONNSGGroupName'))]"
               }
             }
           }
@@ -396,22 +396,22 @@
       "type": "Microsoft.Resources/deployments",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'deploy-CommonInfrastructure')]"
       ],
       "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('gatewayTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('GatewayTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
           },
-          "publicIpAddressName": {
-            "value": "[variables('publicIpAddressName')]"
+          "publicIPAddressName": {
+            "value": "[variables('publicIPAddressName')]"
           },
           "storageAccountName": {
             "value": "[variables('storageAccountDiagnostics')]"
@@ -423,7 +423,7 @@
             "value": "[variables('capacity')]"
           },
           "backendIpAddress1": {
-            "value": "[variables('aseBackendVirtualIp')]"
+            "value": "[variables('ASEbackendVirtualIP')]"
           },
           "certData": {
             "value": "[parameters('certData')]"
@@ -431,14 +431,14 @@
           "certPassword": {
             "value": "[parameters('certPassword')]"
           },
-          "wafSubnetName": {
-            "value": "[variables('wafSubnetName')]"
+          "WAFsubnetName": {
+            "value": "[variables('WAFsubnetName')]"
           },
           "customprobeHostName": {
             "value": "[concat(variables('webSiteName'),'.ase.azurepcisamples.com' )]"
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           }
         }
       }
@@ -453,7 +453,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('aseTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('ASETemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -472,8 +472,8 @@
           "existingVnetResourceId": {
             "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
           },
-          "asesubnetName": {
-            "value": "[variables('asesubnetName')]"
+          "ASEsubnetName": {
+            "value": "[variables('ASEsubnetName')]"
           },
           "frontEndSize": {
             "value": "[variables('frontEndSize')]"
@@ -499,11 +499,11 @@
           "workerPoolThreeInstanceCount": {
             "value": "[variables('workerPoolThreeInstanceCount')]"
           },
-          "aseSubnetAddressPrefix": {
-            "value": "[variables('aseSubnetAddressPrefix')]"
+          "ASEsubnetAddressPrefix": {
+            "value": "[variables('ASEsubnetAddressPrefix')]"
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           }
         }
       }
@@ -517,13 +517,13 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('dnsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('dnsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "newZoneName": { "value": "[variables('NewZoneName')]" },
-          "aseVirtualIP": { "value": "[variables('aseBackendVirtualIp')]" },
-          "tagValues": { "value": "[variables('tagValues')]" }
+          "aseVirtualIP": { "value": "[variables('ASEbackendVirtualIP')]" },
+          "tagvalues": { "value": "[variables('tagvalues')]" }
         }
       }
     },
@@ -538,7 +538,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('vmBastionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('VMBastionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -546,14 +546,14 @@
           "adminPassword": { "value": "[parameters('bastionHostAdministratorPassword')]" },
           "dnsLabelPrefix": { "value": "[concat('pcisamples',uniqueString(resourceGroup().id))]" },
           "virtualNetworkName": { "value": "[variables('virtualNetworkName')]" },
-          "subnetName": { "value": "[variables('bastionSubnetName')]" },
-          "networkSecurityGroupName": { "value": "[variables('bastionNsgGroupName')]" },
+          "subnetName": { "value": "[variables('BastionSubnetName')]" },
+          "networkSecurityGroupName": { "value": "[variables('BASTIONNSGGroupName')]" },
           "diagnosticsStorageAccountName": { "value": "[variables('storageAccountDiagnostics')]" },
-          "omsWorkspaceName": { "value": "[variables('omsWorkspaceName')]" },
-          "aadClientID": { "value": "[parameters('azureAdApplicationClientId')]" },
-          "aadClientSecret": { "value": "[parameters('azureAdApplicationClientSecret')]" },
+          "omsworkspaceName": { "value": "[variables('omsWorkspaceName')]" },
+          "aadClientID": { "value": "[parameters('AzureADApplicationClientID')]" },
+          "aadClientSecret": { "value": "[parameters('AzureADApplicationClientSecret')]" },
           "keyVaultName": { "value": "[variables('keyVaultName')]" },
-          "tagValues": { "value": "[variables('tagValues')]" }
+          "tagvalues": { "value": "[variables('tagvalues')]" }
         }
       }
     },
@@ -567,7 +567,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('sqlServerTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('SQLServerTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -577,17 +577,17 @@
           "administratorLoginPassword": {
             "value": "[parameters('sqlAdministratorLoginPassword')]"
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           },
           "storageAccountDiagnostics": {
             "value": "[variables('storageAccountDiagnostics')]"
           },
           "firewallIPs": {
-            "value": "[variables('sqlFirewallIps')]"
+            "value": "[variables('sqlFirewallIPs')]"
           },
           "emailAddresses": {
-            "value": "[parameters('sqlNotificationEmailAddress')]"
+            "value": "[parameters('SqlNotificationEmailAddress')]"
           }
         }
       }
@@ -604,15 +604,15 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('webAppTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('WebAppTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "AadLoginUser": {
-            "value": "[parameters('sqlAdAdminUserName')]"
+            "value": "[parameters('SQLADAdminUserName')]"
           },
           "AadLoginPassword": {
-            "value": "[parameters('sqlAdAdminUserPassword')]"
+            "value": "[parameters('SQLADAdminUserPassword')]"
           },
           "siteName": {
             "value": "[variables('webSiteName')]"
@@ -621,16 +621,16 @@
             "value": "[variables('aseLocation')]"
           },
           "ClientId": {
-            "value": "[parameters('azureAdApplicationClientId')]"
+            "value": "[parameters('AzureADApplicationClientID')]"
           },
           "ActiveDirectoryAppSecret": {
-            "value": "[parameters('azureAdApplicationClientSecret')]"
+            "value": "[parameters('AzureADApplicationClientSecret')]"
           },
           "aseName": {
             "value": "[variables('aseName')]"
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           },
           "storageAccountDiagnostics": {
             "value": "[variables('storageAccountDiagnostics')]"
@@ -652,7 +652,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('omsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('OMSTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -684,8 +684,8 @@
               "Security"
             ]
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           }
         }
       }
@@ -700,7 +700,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('automationAccountTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('NestedTemplateFolder'), '/', variables('AutomationAccountTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -729,8 +729,8 @@
           "omsworkspaceRegion": {
             "value": "[variables('omsRegion')]"
           },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
+          "tagvalues": {
+            "value": "[variables('tagvalues')]"
           }
         }
       }
@@ -738,18 +738,18 @@
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('aseNsgGroupName')]",
+      "name": "[variables('ASENSGGroupName')]",
       "dependsOn": [
         "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]"
       ],
       "location": "[resourceGroup().location]",
       "tags": {
         "layer": "front-end",
-        "environment": "[variables('tagValues').environment]",
-        "projectname": "[variables('tagValues').projectname]",
-        "dataprofile": "[variables('tagValues').dataprofile]",
-        "department": "[variables('tagValues').department]",
-        "businessUnit": "[variables('tagValues').businessUnit]"
+        "environment": "[variables('tagvalues').environment]",
+        "projectname": "[variables('tagvalues').projectname]",
+        "dataprofile": "[variables('tagvalues').dataprofile]",
+        "department": "[variables('tagvalues').department]",
+        "businessUnit": "[variables('tagvalues').businessUnit]"
       },
       "properties": {
         "mode": "Incremental",
@@ -761,7 +761,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aseNsgGroupName'))]"            
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('ASENSGGroupName'))]"            
           ],
           "apiVersion": "2015-07-01",
           "properties": {

@@ -2,10 +2,10 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "workSpaceName": {
+    "workspaceName": {
       "type": "string",
       "metadata": {
-        "description": "workSpaceName"
+        "description": "workspaceName"
       }
     },
     "serviceTier": {
@@ -28,7 +28,7 @@
         "Australia Southeast"
       ]
     },
-    "resourceGroupName": {
+    "resourcegroupName": {
       "defaultValue": "",
       "type": "string"
     },
@@ -40,7 +40,7 @@
       "defaultValue": [],
       "type": "array"
     },
-    "tagValues": {
+    "tagvalues": {
       "type": "object"
     }
   },
@@ -51,15 +51,15 @@
     {
       "apiVersion": "2015-11-01-preview",
       "type": "Microsoft.OperationalInsights/workspaces",
-      "name": "[parameters('workSpaceName')]",
+      "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
       "tags": {
         "layer": "management",
-        "environment": "[parameters('tagValues').environment]",
-        "projectname": "[parameters('tagValues').projectname]",
-        "dataprofile": "[parameters('tagValues').dataprofile]",
-        "department": "[parameters('tagValues').department]",
-        "businessUnit": "[parameters('tagValues').businessUnit]"
+        "environment": "[parameters('tagvalues').environment]",
+        "projectname": "[parameters('tagvalues').projectname]",
+        "dataprofile": "[parameters('tagvalues').dataprofile]",
+        "department": "[parameters('tagvalues').department]",
+        "businessUnit": "[parameters('tagvalues').businessUnit]"
       },
       "properties": {
         "sku": {
@@ -68,12 +68,12 @@
       }
     },
     {
-      "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourceGroupName'), '/providers/Microsoft.OperationsManagement/solutions/', parameters('solutionTypes')[copyIndex()], '(', parameters('workSpaceName'), ')')]",
+      "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroupName'), '/providers/Microsoft.OperationsManagement/solutions/', parameters('solutionTypes')[copyIndex()], '(', parameters('workspaceName'), ')')]",
       "type": "Microsoft.OperationsManagement/solutions",
-      "name": "[concat(parameters('solutionTypes')[copyIndex()], '(', parameters('workSpaceName'), ')')]",
+      "name": "[concat(parameters('solutionTypes')[copyIndex()], '(', parameters('workspaceName'), ')')]",
       "apiVersion": "2015-11-01-preview",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces', '/' , parameters('workSpaceName'))]"
+        "[concat('Microsoft.OperationalInsights/workspaces', '/' , parameters('workspaceName'))]"
       ],
       "location": "[parameters('location')]",
       "copy": {
@@ -81,54 +81,54 @@
         "count": "[length(parameters('solutionTypes'))]"
       },
       "plan": {
-        "name": "[concat(parameters('solutionTypes')[copyIndex()], '(', parameters('workSpaceName'), ')')]",
+        "name": "[concat(parameters('solutionTypes')[copyIndex()], '(', parameters('workspaceName'), ')')]",
         "product": "[concat('OMSGallery/', parameters('solutionTypes')[copyIndex()])]",
         "promotionCode": "",
         "publisher": "Microsoft"
       },
       "properties": {
-        "workspaceResourceId": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workSpaceName'))]"
+        "workspaceResourceId": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       },
       "tags": {
         "layer": "management",
-        "environment": "[parameters('tagValues').environment]",
-        "projectname": "[parameters('tagValues').projectname]",
-        "dataprofile": "[parameters('tagValues').dataprofile]",
-        "department": "[parameters('tagValues').department]",
-        "businessUnit": "[parameters('tagValues').businessUnit]"
+        "environment": "[parameters('tagvalues').environment]",
+        "projectname": "[parameters('tagvalues').projectname]",
+        "dataprofile": "[parameters('tagvalues').dataprofile]",
+        "department": "[parameters('tagvalues').department]",
+        "businessUnit": "[parameters('tagvalues').businessUnit]"
       }
     },
     {
-      "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workSpaceName'), '/datasources/', parameters('subscriptionId'))]",
+      "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourcegroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'), '/datasources/', parameters('subscriptionId'))]",
       "type": "Microsoft.OperationalInsights/workspaces/datasources",
       "kind": "AzureActivityLog",
-      "name": "[concat(parameters('workSpaceName'), '/', parameters('subscriptionId'))]",
+      "name": "[concat(parameters('workspaceName'), '/', parameters('subscriptionId'))]",
       "apiVersion": "2015-11-01-preview",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces', '/' , parameters('workSpaceName'))]"
+        "[concat('Microsoft.OperationalInsights/workspaces', '/' , parameters('workspaceName'))]"
       ],
       "properties": {
         "linkedResourceId": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/microsoft.insights/eventTypes/management')]"
       },
       "tags": {
         "layer": "management",
-        "environment": "[parameters('tagValues').environment]",
-        "projectname": "[parameters('tagValues').projectname]",
-        "dataprofile": "[parameters('tagValues').dataprofile]",
-        "department": "[parameters('tagValues').department]",
-        "businessUnit": "[parameters('tagValues').businessUnit]"
+        "environment": "[parameters('tagvalues').environment]",
+        "projectname": "[parameters('tagvalues').projectname]",
+        "dataprofile": "[parameters('tagvalues').dataprofile]",
+        "department": "[parameters('tagvalues').department]",
+        "businessUnit": "[parameters('tagvalues').businessUnit]"
       }
     }
   ],
 
   "outputs": {
     "sharedKeyOutput": {
-      "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workSpaceName')), '2015-03-20').primarySharedKey]",
+      "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-03-20').primarySharedKey]",
       "type": "string"
     },
     "workspaceIdOutput": {
-      "value": "[reference(concat('Microsoft.OperationalInsights/workspaces/', parameters('workSpaceName')), '2015-03-20').customerId]",
+      "value": "[reference(concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-03-20').customerId]",
       "type": "string"
     }
   }

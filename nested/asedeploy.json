@@ -33,7 +33,7 @@
         "description": "ARM URI reference for the virtual network that will contain the ASE.  Use Microsoft.Network for ARM vnets.  Use Microsoft.ClassicNetwork for older ASM vnets.  /subscriptions/subIDGoesHere/resourceGroups/rgNameGoesHere/providers/Microsoft.Network/virtualNetworks/vnetnamegoeshere"
       }
     },
-    "aseSubnetName": {
+    "ASEsubnetName": {
       "type": "string",
       "metadata": {
         "description": "ASE Subnet"
@@ -94,13 +94,13 @@
         "description": "Number of instances in worker pool three.  Can be zero if not using worker pool three."
       }
     },
-    "aseSubnetAddressPrefix": {
+    "ASEsubnetAddressPrefix": {
       "type": "string",
       "metadata": {
         "description": "ASE Subnet Address Prefix"
       }
     },
-    "tagValues": {
+    "tagvalues": {
       "type": "object"
     }
   },
@@ -110,10 +110,10 @@
     {
       "comments": "recreate the subnet or else the ASE deploy does not complete",
       "type": "Microsoft.Network/virtualNetworks/subnets",
-      "name": "[concat(parameters('existingVnetName'), '/', parameters('aseSubnetName'))]",
+      "name": "[concat(parameters('existingVnetName'), '/', parameters('ASEsubnetName'))]",
       "apiVersion": "2016-06-01",
       "properties": {
-        "addressPrefix": "[parameters('aseSubnetAddressPrefix')]"
+        "addressPrefix": "[parameters('ASEsubnetAddressPrefix')]"
       }
     },
     {
@@ -122,15 +122,15 @@
       "name": "[parameters('aseName')]",
       "location": "[parameters('aseLocation')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('existingVnetName'), '/subnets/', parameters('aseSubnetName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('existingVnetName'), '/subnets/', parameters('ASEsubnetName'))]"
       ],
       "tags": {
         "layer": "front-end",
-        "environment": "[parameters('tagValues').environment]",
-        "projectname": "[parameters('tagValues').projectname]",
-        "dataprofile": "[parameters('tagValues').dataprofile]",
-        "department": "[parameters('tagValues').department]",
-        "businessUnit": "[parameters('tagValues').businessUnit]"
+        "environment": "[parameters('tagvalues').environment]",
+        "projectname": "[parameters('tagvalues').projectname]",
+        "dataprofile": "[parameters('tagvalues').dataprofile]",
+        "department": "[parameters('tagvalues').department]",
+        "businessUnit": "[parameters('tagvalues').businessUnit]"
       },
       "properties": {
         "name": "[parameters('aseName')]",
@@ -142,7 +142,7 @@
         "virtualNetwork": {
           "Id": "[parameters('existingVnetResourceId')]",
           "type": "Microsoft.Network/virtualNetworks",
-          "Subnet": "[parameters('aseSubnetName')]"
+          "Subnet": "[parameters('ASEsubnetName')]"
         },
         "multiSize": "[parameters('frontEndSize')]",
         "multiRoleCount": "[parameters('frontEndCount')]",

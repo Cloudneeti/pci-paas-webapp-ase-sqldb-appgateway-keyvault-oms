@@ -2,12 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-
+    "_artifactsLocationSasToken": { "value": "" },
     "certData": {
-      "value": ""
+      "value": "<Provide Cert Data>"
     },
     "certPassword": {
-      "value": ""
+      "value": "GEN-PASSWORD"
     },
     "bastionHostAdministratorPassword": {
       "value": "GEN-PASSWORD"
@@ -15,25 +15,25 @@
     "sqlAdministratorLoginPassword": {
       "value": "GEN-PASSWORD"
     },
-    "sqlNotificationEmailAddress": {
-      "value": "changeme"
+    "SqlNotificationEmailAddress": {
+      "value": "<Provide Email Address>"
     },
     "automationAccountName": {
-      "value": "AUTOMATION-PCI-OMS"
+      "value": "<Provide Automation Account Name>"
     },
-    "azureAdApplicationClientId": {
-      "value": ""
+    "AzureADApplicationClientID": {
+      "value": "<Provide AD Application Client ID>"
     },
-    "azureAdApplicationClientSecret": {
+    "AzureADApplicationClientSecret": {
       "value": "GEN-PASSWORD"
     },
-    "azureAdApplicationObjectId": {
-      "value": ""
+    "AzureADApplicationObjectID": {
+      "value": "<Provide AD Application Object ID>"
     },
-    "sqlAdAdminUserName": {
-      "value": "sqladmin"
+    "SQLADAdminUserName": {
+      "value": "<Provide SQL AD Admin User Name>"
     },
-    "sqlAdAdminUserPassword": {
+    "SQLADAdminUserPassword": {
       "value": "GEN-PASSWORD"
     }
   }
