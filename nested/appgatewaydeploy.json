@@ -25,6 +25,12 @@
         "description": "IP Address for Backend Server 1"
       }
     },
+    "backendIpAddress2": {
+      "type": "string",
+      "metadata": {
+        "description": "IP Address for Backend Server 2"
+      }
+    },
     "certData": {
       "type": "string",
       "metadata": {
@@ -136,6 +142,9 @@
               "BackendAddresses": [
                 {
                   "IpAddress": "[parameters('backendIpAddress1')]"
+                },
+                {
+                  "IpAddress": "[parameters('backendIpAddress2')]"
                 }
               ]
             }
