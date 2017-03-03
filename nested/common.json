@@ -108,6 +108,7 @@
         "businessUnit": "[parameters('tagValues').businessUnit]"
       },
       "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts', '/', parameters('storageAccountName'))]"
       ],
       "properties": {
         "accessPolicies": [
