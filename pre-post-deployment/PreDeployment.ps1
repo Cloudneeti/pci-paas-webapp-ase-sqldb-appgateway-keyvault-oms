@@ -45,7 +45,7 @@ $displayName =         ($suffix + "Azure PCI PAAS Sample")
 	Catch [System.Management.Automation.PSInvalidOperationException]  
 	{  
 		 #Add-AzureRmAccount 
-		Login-AzureRmAccount -SubscriptionID $subscriptionID
+		Login-AzureRmAccount -SubscriptionId $subscriptionID
 	} 
 
 # To select a default subscription for your current session
