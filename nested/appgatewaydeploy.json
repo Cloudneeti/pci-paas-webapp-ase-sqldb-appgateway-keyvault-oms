@@ -274,7 +274,7 @@
                 "category": "ApplicationGatewayAccessLog",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": 2,
                   "enabled": true
                 }
               },
@@ -282,7 +282,7 @@
                 "category": "ApplicationGatewayPerformanceLog",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": 2,
                   "enabled": false
                 }
               },
@@ -290,7 +290,7 @@
                 "category": "ApplicationGatewayFirewallLog",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": 2,
                   "enabled": false
                 }
               }

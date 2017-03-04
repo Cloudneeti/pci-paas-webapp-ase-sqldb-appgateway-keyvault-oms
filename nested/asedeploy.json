@@ -100,6 +100,12 @@
         "description": "ASE Subnet Address Prefix"
       }
     },
+    "customHostName": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide the Custom Host Name."
+      }
+    },
     "tagValues": {
       "type": "object"
     }
@@ -138,7 +144,7 @@
         "location": "[parameters('aseLocation')]",
         "ipSslAddressCount": "[parameters('ipSslAddressCount')]",
         "internalLoadBalancingMode": "[parameters('internalLoadBalancingMode')]",
-        "dnsSuffix": "ase.azurepcisamples.com",
+        "dnsSuffix": "[concat('ase.', parameters('customHostName'))]",
         "virtualNetwork": {
           "Id": "[parameters('existingVnetResourceId')]",
           "type": "Microsoft.Network/virtualNetworks",

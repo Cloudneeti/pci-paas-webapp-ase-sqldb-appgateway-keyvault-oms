@@ -148,7 +148,7 @@
                 "category": "AuditEvent",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": 2,
                   "enabled": true
                 }
               }

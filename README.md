@@ -1,6 +1,12 @@
 
 <h1> Management and PCI Compliance Reference Architecture for Azure PaaS Line of Business Application </h1>
 
+Your CIO/CTO, have decided to move your business-critical applications and associated infrastructure to Microsoft Azure.
+
+However you are thinking... Although Azure provides compliance to its infrastructure, anything you host on top of it will be your responsibility. Microsoft's Azure compliance status does not automatically translate to the compliant status for the services that you build or host on the Azure platform.
+
+This  Reference Architecture solution is meant to help you accelerate your deployment cycles with conformance to standards.  
+
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
@@ -159,7 +165,7 @@ You can use [this detailed guide](documents/DeploymentGuide.docx) to configure t
 
 > **Disclaimer**  
 > As stated above, these template are only for pilots or tryouts. There are many things that will need to retrofitted for production purposes. Please work with your Microsoft rep or reach out to us for consultations  
-> **e.g**. Configurations for Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions,Key vault rotation policies, existing AD App and ServicePrincipals and many more.
+> **e.g**. Configurations for Custom Host Names, SSL Certs, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions,Key vault rotation policies, existing AD App and ServicePrincipals and many more.
 
 
 To report issues, please use the GitHub Issues listing
