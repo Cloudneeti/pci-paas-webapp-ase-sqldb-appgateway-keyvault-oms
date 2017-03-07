@@ -99,21 +99,25 @@
             "requestedServiceObjectiveName": "[variables('defaultSqlDatabaseSlo')]"
           },
           "resources": [
-
             {
-              "apiVersion": "2014-04-01-preview",
-              "type": "auditingPolicies",
+              "apiVersion": "2015-05-01-preview",
+              "type": "auditingSettings",
               "dependsOn": [
+                "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'))]",
                 "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'))]"
               ],
               "name": "Default",
               "properties": {
-                "auditingState": "Enabled",
+                "state": "Enabled",
+                "storageEndpoint": "[concat('https://',parameters('storageAccountDiagnostics'),'.blob.core.windows.net')]",
                 "storageAccountName": "[parameters('storageAccountDiagnostics')]",
-                "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountDiagnostics')), '2015-05-01-preview').key1]",
+                "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountDiagnostics')), '2015-05-01-preview').key1]",
+                "retentionDays": 2,
+                "auditActionsAndGroups": [ "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP", "DATABASE_LOGOUT_GROUP", "USER_CHANGE_PASSWORD_GROUP" ],
                 "storageAccountResourceGroupName": "[resourceGroup().name]",
                 "storageAccountSubscriptionId": "[subscription().subscriptionId]",
-                "eventTypesToAudit": "Login_Failure,Login_Success,ParameterizedSQL_Failure,ParameterizedSQL_Success,PlainSQL_Failure,PlainSQL_Success,StoredProcedure_Failure,StoredProcedure_Success,TransactionManagement_Failure,TransactionManagement_Success"
+                "eventTypesToAudit": "Login_Failure,Login_Success,ParameterizedSQL_Failure,ParameterizedSQL_Success,PlainSQL_Failure,PlainSQL_Success,StoredProcedure_Failure,StoredProcedure_Success,TransactionManagement_Failure,TransactionManagement_Success",
+                "isStorageSecondaryKeyInUse": false
               }
             },
             {
@@ -122,7 +126,7 @@
               "name": "Default",
               "dependsOn": [
                 "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'))]",
-                "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'),'/auditingPolicies/Default')]"
+                "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'),'/auditingSettings/Default')]"
               ],
               "properties": {
                 "state": "Enabled",
@@ -138,20 +142,53 @@
               "type": "transparentDataEncryption",
               "dependsOn": [
                 "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'))]",
-                "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'),'/auditingPolicies/Default')]",
+                "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'),'/auditingSettings/Default')]",
                 "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'), '/databases/',variables('defaultSqlDatabaseName'),'/securityAlertPolicies/Default')]"
-
               ],
-              "location": null,
+              "location": "[resourceGroup().location]",
               "apiVersion": "2014-04-01",
               "properties": {
                 "status": "Enabled"
               }
             }
           ]
+        },
+        {
+          "apiVersion": "2014-04-01-preview",
+          "type": "firewallrules",
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'))]"
+          ],
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "apiVersion": "2015-05-01-preview",
+          "type": "auditingSettings",
+          "name": "Default",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('defaultSqlServerName'))]"
+          ],
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat('https://',parameters('storageAccountDiagnostics'),'.blob.core.windows.net')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountDiagnostics')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+            "retentionDays": 2,
+            "auditActionsAndGroups": null,
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "isStorageSecondaryKeyInUse": false
+          }
         }
       ]
-    }
+    },
+    
+
+
   ],
   "outputs": {
   }
