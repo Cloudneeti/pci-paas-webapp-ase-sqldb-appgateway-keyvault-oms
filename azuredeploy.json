@@ -276,11 +276,7 @@
                 "category": "NetworkSecurityGroupEvent",
                 "enabled": true,
                 "retentionPolicy": {
-<<<<<<< HEAD
                   "days": "[variables('retentionPolicy')]",
-=======
-                  "days": 2,
->>>>>>> origin/master
                   "enabled": true
                 }
               },
@@ -288,11 +284,7 @@
                 "category": "NetworkSecurityGroupRuleCounter",
                 "enabled": true,
                 "retentionPolicy": {
-<<<<<<< HEAD
                   "days": "[variables('retentionPolicy')]",
-=======
-                  "days": 2,
->>>>>>> origin/master
                   "enabled": false
                 }
               }
@@ -349,11 +341,7 @@
                 "category": "NetworkSecurityGroupEvent",
                 "enabled": true,
                 "retentionPolicy": {
-<<<<<<< HEAD
                   "days": "[variables('retentionPolicy')]",
-=======
-                  "days": 2,
->>>>>>> origin/master
                   "enabled": true
                 }
               },
@@ -361,11 +349,7 @@
                 "category": "NetworkSecurityGroupRuleCounter",
                 "enabled": true,
                 "retentionPolicy": {
-<<<<<<< HEAD
                   "days": "[variables('retentionPolicy')]",
-=======
-                  "days": 2,
->>>>>>> origin/master
                   "enabled": false
                 }
               }
@@ -852,11 +836,7 @@
                 "category": "NetworkSecurityGroupEvent",
                 "enabled": true,
                 "retentionPolicy": {
-<<<<<<< HEAD
                   "days": "[variables('retentionPolicy')]",
-=======
-                  "days": 2,
->>>>>>> origin/master
                   "enabled": true
                 }
               },
@@ -864,11 +844,7 @@
                 "category": "NetworkSecurityGroupRuleCounter",
                 "enabled": true,
                 "retentionPolicy": {
-<<<<<<< HEAD
                   "days": "[variables('retentionPolicy')]",
-=======
-                  "days": 2,
->>>>>>> origin/master
                   "enabled": false
                 }
               }

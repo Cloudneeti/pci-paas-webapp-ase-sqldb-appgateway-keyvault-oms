@@ -119,11 +119,7 @@
                 "storageEndpoint": "[concat('https://',parameters('storageAccountDiagnostics'),'.blob.core.windows.net')]",
                 "storageAccountName": "[parameters('storageAccountDiagnostics')]",
                 "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountDiagnostics')), '2015-05-01-preview').key1]",
-<<<<<<< HEAD
                 "retentionDays": "[parameters('retentionPolicy')]",
-=======
-                "retentionDays": 2,
->>>>>>> origin/master
                 "auditActionsAndGroups": [ "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP", "DATABASE_LOGOUT_GROUP", "USER_CHANGE_PASSWORD_GROUP" ],
                 "storageAccountResourceGroupName": "[resourceGroup().name]",
                 "storageAccountSubscriptionId": "[subscription().subscriptionId]",
@@ -189,24 +185,14 @@
             "State": "Enabled",
             "storageEndpoint": "[concat('https://',parameters('storageAccountDiagnostics'),'.blob.core.windows.net')]",
             "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountDiagnostics')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
-<<<<<<< HEAD
             "retentionDays": "[parameters('retentionPolicy')]",
-=======
-            "retentionDays": 2,
->>>>>>> origin/master
             "auditActionsAndGroups": null,
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "isStorageSecondaryKeyInUse": false
           }
         }
       ]
-<<<<<<< HEAD
     }
-=======
-    },
-    
-
->>>>>>> origin/master
 
   ],
   "outputs": {
