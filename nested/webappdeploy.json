@@ -185,29 +185,6 @@
           ]
         },
         {
-          "apiVersion": "2015-08-01",
-          "type": "Microsoft.Web/sites/hostNameBindings",
-          "name": "[concat(parameters('siteName'), '/',parameters('customHostName'))]",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('siteName'))]"
-          ],
-          "properties": {
-            "siteName": "[parameters('siteName')]"
-          }
-        },
-        {
-          "apiVersion": "2015-08-01",
-          "type": "Microsoft.Web/sites/hostNameBindings",
-          "name": "[concat(parameters('siteName'), '/', 'www.',parameters('customHostName'))]",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('siteName'))]",
-            "[resourceId('Microsoft.Web/sites/hostNameBindings', parameters('siteName'), parameters('customHostName'))]"
-          ],
-          "properties": {
-            "siteName": "[parameters('siteName')]"
-          }
-        },
-        {
           "name": "MSDeploy",
           "type": "extensions",
           "location": "[parameters('location')]",
@@ -222,6 +199,32 @@
             "packageUri": "[parameters('packageURI')]"
           }
         },
+        {
+          "apiVersion": "2015-08-01",
+          "type": "Microsoft.Web/sites/hostNameBindings",
+          "name": "[concat(parameters('siteName'), '/',parameters('customHostName'))]",
+          "dependsOn": [
+            "[concat('Microsoft.Web/sites/', parameters('siteName'))]",
+            "MSDeploy"
+          ],
+          "properties": {
+            "siteName": "[parameters('siteName')]"
+          }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "type": "Microsoft.Web/sites/hostNameBindings",
+          "name": "[concat(parameters('siteName'), '/', 'www.',parameters('customHostName'))]",
+          "dependsOn": [
+            "[concat('Microsoft.Web/sites/', parameters('siteName'))]",
+            "[resourceId('Microsoft.Web/sites/hostNameBindings', parameters('siteName'), parameters('customHostName'))]",
+            "MSDeploy"
+          ],
+          "properties": {
+            "siteName": "[parameters('siteName')]"
+          }
+        },
+
         {
           "apiVersion": "2015-08-01",
           "type": "config",

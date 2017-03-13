@@ -14,7 +14,9 @@ $TestUserName = "user@$azureADDomainName"
 
 Write-Host ("Step 1: Create Azure Active Directory users,  SQLAdmin = " + $SQLADAdminName + " and Test User=" + $TestUserName ) -ForegroundColor Gray
 
+#Connect to the Azure AD
 Connect-MsolService
+
 $cloudwiseAppServiceURL = "http://localcloudneeti6i.$azureADDomainName"
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 if ($sqlADAdminObjectId -eq $null)  
@@ -22,7 +24,11 @@ if ($sqlADAdminObjectId -eq $null)
     $sqlADAdminDetails = New-MsolUser -UserPrincipalName $SQLADAdminName -DisplayName "SQLADAdministrator PCI Samples" -FirstName "SQL AD Administrator" -LastName "PCI Samples"
 	$sqlADAdminObjectId= $sqlADAdminDetails.ObjectID
 
+    # Make the new user a Global AD Administrator
 	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
+
+    # Grant 'SQL AD Admin' access to the Azure subscription
+    New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )
 }
 $testUserObjectId = (Get-MsolUser -UserPrincipalName $TestUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 if ($testUserObjectId -eq $null)  
