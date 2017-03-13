@@ -18,16 +18,32 @@
 
 
 
+#Param(
+#    [string] $ResourceGroupName = '002-pci-paas-guru', # Provide Resource Group Name Created through ARM template
+#	[string] $SQLServerName = 'sqlserver-y3fccbvhoiqws', # Provide Sql Server name (not required full name) Created through ARM template
+#	[string] $sqlAdministratorLoginPassword = 'PartnerSolutions123', # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
+#	[string] $ClientIPAddress = '50.135.7.0', # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
+#	[string] $ASEOutboundAddress = '52.179.124.107', # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
+#	[string] $SQLADAdministrator = 'mca.lakshman@avyanconsulting.com', # Provide SQL AD Administrator Name, same we used for ARM Deployment
+#	[string] $subscriptionId = 'c53e6ef0-cc4c-4a73-be8f-00c5d97812e8', # Provide your Azure subscription ID
+#	[string] $KeyVaultName = 'kv-pcisamples-y3fccbvh', # Provide Key Vault Name Created through ARM template
+#    [string] $azureAdApplicationClientId = '50ca9772-8f2f-49ea-9757-84f46067296f', # AD Application ClientID - the same one you used in the ARM template
+#    [string] $azureAdApplicationClientSecret = 'Password@123' # AD Application ClientID - the same one you used in the ARM template
+#)
+
 Param(
-    [string] [Parameter(Mandatory=$true)] $ResourceGroupName, # Provide Resource Group Name Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $SQLServerName, # Provide Sql Server name (not required full name) Created through ARM template
+    [string] [Parameter(Mandatory=$true)] $ResourceGroupName , # Provide Resource Group Name Created through ARM template
+	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $sqlAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
-	[string] [Parameter(Mandatory=$true)] $ClientIPAddress, # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
-	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress, # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
+	[string] [Parameter(Mandatory=$true)] $ClientIPAddress , # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
+	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress , # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
 	[string] [Parameter(Mandatory=$true)] $SQLADAdministrator, # Provide SQL AD Administrator Name, same we used for ARM Deployment
-	[string] [Parameter(Mandatory=$true)] $subscriptionId, # Provide your Azure subscription ID
-	[string] [Parameter(Mandatory=$true)] $KeyVaultName # Provide Key Vault Name Created through ARM template
+	[string] [Parameter(Mandatory=$true)] $subscriptionId , # Provide your Azure subscription ID
+	[string] [Parameter(Mandatory=$true)] $KeyVaultName , # Provide Key Vault Name Created through ARM template
+   [string] [Parameter(Mandatory=$true)] $azureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
+    [string] [Parameter(Mandatory=$true)] $azureAdApplicationClientSecret # AD Application ClientID - the same one you used in the ARM template
 )
+
 $DatabaseName = "ContosoClinicDB"
 $StorageName = "stgreleases"+$SQLServerName.Substring(0,2).ToLower()
 $StorageKeyType = "StorageAccessKey"
@@ -56,8 +72,8 @@ Catch [System.Management.Automation.PSInvalidOperationException]
 $PWord = ConvertTo-SecureString -String $sqlAdministratorLoginPassword -AsPlainText -Force
 $credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $sqluserId, $PWord
 $subscriptionId = (Get-AzureRmSubscription -SubscriptionId $subscriptionId).SubscriptionId
-Set-AzureRmContext -SubscriptionId $subscriptionId
-$userPrincipalName = (Set-AzureRmContext -SubscriptionId $subscriptionId).Account.Id
+$context = Set-AzureRmContext -SubscriptionId $subscriptionId
+$userPrincipalName = $context.Account.Id
 Invoke-WebRequest https://stgpcipaasreleases.blob.core.windows.net/pci-paas-sql-container/pcidb.bacpac -OutFile $SQLBackupToUpload
 
 
@@ -86,26 +102,26 @@ $StorageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.R
 Write-Host "SQL Server Updates" -foreground Yellow 
 Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Gray
 $clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
-New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress
-New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress
+Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress -ErrorAction Continue} Catch {}
+Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress -ErrorAction Continue} Catch {}
 
 ########################
 Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray
 
-$importRequest = New-AzureRmSqlDatabaseImport -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -StorageKeytype $StorageKeyType -StorageKey $StorageKey -StorageUri $StorageUri -AdministratorLogin $credential.UserName -AdministratorLoginPassword $credential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
-Get-AzureRmSqlDatabaseImportExportStatus -OperationStatusLink $importRequest.OperationStatusLink
-Start-Sleep -s 100
+    $importRequest = New-AzureRmSqlDatabaseImport -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -StorageKeytype $StorageKeyType -StorageKey $StorageKey -StorageUri $StorageUri -AdministratorLogin $credential.UserName -AdministratorLoginPassword $credential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
+    Get-AzureRmSqlDatabaseImportExportStatus -OperationStatusLink $importRequest.OperationStatusLink
+    Start-Sleep -s 100
 
 ########################
 Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Gray
 
 # Start Dynamic Data Masking
-Get-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
-Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -DataMaskingState Enabled
-Get-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
-New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "FirstName" -MaskingFunction Default
-New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "LastName" -MaskingFunction Default
-New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "SSN" -MaskingFunction SocialSecurityNumber 
+    Get-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
+    Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -DataMaskingState Enabled
+    Get-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
+    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "FirstName" -MaskingFunction Default
+    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "LastName" -MaskingFunction Default
+    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "SSN" -MaskingFunction SocialSecurityNumber 
 # End Dynamic Data Masking
 
 
@@ -128,22 +144,40 @@ $connection.Connect()
 $server = New-Object Microsoft.SqlServer.Management.Smo.Server($connection)
 $database = $server.Databases[$databaseName]
 
-Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -UserPrincipalName $userPrincipalName
-Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -PermissionsToSecrets all
-Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -UserPrincipalName $SQLADAdministrator
-Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SQLADAdministrator -PermissionsToSecrets all
-$key = (Add-AzureKeyVaultKey -VaultName $KeyVaultName -Name $keyName -Destination 'Software').ID
-$cmkSettings = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyURL $key
 
-New-SqlColumnMasterKey -Name $cmkName -InputObject $database -ColumnMasterKeySettings $cmkSettings
-New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName
+#policy for the UserPrincipal
+    Write-Host ("`tGiving Key Vault access permissions to the users and serviceprincipals ..") -ForegroundColor Gray
 
-# Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
-$ces = @()
-$ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Patients.CreditCard_Number" -EncryptionType "Randomized" -EncryptionKey $cekName
-Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
-# End Encryption Columns
+        Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $ResourceGroupName -PermissionsToKeys all  –PermissionsToSecrets all
 
+        Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SQLADAdministrator -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+
+        Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+
+    Write-Host ("`tGranted permissions to the users and serviceprincipals ..") -ForegroundColor Gray
+
+
+# Creating Master key settings
+
+    $key = (Add-AzureKeyVaultKey -VaultName $KeyVaultName -Name $keyName -Destination 'Software').ID
+    $cmkSettings = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyURL $key
+
+
+# Start - Switching SQL commands context to the AD Application
+
+    Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $azureAdApplicationClientSecret -Tenant $context.Tenant
+    #Add-SqlAzureAuthenticationContext -Interactive 
+    
+    New-SqlColumnMasterKey -Name $cmkName -InputObject $database -ColumnMasterKeySettings $cmkSettings
+    New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName
+    
+    # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
+    $ces = @()
+    $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Patients.CreditCard_Number" -EncryptionType "Randomized" -EncryptionKey $cekName
+    Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
+    # End Encryption Columns
+
+# End - Switching SQL commands context to the AD Application
 
 ########################
 Write-Host "OMS Updates..." -foreground Yellow 
@@ -179,6 +213,7 @@ Write-Host ("`tStep 8.1: OMS -- Send Diagnostcis to OMS workspace" ) -Foreground
 
 foreach($resourceType in $resourceTypes)
 {
+    Write-Host ("Add-AzureDiagnosticsToLogAnalytics to " + $resourceType) -ForegroundColor Gray
     $resource = Find-AzureRmResource -ResourceType $resourceType 
     Add-AzureDiagnosticsToLogAnalytics $resource $workspace -ErrorAction SilentlyContinue
 }
