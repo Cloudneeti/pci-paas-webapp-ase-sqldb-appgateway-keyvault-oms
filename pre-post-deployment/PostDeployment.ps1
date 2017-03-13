@@ -1,11 +1,31 @@
+# Refer to the README.md (located here https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/) 
+#   and Deployment Guide (located in the documents folder of the same github repo
+#
+# This is a Post-Deployment script that is to be run after a successful ARM deployment 
+# Pre-Requisites to run this script
+#      1) Global Azure AD admin credentials that has at least contributor access to the Azure Subscription
+#      2) Should have successfully deployed pre-Deployment script and Azure ARM deployment
+#
+# The script does the following things 
+#      1) Downloads and copies the SQL bacpac file to a new Azure storage account
+#      2) Updates SQL DB firewall to allow you (your clientIp) access to manage SQL DB AND Allowing the WebApp deployed on ASE (the ASE outbound virtual IP)
+#      3) Data Mask few DB columns (ensuring that only the SQL Admins be able to see the detailed info in the Database) everyone else sees them as masked .. e.g. SSN will show up as XXX-XX-4digitnumber
+#      4) Enable Always Encrypt for a few columns (e.g. Credit card)
+#      5) Makes an AD User to the the SQL AD Admin [refer command Set-AzureRmSqlServerActiveDirectoryAdministrator]
+#      6) Ensures Diagnotics logs are sent to OMS Workspace (script assumes that there's only one WS in the resourcegroup created by the ARM template)
+#
+# Enjoy the sample.
+
+
+
 Param(
     [string] [Parameter(Mandatory=$true)] $ResourceGroupName, # Provide Resource Group Name Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $SQLServerName, # Provide Sql Server name (not required full name) Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $sqlPassword, # Provide password of sql server
+	[string] [Parameter(Mandatory=$true)] $sqlAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
 	[string] [Parameter(Mandatory=$true)] $ClientIPAddress, # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
 	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress, # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
 	[string] [Parameter(Mandatory=$true)] $SQLADAdministrator, # Provide SQL AD Administrator Name, same we used for ARM Deployment
-	[string] [Parameter(Mandatory=$true)] $subscriptionName, # Provide your Azure subscription
+	[string] [Parameter(Mandatory=$true)] $subscriptionId, # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $KeyVaultName # Provide Key Vault Name Created through ARM template
 )
 $DatabaseName = "ContosoClinicDB"
@@ -23,7 +43,7 @@ $SQLBackupToUpload = ".\pcidb.bacpac"
 # Check if there is already a login session in Azure Powershell, if not, sign in to Azure  
 
 Write-Host "Azure Subscription Login " -foreground Yellow 
-Write-Host ("Step 1: Please use Contributor/Owner access to Login to Azure Subscription Name = " + $subscriptionName) -ForegroundColor Gray
+Write-Host ("Step 1: Please use Contributor/Owner access to Login to Azure Subscription Id = " + $subscriptionId) -ForegroundColor Gray
 
 Try  
 {  
@@ -31,22 +51,24 @@ Try
 }  
 Catch [System.Management.Automation.PSInvalidOperationException]  
 {  
-    Login-AzureRmAccount  -SubscriptionName $subscriptionName
+    Login-AzureRmAccount  -SubscriptionId $subscriptionId
 } 
-$PWord = ConvertTo-SecureString -String $sqlPassword -AsPlainText -Force
+$PWord = ConvertTo-SecureString -String $sqlAdministratorLoginPassword -AsPlainText -Force
 $credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $sqluserId, $PWord
-$subscriptionId = (Get-AzureRmSubscription -SubscriptionName $subscriptionName).SubscriptionId
+$subscriptionId = (Get-AzureRmSubscription -SubscriptionId $subscriptionId).SubscriptionId
 Set-AzureRmContext -SubscriptionId $subscriptionId
 $userPrincipalName = (Set-AzureRmContext -SubscriptionId $subscriptionId).Account.Id
 Invoke-WebRequest https://stgpcipaasreleases.blob.core.windows.net/pci-paas-sql-container/pcidb.bacpac -OutFile $SQLBackupToUpload
 
+
+Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundColor Gray
 # Create a new storage account.
 $StorageAccountExists = Get-AzureRmStorageAccount -Name $StorageName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore
 if ($StorageAccountExists -eq $null)  
 {    
     New-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $StorageName -Location $Location -Type "Standard_GRS"
 }
-Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundColor Gray
+
 # Set a default storage account.
 Set-AzureRmCurrentStorageAccount -StorageAccountName $StorageName -ResourceGroupName $ResourceGroupName
 # Create a new SQL container.
@@ -62,20 +84,20 @@ $StorageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.R
 
 ########################
 Write-Host "SQL Server Updates" -foreground Yellow 
-Write-Host ("Step 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Gray
+Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Gray
 $clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
 New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress
 New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress
 
 ########################
-Write-Host ("Step 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray
+Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray
 
 $importRequest = New-AzureRmSqlDatabaseImport -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -StorageKeytype $StorageKeyType -StorageKey $StorageKey -StorageUri $StorageUri -AdministratorLogin $credential.UserName -AdministratorLoginPassword $credential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
 Get-AzureRmSqlDatabaseImportExportStatus -OperationStatusLink $importRequest.OperationStatusLink
 Start-Sleep -s 100
 
 ########################
-Write-Host ("Step 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Gray
+Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Gray
 
 # Start Dynamic Data Masking
 Get-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
@@ -88,18 +110,18 @@ New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -Ser
 
 
 
-Write-Host ("Step 6: Update SQL Server for Azure Active Directory administrator =" + $SQLADAdministrator ) -ForegroundColor Gray
+Write-Host ("`tStep 6: Update SQL Server for Azure Active Directory administrator =" + $SQLADAdministrator ) -ForegroundColor Gray
 
 # Create an Azure Active Directory administrator for SQL
 Set-AzureRmSqlServerActiveDirectoryAdministrator -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DisplayName $SQLADAdministrator
 ########################
-Write-Host ("Step 7: Encrypt SQL DB columns SSN, Birthdate and Credit card Information" ) -ForegroundColor Gray
+Write-Host ("`tStep 7: Encrypt SQL DB columns SSN, Birthdate and Credit card Information" ) -ForegroundColor Gray
 
 # Start Encryption Columns
 Import-Module "SqlServer"
 
 # Connect to your database.
-$connStr = "Server=tcp:" + $SQLServerName + ".database.windows.net,1433;Initial Catalog=" + $DatabaseName + ";Persist Security Info=False;User ID=" + $sqluserId + ";Password=" + $sqlPassword + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+$connStr = "Server=tcp:" + $SQLServerName + ".database.windows.net,1433;Initial Catalog=" + $DatabaseName + ";Persist Security Info=False;User ID=" + $sqluserId + ";Password=" + $sqlAdministratorLoginPassword + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
 $connection.ConnectionString = $connStr
 $connection.Connect()
@@ -126,7 +148,7 @@ Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
 ########################
 Write-Host "OMS Updates..." -foreground Yellow 
 
-Write-Host ("Step 8: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Gray
+Write-Host ("`tStep 8: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Gray
 
 # Start OMS Diagnostics
 $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $ResourceGroupName
@@ -153,7 +175,7 @@ foreach($resourceType in $resourceTypes)
 $workspace = Find-AzureRmResource -ResourceType "Microsoft.OperationalInsights/workspaces" -ResourceNameContains $omsWS.Name
 
 ########################
-Write-Host ("Step 9: OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Gray
+Write-Host ("`tStep 8.1: OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Gray
 
 foreach($resourceType in $resourceTypes)
 {
