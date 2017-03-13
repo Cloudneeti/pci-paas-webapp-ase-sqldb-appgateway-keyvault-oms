@@ -1,6 +1,6 @@
 Param(
-    [string] [Parameter(Mandatory=$true)] $azureADDomainName,# Provide your azuure Domain Name
-	[string] [Parameter(Mandatory=$true)] $subscriptionName, # Provide your Azure subscription
+    [string] [Parameter(Mandatory=$true)] $azureADDomainName,# Provide your Azure AD Domain Name
+	[string] [Parameter(Mandatory=$true)] $subscriptionID, # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $suffix #This is used to create a unique website name in your organization. This could be your company name or business unit name
 )
 
@@ -45,12 +45,12 @@ $displayName =         ($suffix + "Azure PCI PAAS Sample")
 	Catch [System.Management.Automation.PSInvalidOperationException]  
 	{  
 		 #Add-AzureRmAccount 
-		Login-AzureRmAccount -SubscriptionName $subscriptionName
+		Login-AzureRmAccount -SubscriptionId $subscriptionID
 	} 
 
 # To select a default subscription for your current session
 
-$sub = Get-AzureRmSubscription –SubscriptionName $subscriptionName | Select-AzureRmSubscription 
+$sub = Get-AzureRmSubscription -SubscriptionId $subscriptionID | Select-AzureRmSubscription 
 
 ### 2. Create Azure Active Directory apps in default directory
 Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -ForegroundColor Gray
@@ -64,7 +64,7 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
     $homePageURL = ("http://" + $defaultPrincipal + "azurewebsites.net" + "/" + $Web1SiteName)
     $replyURLs = @( $cloudwiseAppServiceURL, "http://*.azurewebsites.net","http://localhost:62080", "http://localhost:3026/")
     # Create Active Directory Application
-    $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $AzureADApplicationClientSecret -ReplyUrls $replyURLs
+    $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $AzureADApplicationClientSecret # -ReplyUrls $replyURLs
     Write-Host ("`tStep 3.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Gray
 
 ### 3. Create a service principal for the AD Application and add a Reader role to the principal

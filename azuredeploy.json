@@ -89,7 +89,6 @@
         "description": "The AD User password to use for the application's connections to the database server."
       }
     }
-
   },
   "variables": {
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
@@ -109,6 +108,7 @@
     "aseSubnetBaseAddress": "10.0.3",
     "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
     "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
+    "aseBackendVirtualIp2": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -126,6 +126,7 @@
     "workerPoolThreeInstanceCount": 0,
     "skuName": "WAF_Medium",
     "capacity": 1,
+    "retentionPolicy": 2,
     "automationRegion": "East US 2",
     "omsRegion": "East US",
     "sqlFirewallIps": {
@@ -143,7 +144,7 @@
     "webAppTemplateFileName": "webappdeploy.json",
     "vmBastionTemplateFileName": "vmBastion.json",
     "dnsTemplateFileName": "dnsZone.json",
-    "newZoneName": "azurepcisamples.com",
+    "newZoneName": "[parameters('customHostName')]",
     "omsTemplateFileName": "omsworkspace.json",
     "omsWorkspaceName": "[concat('oms-WS-pci-paas-', uniqueString(resourceGroup().id))]",
     "omsSolutionsTemplateFileName": "omsSolutions.json",
@@ -186,8 +187,10 @@
           },
           "tagValues": {
             "value": "[variables('tagValues')]"
+          },
+          "retentionPolicy": {
+            "value": "[variables('retentionPolicy')]"
           }
-
         }
       }
     },
@@ -240,6 +243,20 @@
               "priority": 100,
               "direction": "Inbound"
             }
+          },
+          {
+            "name": "AllowHttps",
+            "properties": {
+              "description": "This is the Https inbound rule",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Inbound"
+            }
           }
         ]
       },
@@ -259,7 +276,7 @@
                 "category": "NetworkSecurityGroupEvent",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[variables('retentionPolicy')]",
                   "enabled": true
                 }
               },
@@ -267,7 +284,7 @@
                 "category": "NetworkSecurityGroupRuleCounter",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[variables('retentionPolicy')]",
                   "enabled": false
                 }
               }
@@ -314,7 +331,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNsgGroupName'))]"            
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNsgGroupName'))]"
           ],
           "apiVersion": "2015-07-01",
           "properties": {
@@ -324,7 +341,7 @@
                 "category": "NetworkSecurityGroupEvent",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[variables('retentionPolicy')]",
                   "enabled": true
                 }
               },
@@ -332,7 +349,7 @@
                 "category": "NetworkSecurityGroupRuleCounter",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[variables('retentionPolicy')]",
                   "enabled": false
                 }
               }
@@ -347,6 +364,7 @@
       "apiVersion": "2016-03-30",
       "location": "[variables('aseLocation')]",
       "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('aseNsgGroupName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('wafNsgGroupName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('bastionNsgGroupName'))]"
       ],
@@ -369,13 +387,19 @@
           {
             "name": "[variables('wafSubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('wafSubnetAddressPrefix')]"
+              "addressPrefix": "[variables('wafSubnetAddressPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('wafNsgGroupName'))]"
+              }
             }
           },
           {
             "name": "[variables('asesubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('aseSubnetAddressPrefix')]"
+              "addressPrefix": "[variables('aseSubnetAddressPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aseNsgGroupName'))]"
+              }
             }
           },
           {
@@ -425,6 +449,9 @@
           "backendIpAddress1": {
             "value": "[variables('aseBackendVirtualIp')]"
           },
+          "backendIpAddress2": {
+            "value": "[variables('aseBackendVirtualIp2')]"
+          },
           "certData": {
             "value": "[parameters('certData')]"
           },
@@ -435,10 +462,13 @@
             "value": "[variables('wafSubnetName')]"
           },
           "customprobeHostName": {
-            "value": "[concat(variables('webSiteName'),'.ase.azurepcisamples.com' )]"
+            "value": "[concat(variables('webSiteName'),'.ase.', parameters('customHostName') )]"
           },
           "tagValues": {
             "value": "[variables('tagValues')]"
+          },
+          "retentionPolicy": {
+            "value": "[variables('retentionPolicy')]"
           }
         }
       }
@@ -501,6 +531,9 @@
           },
           "aseSubnetAddressPrefix": {
             "value": "[variables('aseSubnetAddressPrefix')]"
+          },
+          "customHostName": {
+            "value": "[parameters('customHostName')]"
           },
           "tagValues": {
             "value": "[variables('tagValues')]"
@@ -588,6 +621,9 @@
           },
           "emailAddresses": {
             "value": "[parameters('sqlNotificationEmailAddress')]"
+          },
+          "retentionPolicy": {
+            "value": "[variables('retentionPolicy')]"
           }
         }
       }
@@ -754,6 +790,34 @@
       "properties": {
         "mode": "Incremental",
         "securityRules": [
+          {
+            "name": "AllowHttp",
+            "properties": {
+              "description": "This is the Http inbound rule",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowHttps",
+            "properties": {
+              "description": "This is the Https inbound rule",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Inbound"
+            }
+          }
         ]
       },
       "resources": [
@@ -761,7 +825,7 @@
           "type": "providers/diagnosticSettings",
           "name": "Microsoft.Insights/service",
           "dependsOn": [
-            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aseNsgGroupName'))]"            
+            "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aseNsgGroupName'))]"
           ],
           "apiVersion": "2015-07-01",
           "properties": {
@@ -772,7 +836,7 @@
                 "category": "NetworkSecurityGroupEvent",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[variables('retentionPolicy')]",
                   "enabled": true
                 }
               },
@@ -780,7 +844,7 @@
                 "category": "NetworkSecurityGroupRuleCounter",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[variables('retentionPolicy')]",
                   "enabled": false
                 }
               }

@@ -25,6 +25,12 @@
         "description": "IP Address for Backend Server 1"
       }
     },
+    "backendIpAddress2": {
+      "type": "string",
+      "metadata": {
+        "description": "IP Address for Backend Server 2"
+      }
+    },
     "certData": {
       "type": "string",
       "metadata": {
@@ -54,6 +60,13 @@
     },
     "tagValues": {
       "type": "object"
+    },
+    "retentionPolicy": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of days of Retention Policy"
+      }
     }
   },
   "variables": {
@@ -136,6 +149,9 @@
               "BackendAddresses": [
                 {
                   "IpAddress": "[parameters('backendIpAddress1')]"
+                },
+                {
+                  "IpAddress": "[parameters('backendIpAddress2')]"
                 }
               ]
             }
@@ -265,7 +281,7 @@
                 "category": "ApplicationGatewayAccessLog",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[parameters('retentionPolicy')]",
                   "enabled": true
                 }
               },
@@ -273,7 +289,7 @@
                 "category": "ApplicationGatewayPerformanceLog",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[parameters('retentionPolicy')]",
                   "enabled": false
                 }
               },
@@ -281,7 +297,7 @@
                 "category": "ApplicationGatewayFirewallLog",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[parameters('retentionPolicy')]",
                   "enabled": false
                 }
               }

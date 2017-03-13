@@ -54,6 +54,13 @@
     },
     "applicationObjectId": {
       "type": "string"
+    },
+    "retentionPolicy": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of days of Retention Policy"
+      }
     }
   },
   "variables": {
@@ -108,6 +115,7 @@
         "businessUnit": "[parameters('tagValues').businessUnit]"
       },
       "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts', '/', parameters('storageAccountName'))]"
       ],
       "properties": {
         "accessPolicies": [
@@ -147,7 +155,7 @@
                 "category": "AuditEvent",
                 "enabled": true,
                 "retentionPolicy": {
-                  "days": 0,
+                  "days": "[parameters('retentionPolicy')]",
                   "enabled": true
                 }
               }
