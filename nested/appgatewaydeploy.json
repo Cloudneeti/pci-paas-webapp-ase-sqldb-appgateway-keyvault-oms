@@ -281,7 +281,11 @@
                 "category": "ApplicationGatewayAccessLog",
                 "enabled": true,
                 "retentionPolicy": {
+<<<<<<< HEAD
                   "days": "[parameters('retentionPolicy')]",
+=======
+                  "days": 2,
+>>>>>>> origin/master
                   "enabled": true
                 }
               },
@@ -289,7 +293,11 @@
                 "category": "ApplicationGatewayPerformanceLog",
                 "enabled": true,
                 "retentionPolicy": {
+<<<<<<< HEAD
                   "days": "[parameters('retentionPolicy')]",
+=======
+                  "days": 2,
+>>>>>>> origin/master
                   "enabled": false
                 }
               },
@@ -297,7 +305,11 @@
                 "category": "ApplicationGatewayFirewallLog",
                 "enabled": true,
                 "retentionPolicy": {
+<<<<<<< HEAD
                   "days": "[parameters('retentionPolicy')]",
+=======
+                  "days": 2,
+>>>>>>> origin/master
                   "enabled": false
                 }
               }
