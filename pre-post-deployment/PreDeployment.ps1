@@ -10,9 +10,8 @@ Param(
 Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Red
 
 $SQLADAdminName = "sqladmin@$azureADDomainName"
-$TestUserName = "user@$azureADDomainName"
-$ReceptionistUserName = "EdnaB@$azureADDomainName"
-$DoctorUserName = "ChrisA@$azureADDomainName"
+$receptionistUserName = "receptionist_EdnaB@$azureADDomainName"
+$doctorUserName = "doctor_ChrisA@$azureADDomainName"
 Write-Host ("Step 1: Create Azure Active Directory users,  SQLAdmin = " + $SQLADAdminName + " and Test User=" + $TestUserName ) -ForegroundColor Gray
 
 #Connect to the Azure AD
@@ -20,35 +19,31 @@ Connect-MsolService
 
 $cloudwiseAppServiceURL = "http://localcloudneeti6i.$azureADDomainName"
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+$sqlADAdminDetails = ""
 if ($sqlADAdminObjectId -eq $null)  
 {    
     $sqlADAdminDetails = New-MsolUser -UserPrincipalName $SQLADAdminName -DisplayName "SQLADAdministrator PCI Samples" -FirstName "SQL AD Administrator" -LastName "PCI Samples"
 	$sqlADAdminObjectId= $sqlADAdminDetails.ObjectID
-
     # Make the new user a Global AD Administrator
 	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
 
     # Grant 'SQL AD Admin' access to the Azure subscription
     New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )
 }
-$testUserObjectId = (Get-MsolUser -UserPrincipalName $TestUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
-if ($testUserObjectId -eq $null)  
-{    
-    $testUserDetails = New-MsolUser -UserPrincipalName $TestUserName -DisplayName "Test User PCI Samples" -FirstName "Test User" -LastName "PCI Samples"
-	$testUserObjectId= $testUserDetails.ObjectID
-}
-$receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $ReceptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+$receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+$receptionistuserDetails = ""
 if ($receptionistUserObjectId -eq $null)  
 {    
-    $receptionistuserDetails = New-MsolUser -UserPrincipalName $ReceptionistUserName -DisplayName "Edna Benson" -FirstName "Edna" -LastName "Benson"
-    Write-Host ($ReceptionistUserName +" user is created. Temporaty password is "+$receptionistuserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+    $receptionistuserDetails = New-MsolUser -UserPrincipalName $receptionistUserName -DisplayName "Edna Benson" -FirstName "Edna" -LastName "Benson"
+    $receptionistuserDetails
 }
 
-$doctorUserObjectId = (Get-MsolUser -UserPrincipalName $DoctorUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
-if ($receptionistUserObjectId -eq $null)  
+$doctorUserObjectId = (Get-MsolUser -UserPrincipalName $doctorUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+$doctoruserDetails = ""
+if ($doctorUserObjectId -eq $null)  
 {    
-    $doctoruserDetails = New-MsolUser -UserPrincipalName $DoctorUserName -DisplayName "Chris Aston" -FirstName "Chris" -LastName "Aston"
-    Write-Host ($DoctorUserName +" user is created. Temporaty password is "+$doctoruserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+    $doctoruserDetails = New-MsolUser -UserPrincipalName $doctorUserName -DisplayName "Chris Aston" -FirstName "Chris" -LastName "Aston"
+    $doctoruserDetails
 }
 #------------------------------
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
@@ -135,6 +130,11 @@ Write-Host ("`t 2) Windows Azure Service Management API ") -foreground Yellow
 Write-Host ("`t 3) Key Vault ") -foreground Yellow
 Write-Host ("`t 4) Microsoft Graph API ") -foreground Yellow
 Write-Host ("see README.md for details") -foreground Yellow
+
+Write-Host -Prompt "The following users have been created in domain" -ForegroundColor Yellow
+Write-Host ($SQLADAdminName +" user is created. Temporary password is "+$sqlADAdminDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+Write-Host ($receptionistUserName +" user is created. Temporary password is "+$receptionistuserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+Write-Host ($doctorUserName +" user is created. Temporary password is "+$doctoruserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
 
 Write-Host -Prompt "End copy all the values from below here." -ForegroundColor Yellow
 
