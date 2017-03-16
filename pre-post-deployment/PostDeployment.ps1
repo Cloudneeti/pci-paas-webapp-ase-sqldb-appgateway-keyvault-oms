@@ -48,14 +48,14 @@ $DatabaseName = "ContosoClinicDB"
 $StorageName = "stgreleases"+$SQLServerName.Substring(0,2).ToLower()
 $StorageKeyType = "StorageAccessKey"
 $SQLContainerName = "pci-paas-sql-container"
-$SQLBackupName = "pcidb.bacpac"
+$SQLBackupName = "clinic.bacpac"
 $StorageUri = "http://$StorageName.blob.core.windows.net/$SQLContainerName/$SQLBackupName"
 $cmkName = "CMK1" 
 $cekName = "CEK1" 
 $keyName = "CMK1" 
 $sqluserId = "sqladmin"
 $location = 'East US'
-$SQLBackupToUpload = ".\pcidb.bacpac"
+$SQLBackupToUpload = (".\"+$SQLBackupName)
 # Check if there is already a login session in Azure Powershell, if not, sign in to Azure  
 
 Write-Host "Azure Subscription Login " -foreground Yellow 
@@ -74,7 +74,7 @@ $credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 $subscriptionId = (Get-AzureRmSubscription -SubscriptionId $subscriptionId).SubscriptionId
 $context = Set-AzureRmContext -SubscriptionId $subscriptionId
 $userPrincipalName = $context.Account.Id
-Invoke-WebRequest https://stgpcipaasreleases.blob.core.windows.net/pci-paas-sql-container/pcidb.bacpac -OutFile $SQLBackupToUpload
+Invoke-WebRequest "https://stgpcipaasreleases.blob.core.windows.net/pci-paas-sql-container/"+$SQLBackupName -OutFile $SQLBackupToUpload
 
 
 Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundColor Gray
@@ -104,6 +104,7 @@ Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAdd
 $clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
 Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress -ErrorAction Continue} Catch {}
 Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress -ErrorAction Continue} Catch {}
+Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIp" -StartIpAddress $clientIp -EndIpAddress $clientIp -ErrorAction Continue} Catch {}
 
 ########################
 Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray
@@ -164,16 +165,15 @@ $database = $server.Databases[$databaseName]
 
 
 # Start - Switching SQL commands context to the AD Application
-
-    Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $azureAdApplicationClientSecret -Tenant $context.Tenant
     #Add-SqlAzureAuthenticationContext -Interactive 
     
     New-SqlColumnMasterKey -Name $cmkName -InputObject $database -ColumnMasterKeySettings $cmkSettings
+	Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $azureAdApplicationClientSecret -Tenant $context.Tenant
     New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName
     
     # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
     $ces = @()
-    $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Patients.CreditCard_Number" -EncryptionType "Randomized" -EncryptionKey $cekName
+    $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Patients.CreditCard_Number" -EncryptionType "Deterministic" -EncryptionKey $cekName
     Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
     # End Encryption Columns
 

@@ -11,7 +11,8 @@ Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrat
 
 $SQLADAdminName = "sqladmin@$azureADDomainName"
 $TestUserName = "user@$azureADDomainName"
-
+$ReceptionistUserName = "EdnaB@$azureADDomainName"
+$DoctorUserName = "ChrisA@$azureADDomainName"
 Write-Host ("Step 1: Create Azure Active Directory users,  SQLAdmin = " + $SQLADAdminName + " and Test User=" + $TestUserName ) -ForegroundColor Gray
 
 #Connect to the Azure AD
@@ -36,7 +37,19 @@ if ($testUserObjectId -eq $null)
     $testUserDetails = New-MsolUser -UserPrincipalName $TestUserName -DisplayName "Test User PCI Samples" -FirstName "Test User" -LastName "PCI Samples"
 	$testUserObjectId= $testUserDetails.ObjectID
 }
+$receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $ReceptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+if ($receptionistUserObjectId -eq $null)  
+{    
+    $receptionistuserDetails = New-MsolUser -UserPrincipalName $ReceptionistUserName -DisplayName "Edna Benson" -FirstName "Edna" -LastName "Benson"
+    Write-Host ($ReceptionistUserName +" user is created. Temporaty password is "+$receptionistuserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+}
 
+$doctorUserObjectId = (Get-MsolUser -UserPrincipalName $DoctorUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+if ($receptionistUserObjectId -eq $null)  
+{    
+    $doctoruserDetails = New-MsolUser -UserPrincipalName $DoctorUserName -DisplayName "Chris Aston" -FirstName "Chris" -LastName "Aston"
+    Write-Host ($DoctorUserName +" user is created. Temporaty password is "+$doctoruserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+}
 #------------------------------
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
 Set-Location ".\"
