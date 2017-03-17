@@ -34,18 +34,18 @@
 Param(
     [string] [Parameter(Mandatory=$true)] $ResourceGroupName , # Provide Resource Group Name Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $sqlAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
 	[string] [Parameter(Mandatory=$true)] $ClientIPAddress , # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
 	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress , # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
 	[string] [Parameter(Mandatory=$true)] $SQLADAdministrator, # Provide SQL AD Administrator Name, same we used for ARM Deployment
+	[string] [Parameter(Mandatory=$true)] $sqlAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
 	[string] [Parameter(Mandatory=$true)] $subscriptionId , # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $KeyVaultName , # Provide Key Vault Name Created through ARM template
-   [string] [Parameter(Mandatory=$true)] $azureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
+	[string] [Parameter(Mandatory=$true)] $azureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
     [string] [Parameter(Mandatory=$true)] $azureAdApplicationClientSecret # AD Application ClientID - the same one you used in the ARM template
 )
 
 $DatabaseName = "ContosoClinicDB"
-$StorageName = "stgreleases"+$SQLServerName.Substring(0,2).ToLower()
+$StorageName = "stgreleases"+$SQLServerName.Substring(10,5).ToLower()
 $StorageKeyType = "StorageAccessKey"
 $SQLContainerName = "pci-paas-sql-container"
 $SQLBackupName = "clinic.bacpac"
@@ -74,7 +74,8 @@ $credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 $subscriptionId = (Get-AzureRmSubscription -SubscriptionId $subscriptionId).SubscriptionId
 $context = Set-AzureRmContext -SubscriptionId $subscriptionId
 $userPrincipalName = $context.Account.Id
-Invoke-WebRequest "https://stgpcipaasreleases.blob.core.windows.net/pci-paas-sql-container/"+$SQLBackupName -OutFile $SQLBackupToUpload
+$downloadbacpacPath = "https://stgpcipaasreleases.blob.core.windows.net/pci-paas-sql-container/"+$SQLBackupName
+Invoke-WebRequest $downloadbacpacPath -OutFile $SQLBackupToUpload
 
 
 Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundColor Gray

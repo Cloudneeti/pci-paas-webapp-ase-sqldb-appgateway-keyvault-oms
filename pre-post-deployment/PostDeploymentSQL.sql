@@ -10,8 +10,6 @@ exec ('GRANT SELECT TO [' + @doctorUserName+']' )
 exec ('GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO [' + @doctorUserName+']' )
 exec ('GRANT VIEW ANY COLUMN Encryption KEY DEFINITION TO [' + @doctorUserName+']' )
 
-GO
-
 Declare @receptionistUserName as varchar(100) = 'receptionist_EdnaB@'+@domainName
 exec ('CREATE USER [' + @receptionistUserName+'] FROM EXTERNAL PROVIDER')
 exec ('GRANT CONNECT TO [' + @receptionistUserName+']' )
@@ -23,3 +21,4 @@ exec ('GRANT VIEW ANY COLUMN Encryption KEY DEFINITION TO [' + @receptionistUser
 
 EXECUTE AS USER = @receptionistUserName 
 SELECT * FROM patients;
+REVERT

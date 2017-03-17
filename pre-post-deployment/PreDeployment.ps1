@@ -26,9 +26,6 @@ if ($sqlADAdminObjectId -eq $null)
 	$sqlADAdminObjectId= $sqlADAdminDetails.ObjectID
     # Make the new user a Global AD Administrator
 	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
-
-    # Grant 'SQL AD Admin' access to the Azure subscription
-    New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )
 }
 $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 $receptionistuserDetails = ""
@@ -61,6 +58,9 @@ $displayName =         ($suffix + "Azure PCI PAAS Sample")
 		 #Add-AzureRmAccount 
 		Login-AzureRmAccount -SubscriptionId $subscriptionID
 	} 
+
+# Grant 'SQL AD Admin' access to the Azure subscription
+New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )
 
 # To select a default subscription for your current session
 
