@@ -28,10 +28,24 @@
         "description": "Password for .pfx certificate"
       }
     },
+    "bastionHostAdministratorUserName": {
+      "type": "string",
+      "defaultValue": "bastionadmin",
+      "metadata": {
+        "description": "The user name to use for the bastion host VM administrator."
+      }
+    },
     "bastionHostAdministratorPassword": {
       "type": "securestring",
       "metadata": {
         "description": "The password to use for the bastion host VM administrator."
+      }
+    },
+    "sqlAdministratorLoginUserName": {
+      "type": "string",
+      "defaultValue": "sqladmin",
+      "metadata": {
+        "description": "The user name to use for the database server administrator."
       }
     },
     "sqlAdministratorLoginPassword": {
@@ -40,10 +54,10 @@
         "description": "The password to use for the database server administrator."
       }
     },
-    "sqlNotificationEmailAddress": {
+    "sqlThreatDetectionAlertEmailAddress": {
       "type": "string",
       "metadata": {
-        "description": "Provide Email Address to send Sql Notifications"
+        "description": "Provide Email Address to send Sql Threat Detection Alerts"
       }
     },
     "automationAccountName": {
@@ -113,8 +127,6 @@
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
     "keyVaultName": "[substring(concat('kv-pcisamples','-',uniquestring(resourceGroup().id)),0,22)]",
-    "bastionHostAdministrator": "bastionadmin",
-    "sqlAdministratorLogin": "sqladmin",
     "ipSslAddressCount": 0,
     "frontEndSize": "Medium",
     "frontEndCount": 2,
@@ -135,7 +147,6 @@
     },
     "webSiteName": "[concat('webapp', '-pciwebapp')]",
     "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('webContainerName'),'/',variables('webPackageName'))]",
-    "rootTemplateFolder": "PCI-PAAS",
     "nestedTemplateFolder": "nested",
     "aseTemplateFileName": "asedeploy.json",
     "gatewayTemplateFileName": "appgatewaydeploy.json",
@@ -575,7 +586,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "adminUsername": { "value": "[variables('bastionHostAdministrator')]" },
+          "adminUsername": { "value": "[parameters('bastionHostAdministratorUserName')]" },
           "adminPassword": { "value": "[parameters('bastionHostAdministratorPassword')]" },
           "dnsLabelPrefix": { "value": "[concat('pcisamples',uniqueString(resourceGroup().id))]" },
           "virtualNetworkName": { "value": "[variables('virtualNetworkName')]" },
@@ -605,7 +616,7 @@
         },
         "parameters": {
           "administratorLogin": {
-            "value": "[variables('sqlAdministratorLogin')]"
+            "value": "[parameters('sqlAdministratorLoginUserName')]"
           },
           "administratorLoginPassword": {
             "value": "[parameters('sqlAdministratorLoginPassword')]"
@@ -620,7 +631,7 @@
             "value": "[variables('sqlFirewallIps')]"
           },
           "emailAddresses": {
-            "value": "[parameters('sqlNotificationEmailAddress')]"
+            "value": "[parameters('sqlThreatDetectionAlertEmailAddress')]"
           },
           "retentionPolicy": {
             "value": "[variables('retentionPolicy')]"

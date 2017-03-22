@@ -1,5 +1,9 @@
+# Purpose : 
+# 1) This script is used to create additional AD users to run various scenarios and creates AD Application and creates service principle to AD Application
+# 2) This script should run by Global AD Administrator, You created Global AD Admin in previous script(CreateGlobalADAdmin.ps1)
+# 3) This script should run before start deployment of ARM Templates
 Param(
-    [string] [Parameter(Mandatory=$true)] $azureADDomainName,# Provide your Azure AD Domain Name
+	[string] [Parameter(Mandatory=$true)] $azureADDomainName, # Provide your Azure AD Domain Name
 	[string] [Parameter(Mandatory=$true)] $subscriptionID, # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $suffix #This is used to create a unique website name in your organization. This could be your company name or business unit name
 )
@@ -8,16 +12,16 @@ Param(
 #Imp: This script needs to be run by Global AD Administrator (aka Company Administrator)
 ###
 Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Red
-
-$SQLADAdminName = "sqladmin@$azureADDomainName"
-$receptionistUserName = "receptionist_EdnaB@$azureADDomainName"
-$doctorUserName = "doctor_ChrisA@$azureADDomainName"
-Write-Host ("Step 1: Create Azure Active Directory users,  SQLAdmin = " + $SQLADAdminName + " and Test User=" + $TestUserName ) -ForegroundColor Gray
-
 #Connect to the Azure AD
 Connect-MsolService
-
-$cloudwiseAppServiceURL = "http://localcloudneeti6i.$azureADDomainName"
+$SQLADAdminName = "sqladmin@"+$azureADDomainName
+$receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
+$doctorUserName = "doctor_ChrisA@"+$azureADDomainName
+$SQLADAdminPassword = "!Password333!!!"
+$receptionistPassword = "!Password111!!!"
+$doctorPassword = "!Password222!!!"
+$cloudwiseAppServiceURL = "http://localcloudneeti6i"+$azureADDomainName
+Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Red
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 $sqlADAdminDetails = ""
 if ($sqlADAdminObjectId -eq $null)  
@@ -26,13 +30,14 @@ if ($sqlADAdminObjectId -eq $null)
 	$sqlADAdminObjectId= $sqlADAdminDetails.ObjectID
     # Make the new user a Global AD Administrator
 	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
+	Set-MsolUserPassword -userPrincipalName $SQLADAdminName -NewPassword $SQLADAdminPassword -ForceChangePassword $false
 }
 $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 $receptionistuserDetails = ""
 if ($receptionistUserObjectId -eq $null)  
 {    
     $receptionistuserDetails = New-MsolUser -UserPrincipalName $receptionistUserName -DisplayName "Edna Benson" -FirstName "Edna" -LastName "Benson"
-    $receptionistuserDetails
+    Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $receptionistPassword -ForceChangePassword $false
 }
 
 $doctorUserObjectId = (Get-MsolUser -UserPrincipalName $doctorUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
@@ -40,8 +45,9 @@ $doctoruserDetails = ""
 if ($doctorUserObjectId -eq $null)  
 {    
     $doctoruserDetails = New-MsolUser -UserPrincipalName $doctorUserName -DisplayName "Chris Aston" -FirstName "Chris" -LastName "Aston"
-    $doctoruserDetails
+    Set-MsolUserPassword -userPrincipalName $doctorUserName -NewPassword $doctorPassword -ForceChangePassword $false
 }
+Write-Host ("Created AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Red
 #------------------------------
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
 Set-Location ".\"
@@ -97,6 +103,12 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
 #############################################################################################
 $AzureADApplicationObjectID = (Get-AzureRmADServicePrincipal -ServicePrincipalName $azureAdApplication.ApplicationId).Id
 
+Write-Host "TenantId: " -foreground Green –NoNewLine
+Write-Host $tenantID -foreground Red 
+Write-Host "SubscriptionID: " -foreground Green –NoNewLine
+Write-Host $sub.Subscription -foreground Red 
+
+
 Write-Host -Prompt "Start copy all the values from below here." -ForegroundColor Yellow
 
 Write-Host ("Parameters to be used in the registration / configuration.") -foreground Green
@@ -110,32 +122,16 @@ Write-Host "SQL AD Admin Name: " -foreground Green –NoNewLine
 Write-Host $SQLADAdminName -foreground Red 
 Write-Host "SQL AD Admin Password:(If user already exists then we have to get password manually) " -foreground Green –NoNewLine
 Write-Host $sqlADAdminDetails.password -foreground Red 
-Write-Host "Azure AD User Object Id: " -foreground Green –NoNewLine
-Write-Host $testUserObjectId -foreground Red 
-
-
-Write-Host "PostLogoutRedirectUri: " -foreground Green –NoNewLine
-Write-Host $cloudwiseAppServiceURL -foreground Red 
-Write-Host "TenantId: " -foreground Green –NoNewLine
-Write-Host $tenantID -foreground Red 
-Write-Host "SubscriptionID: " -foreground Green –NoNewLine
-Write-Host $sub.Subscription -foreground Red 
 
 
 Write-Host ("TODO - Update permissions for the AD Application  '") -foreground Yellow –NoNewLine
 Write-Host $displayName1 -foreground Red –NoNewLine
-Write-Host ("'. Cloudwise would atleast need 2 apps") -foreground Yellow
-Write-Host ("`t 1) Windows Azure Active Directory ") -foreground Yellow
-Write-Host ("`t 2) Windows Azure Service Management API ") -foreground Yellow
-Write-Host ("`t 3) Key Vault ") -foreground Yellow
-Write-Host ("`t 4) Microsoft Graph API ") -foreground Yellow
-Write-Host ("see README.md for details") -foreground Yellow
+Write-Host ("'.Please follow the deployment guide for the specific permissions") -foreground Yellow
 
-Write-Host -Prompt "The following users have been created in domain" -ForegroundColor Yellow
-Write-Host ($SQLADAdminName +" user is created. Temporary password is "+$sqlADAdminDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
-Write-Host ($receptionistUserName +" user is created. Temporary password is "+$receptionistuserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
-Write-Host ($doctorUserName +" user is created. Temporary password is "+$doctoruserDetails.Password+" User required to change password after sign in" ) -ForegroundColor Red
+Write-Host -Prompt "The following additional users have been created in domain. These users will be used for trying out various scenarios" -ForegroundColor Yellow
+Write-Host ($receptionistUserName +" user is created. password is "+$receptionistPassword ) -ForegroundColor Red
+Write-Host ($doctorUserName +" user is created. password is "+$doctorPassword ) -ForegroundColor Red
 
-Write-Host -Prompt "End copy all the values from below here." -ForegroundColor Yellow
+Write-Host -Prompt "End copy all the values from above here." -ForegroundColor Yellow
 
 Read-Host -Prompt "The script completed execution. Press any key to exit"

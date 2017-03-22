@@ -15,7 +15,7 @@
     "sqlAdministratorLoginPassword": {
       "value": "GEN-PASSWORD"
     },
-    "sqlNotificationEmailAddress": {
+    "sqlThreatDetectionAlertEmailAddress": {
       "value": "changeme"
     },
     "automationAccountName": {

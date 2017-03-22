@@ -33,15 +33,16 @@
 
 Param(
     [string] [Parameter(Mandatory=$true)] $ResourceGroupName , # Provide Resource Group Name Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $ClientIPAddress , # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
 	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress , # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
+	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through ARM template
 	[string] [Parameter(Mandatory=$true)] $SQLADAdministrator, # Provide SQL AD Administrator Name, same we used for ARM Deployment
-	[string] [Parameter(Mandatory=$true)] $sqlAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
-	[string] [Parameter(Mandatory=$true)] $subscriptionId , # Provide your Azure subscription ID
+	[string] [Parameter(Mandatory=$true)] $SQLAdministratorLoginUserName, # Provide admin user name of sql server used for ARM template parameter "sqlAdministratorLoginUserName" (this is not the SQL AD admin but the admin user of the SQL Server)
+	[string] [Parameter(Mandatory=$true)] $SQLAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
+	[string] [Parameter(Mandatory=$true)] $SubscriptionId , # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $KeyVaultName , # Provide Key Vault Name Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $azureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
-    [string] [Parameter(Mandatory=$true)] $azureAdApplicationClientSecret # AD Application ClientID - the same one you used in the ARM template
+	[string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
+    [string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientSecret # AD Application ClientID - the same one you used in the ARM template
 )
 
 $DatabaseName = "ContosoClinicDB"
@@ -53,7 +54,6 @@ $StorageUri = "http://$StorageName.blob.core.windows.net/$SQLContainerName/$SQLB
 $cmkName = "CMK1" 
 $cekName = "CEK1" 
 $keyName = "CMK1" 
-$sqluserId = "sqladmin"
 $location = 'East US'
 $SQLBackupToUpload = (".\"+$SQLBackupName)
 # Check if there is already a login session in Azure Powershell, if not, sign in to Azure  
@@ -70,7 +70,7 @@ Catch [System.Management.Automation.PSInvalidOperationException]
     Login-AzureRmAccount  -SubscriptionId $subscriptionId
 } 
 $PWord = ConvertTo-SecureString -String $sqlAdministratorLoginPassword -AsPlainText -Force
-$credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $sqluserId, $PWord
+$credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $SQLAdministratorLoginUserName, $PWord
 $subscriptionId = (Get-AzureRmSubscription -SubscriptionId $subscriptionId).SubscriptionId
 $context = Set-AzureRmContext -SubscriptionId $subscriptionId
 $userPrincipalName = $context.Account.Id
@@ -139,7 +139,7 @@ Write-Host ("`tStep 7: Encrypt SQL DB columns SSN, Birthdate and Credit card Inf
 Import-Module "SqlServer"
 
 # Connect to your database.
-$connStr = "Server=tcp:" + $SQLServerName + ".database.windows.net,1433;Initial Catalog=" + $DatabaseName + ";Persist Security Info=False;User ID=" + $sqluserId + ";Password=" + $sqlAdministratorLoginPassword + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+$connStr = "Server=tcp:" + $SQLServerName + ".database.windows.net,1433;Initial Catalog=" + $DatabaseName + ";Persist Security Info=False;User ID=" + $SQLAdministratorLoginUserName + ";Password=" + $sqlAdministratorLoginPassword + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
 $connection.ConnectionString = $connStr
 $connection.Connect()
