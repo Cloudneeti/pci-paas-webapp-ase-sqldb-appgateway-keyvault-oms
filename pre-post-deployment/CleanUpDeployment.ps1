@@ -50,7 +50,7 @@ Write-Host ("Step 2:Remove Azure Resource Group" ) -ForegroundColor Red
 		Login-AzureRmAccount -SubscriptionId $subscriptionID
 	} 
 
-Remove-AzureRmResourceGroup -Name $resourceGroupName -Force
+Remove-AzureRmResourceGroup -Name $resourceGroupName -Force -ErrorAction SilentlyContinue
 
 Write-Host ("Step 3:Remove Azure Application Id" ) -ForegroundColor Red
 $ADObjectId = (Get-AzureADApplication).AppId -eq $ADApplicationId

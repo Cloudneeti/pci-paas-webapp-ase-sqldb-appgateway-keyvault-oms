@@ -31,7 +31,7 @@
       "value": ""
     },
     "sqlAdAdminUserName": {
-      "value": "sqladmin"
+      "value": "changeme"
     },
     "sqlAdAdminUserPassword": {
       "value": "GEN-PASSWORD"

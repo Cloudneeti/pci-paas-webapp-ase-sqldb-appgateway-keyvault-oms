@@ -11,7 +11,7 @@ Param(
 ###
 #Imp: This script needs to be run by Global AD Administrator (aka Company Administrator)
 ###
-Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Red
+Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Gray
 #Connect to the Azure AD
 Connect-MsolService
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
@@ -21,7 +21,7 @@ $SQLADAdminPassword = "!Password333!!!"
 $receptionistPassword = "!Password111!!!"
 $doctorPassword = "!Password222!!!"
 $cloudwiseAppServiceURL = "http://localcloudneeti6i"+$azureADDomainName
-Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Red
+Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 $sqlADAdminDetails = ""
 if ($sqlADAdminObjectId -eq $null)  
@@ -47,7 +47,7 @@ if ($doctorUserObjectId -eq $null)
     $doctoruserDetails = New-MsolUser -UserPrincipalName $doctorUserName -DisplayName "Chris Aston" -FirstName "Chris" -LastName "Aston"
     Set-MsolUserPassword -userPrincipalName $doctorUserName -NewPassword $doctorPassword -ForceChangePassword $false
 }
-Write-Host ("Created AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Red
+Write-Host ("Created AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
 #------------------------------
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
 Set-Location ".\"
@@ -103,24 +103,45 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
 #############################################################################################
 $AzureADApplicationObjectID = (Get-AzureRmADServicePrincipal -ServicePrincipalName $azureAdApplication.ApplicationId).Id
 
-Write-Host "TenantId: " -foreground Green –NoNewLine
+Write-Host "TenantId: " -foreground Yellow –NoNewLine
 Write-Host $tenantID -foreground Red 
-Write-Host "SubscriptionID: " -foreground Green –NoNewLine
+Write-Host "SubscriptionID: " -foreground Yellow –NoNewLine
 Write-Host $sub.Subscription -foreground Red 
 
 
 Write-Host -Prompt "Start copy all the values from below here." -ForegroundColor Yellow
 
-Write-Host ("Parameters to be used in the registration / configuration.") -foreground Green
-Write-Host "Azure AD Application Client ID: " -foreground Green –NoNewLine
+Write-Host ("Parameters to be used in the registration / configuration.") -foreground Yellow
+Write-Host "_artifactsLocationSasToken: " -foreground Yellow –NoNewLine
+Write-Host "" -foreground Red 
+Write-Host "Cert Data: " -foreground Yellow –NoNewLine
+Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+Write-Host "Cert Password: " -foreground Yellow –NoNewLine
+Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+Write-Host "Bastion Host Administrator User Name: " -foreground Yellow –NoNewLine
+Write-Host "Default Value is 'bastionadmin'.If needs change please do so in the next step" -foreground Red 
+Write-Host "Bastion Host Administrator Password: " -foreground Yellow –NoNewLine
+Write-Host "Please Provide Host Administrator Password" -foreground Red 
+Write-Host "SQL Administrator Login User Name: " -foreground Yellow –NoNewLine
+Write-Host "Default Value is 'sqladmin'.If needs change please do so in the next step" -foreground Red 
+Write-Host "SQL Administrator Login Password: " -foreground Yellow –NoNewLine
+Write-Host "Please Provide SQL Administrator Login Password" -foreground Red 
+Write-Host "SQL Threat Detection Alert Email Address: " -foreground Yellow –NoNewLine
+Write-Host "Please Provide Email Address to get SQL Threat Detection Alerts" -foreground Red 
+Write-Host "Automation Account Name: " -foreground Yellow –NoNewLine
+Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+Write-Host "Custom Host Name: " -foreground Yellow –NoNewLine
+Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+
+Write-Host "Azure AD Application Client ID: " -foreground Yellow –NoNewLine
 Write-Host $azureAdApplication.ApplicationId -foreground Red 
-Write-Host "Azure AD Application Client Secret: " -foreground Green –NoNewLine
+Write-Host "Azure AD Application Client Secret: " -foreground Yellow –NoNewLine
 Write-Host $AzureADApplicationClientSecret -foreground Red 
-Write-Host "Azure AD Application Object ID: " -foreground Green –NoNewLine
+Write-Host "Azure AD Application Object ID: " -foreground Yellow –NoNewLine
 Write-Host $AzureADApplicationObjectID -foreground Red 
-Write-Host "SQL AD Admin Name: " -foreground Green –NoNewLine
+Write-Host "SQL AD Admin User Name: " -foreground Yellow –NoNewLine
 Write-Host $SQLADAdminName -foreground Red 
-Write-Host "SQL AD Admin Password:(If user already exists then we have to get password manually) " -foreground Green –NoNewLine
+Write-Host "SQL AD Admin User Password:(If user already exists then we have to get password manually) " -foreground Green –NoNewLine
 Write-Host $sqlADAdminDetails.password -foreground Red 
 
 
