@@ -1,10 +1,15 @@
 # Purpose : 
-# 1) This script is used to create global AD Admin user to run Pre Deployment scripts
-# 2) This script should run by user who is having admin access on perticular tenant
-# 3) This script should run before running PreDeployment.ps1 
+#  This script is used to create global AD Admin user to run Pre Deployment scripts
+#
+#  Should run by user who is having admin access on perticular tenant. In scenarios where a new Azure Subscription has been created using a Microsoft Account MSA (Live ID), 
+#   the MSA user may not be able to run the PreDeployment script. Please use this script to create an Azure AD user using this script.
+#  This script would be run before running PreDeployment.ps1.
+
+
 Param(
 	[string] $azureADDomainName , # Provide your Azure AD Domain Name
-    [string] $tenantId # Provide your Azure AD Tenant ID
+    [string] $tenantId, # Provide your Azure AD Tenant ID
+    [string] $globalADAdminPassword # Provide an AD Admin Password for the user admin@$azureADDomainName that complies to your AD's password policy. 
 )
 
 #Depends on Azure AD Preview Module
@@ -15,44 +20,45 @@ if (-not (Get-Module -Name AzureADPreview))
     Import-Module AzureADPreview
 }
 
-Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Red
+Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Grey
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Red
+Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Grey
 
 
 Write-Host ("Step 3: Create Global Admin User Id" ) -ForegroundColor Red
 $globalADAdminName = "admin@"+$azureADDomainName
-Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Red
+Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Grey
 Connect-AzureAD -TenantId $tenantId
-$newUserPasswordProfile = "" | Select password, forceChangePasswordNextLogin
-$newUserPasswordProfile.password = "CF4!!12sdfStgb"
+$newUserPasswordProfile = "" | Select-Object password, forceChangePasswordNextLogin
+$newUserPasswordProfile.password = $globalADAdminPassword
 $newUserPasswordProfile.forceChangePasswordNextLogin = $false 
 
 #check if user exists
-try
-{
-    $adAdmin = Get-AzureADUser -ObjectId $globalADAdminName -ErrorAction SilentlyContinue
-}
-catch
-{
-    Write-Host "admin user not found. attempting create..."
-    #Create New User
-    $adAdmin = New-AzureADUser -DisplayName "Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "admin" -UserPrincipalName $globalADAdminName
-}
+    try
+    {
+        $adAdmin = Get-AzureADUser -ObjectId $globalADAdminName -ErrorAction SilentlyContinue
+    }
+    catch
+    {
+        Write-Host "`tAdmin user not $globalADAdminName found. attempting create..." -ForegroundColor Gray
+        #Create New User
+        $adAdmin = New-AzureADUser -DisplayName "Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "admin" -UserPrincipalName $globalADAdminName
+    }
 
 
 #Get the Compay AD Admin ObjectID
-$companyAdminObjectId = Get-AzureADDirectoryRole | Where {$_."DisplayName" -eq "Company Administrator"} | Select ObjectId
+    $companyAdminObjectId = Get-AzureADDirectoryRole | Where {$_."DisplayName" -eq "Company Administrator"} | Select ObjectId
 
 #make the new user the company admin aka Global AD administrator
-try
-{
-    Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId -ErrorAction SilentlyContinue
-} catch {}
+    try
+    {
+        Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId -ErrorAction SilentlyContinue
+        Write-Host "`tSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
+        
+    } catch {}
 
-Write-Host ("Global AD Admin User " ) -ForegroundColor Cyan
+Write-Host ("Global AD Admin User created Successfully. Details are" ) -ForegroundColor Cyan
 Write-Host ("`tUser Name: $globalADAdminName") -ForegroundColor Red -NoNewline
 Write-Host ("`tPassword: " + $newUserPasswordProfile.password) -ForegroundColor Red
-Write-Host (" Created Successfully" ) -ForegroundColor Cyan
 
 Read-Host -Prompt "The script completed execution. Press any key to exit"
