@@ -7,15 +7,9 @@
 
 
 Param(
-<<<<<<< HEAD
 	[string] [Parameter(Mandatory=$true)] $azureADDomainName, # Provide your Azure AD Domain Name
     [string] [Parameter(Mandatory=$true)] $tenantId, # Provide your Azure AD Tenant ID
     [string] [Parameter(Mandatory=$true)] $globalADAdminPassword # Provide an AD Admin Password for the user admin@$azureADDomainName that complies to your AD's password policy. 
-=======
-	[string] $azureADDomainName , # Provide your Azure AD Domain Name
-    [string] $tenantId, # Provide your Azure AD Tenant ID
-    [string] $globalADAdminPassword # Provide an AD Admin Password for the user admin@$azureADDomainName that complies to your AD's password policy. 
->>>>>>> origin/master
 )
 
 #Depends on Azure AD Preview Module
@@ -26,24 +20,14 @@ if (-not (Get-Module -Name AzureADPreview))
     Import-Module AzureADPreview
 }
 
-<<<<<<< HEAD
 Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Gray
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Gray
-=======
-Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Grey
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Grey
->>>>>>> origin/master
 
 
 Write-Host ("Step 3: Create Global Admin User Id" ) -ForegroundColor Gray
 $globalADAdminName = "admin@"+$azureADDomainName
-<<<<<<< HEAD
 Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Gray
-=======
-Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Grey
->>>>>>> origin/master
 Connect-AzureAD -TenantId $tenantId
 $newUserPasswordProfile = "" | Select-Object password, forceChangePasswordNextLogin
 $newUserPasswordProfile.password = $globalADAdminPassword
@@ -73,11 +57,7 @@ $newUserPasswordProfile.forceChangePasswordNextLogin = $false
         
     } catch {}
 
-<<<<<<< HEAD
 Write-Host ("Global AD Admin User created Successfully. Details are" ) -ForegroundColor Gray
-=======
-Write-Host ("Global AD Admin User created Successfully. Details are" ) -ForegroundColor Cyan
->>>>>>> origin/master
 Write-Host ("`tUser Name: $globalADAdminName") -ForegroundColor Red -NoNewline
 Write-Host ("`tPassword: " + $newUserPasswordProfile.password) -ForegroundColor Red
 

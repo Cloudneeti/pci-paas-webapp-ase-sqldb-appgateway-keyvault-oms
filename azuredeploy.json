@@ -326,7 +326,7 @@
             "name": "default-allow-rdp",
             "properties": {
               "priority": 1000,
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "Internet",
               "protocol": "Tcp",
               "destinationPortRange": "3389",
               "access": "Allow",
