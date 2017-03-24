@@ -5,7 +5,7 @@ Your CIO/CTO, have decided to move your business-critical applications and assoc
 
 However you are thinking... Although Azure provides compliance to its infrastructure, anything you host on top of it will be your responsibility. Microsoft's Azure compliance status does not automatically translate to the compliant status for the services that you build or host on the Azure platform.
 
-This  Reference Architecture solution is meant to help you accelerate your deployment cycles with conformance to standards.  
+This  Reference Architecture solution is meant to help your team to accelerate your deployment cycles with conformance to standards.  
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
