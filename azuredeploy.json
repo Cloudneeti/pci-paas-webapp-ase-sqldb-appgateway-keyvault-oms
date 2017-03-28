@@ -121,8 +121,7 @@
     "bastionSubnetAddressPrefix": "10.0.2.0/24",
     "aseSubnetBaseAddress": "10.0.3",
     "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
-    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
-    "aseBackendVirtualIp2": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
+    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -137,7 +136,7 @@
     "workerPoolThreeInstanceSize": "Small",
     "workerPoolThreeInstanceCount": 0,
     "skuName": "WAF_Medium",
-    "capacity": 1,
+    "capacity": 2,
     "retentionPolicy": 2,
     "automationRegion": "East US 2",
     "omsRegion": "East US",
@@ -266,6 +265,19 @@
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 110,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowGatewayBackendHealth",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "65503-65534",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 130,
               "direction": "Inbound"
             }
           }
@@ -457,11 +469,8 @@
           "capacity": {
             "value": "[variables('capacity')]"
           },
-          "backendIpAddress1": {
+          "backendIpAddress": {
             "value": "[variables('aseBackendVirtualIp')]"
-          },
-          "backendIpAddress2": {
-            "value": "[variables('aseBackendVirtualIp2')]"
           },
           "certData": {
             "value": "[parameters('certData')]"
@@ -728,7 +737,9 @@
               "ChangeTracking",
               "ApplicationInsights",
               "ServiceMap",
-              "Security"
+              "Security",
+              "AntiMalware",
+              "Updates"
             ]
           },
           "tagValues": {

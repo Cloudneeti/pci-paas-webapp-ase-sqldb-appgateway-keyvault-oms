@@ -19,16 +19,10 @@
         "description": "Number of instances"
       }
     },
-    "backendIpAddress1": {
+    "backendIpAddress": {
       "type": "string",
       "metadata": {
         "description": "IP Address for Backend Server 1"
-      }
-    },
-    "backendIpAddress2": {
-      "type": "string",
-      "metadata": {
-        "description": "IP Address for Backend Server 2"
       }
     },
     "certData": {
@@ -148,10 +142,7 @@
             "properties": {
               "BackendAddresses": [
                 {
-                  "IpAddress": "[parameters('backendIpAddress1')]"
-                },
-                {
-                  "IpAddress": "[parameters('backendIpAddress2')]"
+                  "IpAddress": "[parameters('backendIpAddress')]"
                 }
               ]
             }
