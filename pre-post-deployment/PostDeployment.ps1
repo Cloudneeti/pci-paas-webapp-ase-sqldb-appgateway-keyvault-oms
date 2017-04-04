@@ -18,18 +18,23 @@
 
 
 
-#Param(
-#    [string] $ResourceGroupName = '002-pci-paas-guru', # Provide Resource Group Name Created through ARM template
-#	[string] $SQLServerName = 'sqlserver-y3fccbvhoiqws', # Provide Sql Server name (not required full name) Created through ARM template
-#	[string] $SQLServerAdministratorLoginPassword = 'PartnerSolutions123', # Provide admin password of sql server used for ARM template parameter "SQLServerAdministratorLoginPassword" (this is not the SQL AD admin but the admin user of the SQL Server)
-#	[string] $ClientIPAddress = '50.135.7.0', # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
-#	[string] $ASEOutboundAddress = '52.179.124.107', # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
-#	[string] $SQLServerAdministratorLoginUserName = 'mca.lakshman@avyanconsulting.com', # Provide SQL AD Administrator Name, same we used for ARM Deployment
-#	[string] $subscriptionId = 'c53e6ef0-cc4c-4a73-be8f-00c5d97812e8', # Provide your Azure subscription ID
-#	[string] $KeyVaultName = 'kv-pcisamples-y3fccbvh', # Provide Key Vault Name Created through ARM template
-#    [string] $azureAdApplicationClientId = '50ca9772-8f2f-49ea-9757-84f46067296f', # AD Application ClientID - the same one you used in the ARM template
-#    [string] $azureAdApplicationClientSecret = 'Password@123' # AD Application ClientID - the same one you used in the ARM template
-#)
+
+<#
+# If you'd like to run this from w/i a powershell_ISE or visual studio code, you could try replacing and uncommenting this code block AND commenting out the parameters block.
+$SubscriptionId = <your sub id> # Provide your Azure subscription ID
+$ResourceGroupName = '001-azurepcisamples-avyan' # Provide Resource Group Name Created through ARM template
+$ClientIPAddress = <your client IP address>  # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
+$ASEOutboundAddress = <virtual outbound IP address of the ASE> # Provide ASE Outbound address we will get it in ASE properties in Azure portal
+$SQLServerName = <your sql server name> # Provide Sql Server name (not required full name) Created through ARM template
+$SQLServerAdministratorLoginUserName = 'sqladmin'  # Provide admin user name of sql server used for ARM template parameter "sqlAdministratorLoginUserName" 
+$SQLServerAdministratorLoginPassword = <your sqlserver admin password> # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" 
+$KeyVaultName = <your keyvault name> # Provide Key Vault Name Created through ARM template
+$AzureAdApplicationClientId = <your app id> # AD Application ClientID - the same one you used in the ARM template
+$AzureAdApplicationClientSecret = <your password> # AD Application ClientID - the same one you used in the ARM template
+$SqlAdAdminUserName = <your sqladadmin user principal name> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserName
+$SqlAdAdminUserPassword = <your password> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
+#>
+
 
 Param(
 	[string] [Parameter(Mandatory=$true)] $SubscriptionId , # Provide your Azure subscription ID
@@ -45,6 +50,7 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserName, # Provide SQL AD Administrator Name, same we used for ARM Deployment for parameter sqlAdAdminUserName
 	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserPassword # Provide SQL AD Administrator Name, same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
 )
+
 
 $DatabaseName = "ContosoClinicDB"
 $StorageName = "stgreleases"+$SQLServerName.Substring(10,5).ToLower()
@@ -171,7 +177,7 @@ $database = $server.Databases[$databaseName]
     #Add-SqlAzureAuthenticationContext -Interactive 
     
     New-SqlColumnMasterKey -Name $cmkName -InputObject $database -ColumnMasterKeySettings $cmkSettings
-	Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $azureAdApplicationClientSecret -Tenant $context.Tenant
+    Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $azureAdApplicationClientSecret -Tenant $context.Tenant.TenantId
     New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName
     
     # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
@@ -198,10 +204,13 @@ $resourceTypes = @( "Microsoft.Network/applicationGateways",
                     "Microsoft.Web/sites",
                     "Microsoft.KeyVault/Vaults" ,
 					"Microsoft.Automation/automationAccounts")
-Install-Script -Name Enable-AzureRMDiagnostics -Force
-Install-Script -Name AzureDiagnosticsAndLogAnalytics -Force
-Install-Module -Name Enable-AzureRMDiagnostics -Force
-Install-Module -Name AzureDiagnosticsAndLogAnalytics -Force
+
+<#
+    Install-Script -Name Enable-AzureRMDiagnostics -Force
+    Install-Script -Name AzureDiagnosticsAndLogAnalytics -Force
+    Install-Module -Name Enable-AzureRMDiagnostics -Force
+    Import-Module -Name AzureDiagnosticsAndLogAnalytics -Force
+#>
 
 foreach($resourceType in $resourceTypes)
 {

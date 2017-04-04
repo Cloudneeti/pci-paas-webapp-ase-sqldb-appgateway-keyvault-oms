@@ -102,8 +102,9 @@
         "name": "[parameters('siteName')]",
         "serverFarmId": "[variables('defaultAppServicePlanName')]",
         "siteConfig": {
-          "AlwaysOn": true
+          "AlwaysOn": false
         },
+        "clientAffinityEnabled": false,
         "hostingEnvironmentProfile": {
           "id": "[resourceId('Microsoft.Web/hostingEnvironments', parameters('aseName'))]"
         }
@@ -118,7 +119,7 @@
           ],
           "properties": {
             "DefaultConnection": {
-              "value": "[concat('Data Source=tcp:', variables('defaultSqlServerName'), '.database.windows.net,1433;Initial Catalog=', variables('defaultSqlDatabaseName'), ';User Id=', parameters('aadLoginUser'), ';Password=', parameters('aadLoginPassword'), ';Authentication=Active Directory Password;Column Encryption Setting=Enabled;Connection Timeout=30;')]",
+              "value": "[concat('Data Source=tcp:', variables('defaultSqlServerName'), '.database.windows.net,1433;Initial Catalog=', variables('defaultSqlDatabaseName'), ';User Id=', parameters('aadLoginUser'), ';Password=', parameters('aadLoginPassword'), ';Authentication=Active Directory Password;Column Encryption Setting=Enabled;Connection Timeout=300;')]",
               "type": "SQLAzure"
             }
           }

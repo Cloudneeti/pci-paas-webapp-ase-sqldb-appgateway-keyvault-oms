@@ -254,7 +254,7 @@
         },
         "webApplicationFirewallConfiguration": {
           "enabled": true,
-          "firewallMode": "Detection"
+          "firewallMode": "Prevention"
         }
       },
       "resources": [

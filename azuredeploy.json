@@ -136,7 +136,7 @@
     "workerPoolThreeInstanceSize": "Small",
     "workerPoolThreeInstanceCount": 0,
     "skuName": "WAF_Medium",
-    "capacity": 2,
+    "capacity": 1,
     "retentionPolicy": 2,
     "automationRegion": "East US 2",
     "omsRegion": "East US",
@@ -839,6 +839,62 @@
               "priority": 110,
               "direction": "Inbound"
             }
+          },
+          {
+            "name": "REQ_AllowAzureHealthProbes",
+            "properties": {
+              "description": "Required port used by Azure infrastructure for managing and maintaining App Service Environments",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "454-455",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowOutboundSQL_1433",
+            "properties": {
+              "description": "Allowing ASE to communicate to SQL DB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1433",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowOutboundSQL_11000-11999",
+            "properties": {
+              "description": "Allowing ASE to communicate to SQL DB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "11000-11999",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowOutboundSQL_14000-14999",
+            "properties": {
+              "description": "Allowing ASE to communicate to SQL DB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "14000-14999",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Outbound"
+            }
           }
         ]
       },
@@ -874,6 +930,21 @@
           }
         }
       ]
+    },
+    {
+      "comments": "Associate nsg-asg to subnet-ase after ASE deploys",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(variables('virtualNetworkName'), '/', variables('asesubnetName'))]",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-ASE')]"
+      ],
+      "properties": {
+        "addressPrefix": "[variables('aseSubnetAddressPrefix')]",
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aseNsgGroupName'))]"
+        }
+      }
     }
   ],
   "outputs": {
