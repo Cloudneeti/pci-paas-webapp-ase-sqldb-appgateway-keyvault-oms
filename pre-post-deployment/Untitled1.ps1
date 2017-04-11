@@ -1,4 +1,4 @@
-# Purpose : 
+﻿# Purpose : 
 #  This script is used to create global AD Admin user to run Pre Deployment scripts
 #
 #  Should run by user who is having admin access on perticular tenant. In scenarios where a new Azure Subscription has been created using a Microsoft Account MSA (Live ID), 
@@ -26,7 +26,7 @@ Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Gray
 
 
 Write-Host ("Step 3: Create Global Admin User Id" ) -ForegroundColor Gray
-$globalADAdminName = "admin@"+$azureADDomainName
+$globalADAdminName = "admin2@"+$azureADDomainName
 Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Gray
 Connect-AzureAD -TenantId $tenantId
 $newUserPasswordProfile = "" | Select-Object password, forceChangePasswordNextLogin
