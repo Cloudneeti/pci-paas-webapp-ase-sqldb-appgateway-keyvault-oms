@@ -1,7 +1,9 @@
----
-subtitle: Blueprint and reference architecture with ARM templates
+
+
 title: "Azure PCI and HIPAA validated solution "
----
+
+subtitle: Blueprint and reference architecture with ARM templates
+
 
 Disclaimer   
 
