@@ -1,8 +1,8 @@
 
 
-title: "Azure PCI and HIPAA validated solution "
+# Azure PCI and HIPAA validated solution
 
-subtitle: Blueprint and reference architecture with ARM templates
+## Blueprint and reference architecture with ARM templates
 
 
 Disclaimer   
@@ -29,19 +29,19 @@ subscription costs.*
 
 Acknowledgements
 
-Authors 
+Authors
 ========
 
 *Frank Simorjay*
 
 *Gururaj Pandurangi (Avyan Consulting)*
 
-Contributors and Reviewers 
+Contributors and Reviewers
 ===========================
 
 TBD
 
-SOLUTION OBJECTIVE and SCENARIO 
+SOLUTION OBJECTIVE and SCENARIO
 ================================
 
 The objective of this solution is to illustrate how a secure and compliant
@@ -96,21 +96,21 @@ consist of the following items:
 
 | **Resource**                  | **Cost/Month** |
 |-------------------------------|----------------|
-| S1 SQL Database               | \$30.00        |
-| B1 App Service Plan           | \$55.80        |
-| Storage Plan                  | \$0.36         |
-| Azure Key Vault               | \$0.00         |
-| OMS                           | \$10.00        |
-| Domain name/SSL certificate\* | \$10.00        |
-| Security Center               | \$15.00        |
-| Key Vault                     | \$0.03         |
-| Azure Active Directory        | \$126.60       |
-| App Service                   | \$74.40        |
-| SQL Database                  | \$15.03        |
-| Virtual Machines              | \$104.93       |
-| Application Gateway           | \$93.74        |
-| \*Azure DNS                   | \$0.90         |
-| **Total monthly estimate**    | **\$536.79**   |
+| S1 SQL Database               | $30.00        |
+| B1 App Service Plan           | $55.80        |
+| Storage Plan                  | $0.36         |
+| Azure Key Vault               | $0.00         |
+| OMS                           | $10.00        |
+| Domain name/SSL certificate\* | $10.00        |
+| Security Center               | $15.00        |
+| Key Vault                     | $0.03         |
+| Azure Active Directory        | $126.60       |
+| App Service                   | $74.40        |
+| SQL Database                  | $15.03        |
+| Virtual Machines              | $104.93       |
+| Application Gateway           | $93.74        |
+| \*Azure DNS                   | $0.90         |
+| **Total monthly estimate**    | **$536.79**   |
 
 \*The domain name and SSL certificate are external service offerings. Prices may
 vary.
@@ -142,57 +142,54 @@ understand how Azure can be used to accomplish the following:
 
 Because this is a POC that installs the required elements to operate a service,
 it is not a customer ready-to-go solution. It requires careful understanding of
-all the regulations and laws that your organization must abide by. *You will be
-responsible for conducting appropriate security and compliance reviews of any
+all the regulations and laws that your organization must abide by.
+
+*You will be responsible for conducting appropriate security and compliance reviews of any
 solution built with the architecture used by this POC, as requirements may vary
 based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
 your production ready solution.*
 
-The POC solution is designed with the following employees of Contosohealth:
+The POC solution is designed with the following employees of **Contosohealth**:
 
 >   **Name**: Edna Benson is the receptionist, and business manager. She is
 >   responsible to ensure that patient customer information is accurate, and
 >   billing is completed.
 
->   **Username**: EdnaB
+|Item      |Example|
+|----------|------|
+ |Username:| EdnaB|
+| Password:|!Password111!!!|
+| First name:| Edna|
+|Last name:| Benson|
+| User type: |Member|
 
->   Password:!Password111!!!
+>   Permissions: Create, read patient information, read date of birth (DOB)
 
->   First name: Edna
-
->   Last name: Benson
-
->   User type: Member
-
->   **Permissions**: Create, read patient information, read date of birth (DOB)
-
--   Edna will be able to modify patient information but will not be able to
+>   Edna will be able to modify patient information but will not be able to
     alter patient medical records
 
--   Edna can overwrite (or replace) credit card number, expiration, and CVC
+>   Edna can overwrite (or replace) credit card number, expiration, and CVC
     verification information
 
--   Edna can replace stored Social Security number (SSN)
+>   Edna can replace stored Social Security number (SSN)
 
--   Edna cannot read SSN or credit card information unmasked. In addition, all
+>   Edna cannot read SSN or credit card information unmasked. In addition, all
     her actions are logged.
 
 >   **Name:** Dr. Chris Aston is the clinic’s doctor. He is responsible for
 >   patient care, he will be entering patient history and treatment information.
 >   Chris can update information for patients.
 
->   **Username**: ChrisA
+|Item      |Example|
+|----------|------|
+|Username: |ChrisA|
+ | Password: |!Password222!!!|
+| First name: |Chris|
+|Last name: |Aston|
+|User type:| Member|
 
->   Password: !Password222!!!
-
->   First name: Chris
-
->   Last name: Aston
-
->   User type: Member
-
->   **Permissions:** Create, read patient information, read DOB
+>   Permissions: Create, read patient information, read DOB
 
 >   Chris can modify patient information, including medical records and date of
 >   birth, and can view masked SSN.
@@ -377,26 +374,22 @@ computer throughout the installation of this solution.
 
 >   **Install-azure-powershell-modules.ps1**
 
-|   |
-|---|
+
 
 
 If any of the commands from the script fail, see the following reference links
 for assistance:
 
-| **Module**                             | **Reference link**                                                                                                                                          |
-|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **AzureRM**                            | <https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/> **Validate by testing** \$cred = Get-Credential Login-AzureRmAccount -Credential \$cred |
-| **Azure AD**                           | <https://technet.microsoft.com/en-us/library/dn975125.aspx> **Validate by testing**                                                                         |
+
+ To test [AzureRM](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/)                       run the following commands in PowerShell:
+  >$cred = Get-Credential
+
+  >Login-AzureRmAccount -Credential \$cred
+
+To test [Azure AD](https://technet.microsoft.com/en-us/library/dn975125.aspx) Validate by testing                                                                        |
 | **Enable AzureRM Diagnostics**         | <https://www.powershellgallery.com/packages/Enable-AzureRMDiagnostics/1.3/DisplayScript>                                                                    |
 | **Azure Diagnostics and LogAnalytics** | <https://www.powershellgallery.com/packages/AzureDiagnosticsAndLogAnalytics/0.1>                                                                            |
-| **SQL Server PowerShell**              | <https://msdn.microsoft.com/en-us/library/hh231683.aspx?f=255&MSPPError=-2147217396#Installing SQL Server PowerShell Support> **Validate by testing**       |
-
->   \$Credential = Get-Credential
-
->   Connect-AzureAD -Credential \$Credential
-
->   Get-Module -ListAvailable -Name Sqlps;
+| **SQL Server PowerShell**              | <https://msdn.microsoft.com/en-us/library/hh231683.aspx?f=255&MSPPError=-2147217396#Installing SQL Server PowerShell Support> Validate by testing   $Credential = Get-Credential   Connect-AzureAD -Credential $Credential   Get-Module -ListAvailable -Name Sqlps;|
 
 Configure your global admin for the solution
 --------------------------------------------
@@ -517,7 +510,7 @@ NOTE – whenever starting your PowerShell IDE it is recommended you run the
 previous four commands to ensure your are logged into the correct services
 throughout the installation, and testing of this solution.
 
-Pre-ARM template deployment 
+Pre-ARM template deployment
 ----------------------------
 
 The script pre-deployment.ps1 provides the setup and configuration of users and
@@ -614,7 +607,7 @@ proceed as illustrated in the following example for contosoclinic.
 
 >   SQL AD Admin User Name: **sqladmin\@pcidemo.onmicrosoft.com**
 
->   SQL AD Admin User temporary password: **Xufo8956**
+
 
 >   Please follow the deployment guide for the specific permissions
 
@@ -840,7 +833,7 @@ components. The total time required is approximately 2.5 hours from when the
 
 ![](media/55b93440ce5d4b431f16fe6125ac72e6.png)
 
-Post-ARM Deployment 
+Post-ARM Deployment
 --------------------
 
 The following post-deployment steps deploy and set up the database, users, and
@@ -1018,7 +1011,7 @@ of the reference architecture. Deployment details can be found in section 6.0.
 Run post-deployment SQL script
 ------------------------------
 
-### At this point you will have a fully deployed solution, to which the two administrative user roles will be added. The user roles can be deployed using SQL Management Studio. 
+### At this point you will have a fully deployed solution, to which the two administrative user roles will be added. The user roles can be deployed using SQL Management Studio.
 
 ### Open SQL Server Management Studio using the Active Directory username and password.
 
@@ -1179,7 +1172,7 @@ You can now review your data collection in OMS.
 
 ![](media/16e8964e5de5283a649e00c1eb8196b1.png)
 
-Upgrade Azure Security Center 
+Upgrade Azure Security Center
 ------------------------------
 
 Azure Security Center was enabled in the deployment of your subscription.
@@ -1322,7 +1315,7 @@ A PaaS SQL Database instance was used to showcase various security measures.
 masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)
 (using the post-deployment PowerShell script)
 
-**Logging and Auditing** 
+**Logging and Auditing**
 -------------------------
 
 -   **Activity Logs**: Configure [Azure Activity
