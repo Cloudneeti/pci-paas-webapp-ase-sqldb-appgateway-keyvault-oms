@@ -1007,6 +1007,11 @@ of the reference architecture. Deployment details can be found in section 6.0.
     -   .\\pre-post-deployment\\PostDeployment.ps1
 
     -   Select **Run Once** to the script warning
+	
+	
+2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command. You will need to provide the same password you selected for your SQL admin you established in step 4.6
+>Set-MsolUserPassword -userPrincipalName sqladmin@pcidemouseroutlook.onmicrosoft.com -NewPassword ‘<SQLADMINPASSWORD>’ -ForceChangePassword $false
+
 
 Run post-deployment SQL script
 ------------------------------
