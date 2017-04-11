@@ -1,15 +1,56 @@
-$SubscriptionId = 'fb828b18-79dd-400c-919a-a393d88835e5' #<your sub id> # Provide your Azure subscription ID
-$ResourceGroupName = 'Contosoclinic' #'001-azurepcisamples-avyan' # Provide Resource Group Name Created through ARM template
-$ClientIPAddress = '131.107.160.167' #<your client IP address>  # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
-$ASEOutboundAddress = '13.92.27.211' # <virtual outbound IP address of the ASE> # Provide ASE Outbound address we will get it in ASE properties in Azure portal
-$SQLServerName = 'sqlserver-fbikvpe4mjhgu' #<your sql server name> # Provide Sql Server name (not required full name) Created through ARM template
-$SQLServerAdministratorLoginUserName = 'sqladmin'  # Provide admin user name of sql server used for ARM template parameter "sqlAdministratorLoginUserName" 
-$SQLServerAdministratorLoginPassword = 'h6^UPWPLE$' #<your sqlserver admin password> # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" 
-$KeyVaultName = 'kv-pcisamples-fbikvpe4' #<your keyvault name> # Provide Key Vault Name Created through ARM template
-$AzureAdApplicationClientId = '2fef9133-5184-44bd-ac21-4d0f942c3cae' #<your app id> # AD Application ClientID - the same one you used in the ARM template
-$AzureAdApplicationClientSecret = "Password@123" #<your password> # AD Application ClientID - the same one you used in the ARM template
-$SqlAdAdminUserName = 'sqladmin@pcidemoxoutlook560.onmicrosoft.com' #<your sqladadmin user principal name> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserName
-$SqlAdAdminUserPassword = 'h6^UPWPLE$' #<your password> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
+# Refer to the README.md (located here https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/) 
+#   and Deployment Guide (located in the documents folder of the same github repo
+#
+# This is a Post-Deployment script that is to be run after a successful ARM deployment 
+# Pre-Requisites to run this script
+#      1) Global Azure AD admin credentials that has at least contributor access to the Azure Subscription
+#      2) Should have successfully deployed pre-Deployment script and Azure ARM deployment
+#
+# The script does the following things 
+#      1) Downloads and copies the SQL bacpac file to a new Azure storage account
+#      2) Updates SQL DB firewall to allow you (your clientIp) access to manage SQL DB AND Allowing the WebApp deployed on ASE (the ASE outbound virtual IP)
+#      3) Data Mask few DB columns (ensuring that only the SQL Admins be able to see the detailed info in the Database) everyone else sees them as masked .. e.g. SSN will show up as XXX-XX-4digitnumber
+#      4) Enable Always Encrypt for a few columns (e.g. Credit card)
+#      5) Makes an AD User to the the SQL AD Admin [refer command Set-AzureRmSqlServerActiveDirectoryAdministrator]
+#      6) Ensures Diagnotics logs are sent to OMS Workspace (script assumes that there's only one WS in the resourcegroup created by the ARM template)
+#
+# Enjoy the sample.
+
+
+
+
+<#
+# If you'd like to run this from w/i a powershell_ISE or visual studio code, you could try replacing and uncommenting this code block AND commenting out the parameters block.
+$SubscriptionId = <your sub id> # Provide your Azure subscription ID
+$ResourceGroupName = '001-azurepcisamples-avyan' # Provide Resource Group Name Created through ARM template
+$ClientIPAddress = <your client IP address>  # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
+$ASEOutboundAddress = <virtual outbound IP address of the ASE> # Provide ASE Outbound address we will get it in ASE properties in Azure portal
+$SQLServerName = <your sql server name> # Provide Sql Server name (not required full name) Created through ARM template
+$SQLServerAdministratorLoginPassword = <your sqlserver admin password> # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" 
+$KeyVaultName = <your keyvault name> # Provide Key Vault Name Created through ARM template
+$AzureAdApplicationClientId = <your app id> # AD Application ClientID - the same one you used in the ARM template
+$AzureAdApplicationClientSecret = <your password> # AD Application ClientID - the same one you used in the ARM template
+$SqlAdAdminUserName = <your sqladadmin user principal name> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserName
+$SqlAdAdminUserPassword = <your password> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
+#>
+
+
+Param(
+	[string] [Parameter(Mandatory=$true)] $SubscriptionId , # Provide your Azure subscription ID
+    [string] [Parameter(Mandatory=$true)] $ResourceGroupName , # Provide Resource Group Name Created through ARM template
+	[string] [Parameter(Mandatory=$true)] $ClientIPAddress , # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
+	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress , # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
+	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through ARM template
+	[string] [Parameter(Mandatory=$true)] $SQLServerAdministratorLoginUserName, # Provide admin user name of sql server used for ARM template parameter "sqlAdministratorLoginUserName" 
+	[string] [Parameter(Mandatory=$true)] $SQLServerAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" 
+	[string] [Parameter(Mandatory=$true)] $KeyVaultName , # Provide Key Vault Name Created through ARM template
+	[string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
+    [string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientSecret, # AD Application ClientID - the same one you used in the ARM template
+	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserName, # Provide SQL AD Administrator Name, same we used for ARM Deployment for parameter sqlAdAdminUserName
+	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserPassword # Provide SQL AD Administrator Name, same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
+)
+
+
 
 
 
