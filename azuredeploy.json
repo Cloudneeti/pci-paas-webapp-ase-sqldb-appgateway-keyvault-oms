@@ -17,7 +17,7 @@
       }
     },
     "certData": {
-      "type": "string",
+      "type": "securestring",
       "metadata": {
         "description": "Base-64 encoded form of the .pfx file"
       }
@@ -121,8 +121,7 @@
     "bastionSubnetAddressPrefix": "10.0.2.0/24",
     "aseSubnetBaseAddress": "10.0.3",
     "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
-    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
-    "aseBackendVirtualIp2": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
+    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -268,6 +267,19 @@
               "priority": 110,
               "direction": "Inbound"
             }
+          },
+          {
+            "name": "AllowGatewayBackendHealth",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "65503-65534",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 130,
+              "direction": "Inbound"
+            }
           }
         ]
       },
@@ -326,7 +338,7 @@
             "name": "default-allow-rdp",
             "properties": {
               "priority": 1000,
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "Internet",
               "protocol": "Tcp",
               "destinationPortRange": "3389",
               "access": "Allow",
@@ -457,11 +469,8 @@
           "capacity": {
             "value": "[variables('capacity')]"
           },
-          "backendIpAddress1": {
+          "backendIpAddress": {
             "value": "[variables('aseBackendVirtualIp')]"
-          },
-          "backendIpAddress2": {
-            "value": "[variables('aseBackendVirtualIp2')]"
           },
           "certData": {
             "value": "[parameters('certData')]"
@@ -728,7 +737,9 @@
               "ChangeTracking",
               "ApplicationInsights",
               "ServiceMap",
-              "Security"
+              "Security",
+              "AntiMalware",
+              "Updates"
             ]
           },
           "tagValues": {
@@ -828,6 +839,62 @@
               "priority": 110,
               "direction": "Inbound"
             }
+          },
+          {
+            "name": "REQ_AllowAzureHealthProbes",
+            "properties": {
+              "description": "Required port used by Azure infrastructure for managing and maintaining App Service Environments",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "454-455",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowOutboundSQL_1433",
+            "properties": {
+              "description": "Allowing ASE to communicate to SQL DB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1433",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowOutboundSQL_11000-11999",
+            "properties": {
+              "description": "Allowing ASE to communicate to SQL DB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "11000-11999",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowOutboundSQL_14000-14999",
+            "properties": {
+              "description": "Allowing ASE to communicate to SQL DB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "14000-14999",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Outbound"
+            }
           }
         ]
       },
@@ -863,6 +930,21 @@
           }
         }
       ]
+    },
+    {
+      "comments": "Associate nsg-asg to subnet-ase after ASE deploys",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(variables('virtualNetworkName'), '/', variables('asesubnetName'))]",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-ASE')]"
+      ],
+      "properties": {
+        "addressPrefix": "[variables('aseSubnetAddressPrefix')]",
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('aseNsgGroupName'))]"
+        }
+      }
     }
   ],
   "outputs": {
