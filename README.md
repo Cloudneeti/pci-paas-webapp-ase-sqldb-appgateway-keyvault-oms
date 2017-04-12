@@ -1339,14 +1339,18 @@ A PaaS SQL Database instance was used to showcase various security measures.
     (allowing for ASE worker pools and client IP management)
 
 -   [Enabled Threat
-    Detection](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-threat-detection-get-started)
+    Detection](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-threat-detection-get-started) for the database.
 
 -   [Enabled Always Encrypted
     columns](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault)
 
-[Enabled Dynamic Data
+-   [Enabled Dynamic Data
 masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)
 (using the post-deployment PowerShell script)
+
+-   [Connection & Transport level Encyption](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-security-overview) Connection string was modified to use *Encrypt=True; TrustServerCertificate=False;*
+
+For more information around SQL database security, refer to the blog and the associated whitepaper here [Securing your SQL Database](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-security-overview) 
 
 ### Logging and Auditing
 
