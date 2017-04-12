@@ -168,7 +168,7 @@ This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
 
-[!IMPORTANT] The solution requires `a paid subscription on Azure`, it will not work
+> [!IMPORTANT] The solution requires `a paid subscription on Azure`, it will not work
 with a Trial subscription.
 
 
