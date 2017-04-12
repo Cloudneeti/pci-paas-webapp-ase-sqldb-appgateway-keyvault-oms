@@ -26,12 +26,12 @@ subscription costs.*
 <H2> Authors of the document </H2>
 
 * *Frank Simorjay (Microsoft)*  
-* *Gururaj Pandurangi (Avyan Consulting)* 
+* *Gururaj Pandurangi (Avyan Consulting)*
 
 <H2> Disclaimer </H2>
 > This solution is intended as a reference architecture pilot and should not be used as-is for production purposes
 > * Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
-> * If you are a Microsoft internal team member, please refer to the **http://aka.ms/azurepci** and engage your respective DX / CSA /Account teams. 
+> * If you are a Microsoft internal team member, please refer to the **http://aka.ms/azurepci** and engage your respective DX / CSA /Account teams.
 > * Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
 
 <H2> Contributors and Reviewers </H2>
@@ -53,8 +53,6 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 - [SOLUTION OBJECTIVE AND SCENARIO](#solution-objective-and-scenario)
 - [COST MODEL](#cost-model)
 - [USER SCENARIO](#user-scenario)
-        - [Role: Receptionist](#role-receptionist)
-        - [Role: Doctor](#role-doctor)
 - [DEPLOYMENT GUIDE](#deployment-guide)
     - [Installation procedure overview](#installation-procedure-overview)
     - [Collect prerequisites certificate, azure subscription](#collect-prerequisites-certificate-azure-subscription)
@@ -117,8 +115,8 @@ The objective of this solution is to illustrate how a secure and compliant
 solution could be deployed as an end-to-end Azure solution. The components of
 this solution are as follows:
 
--   **Solution blueprint**. The blueprint provides an understanding of how Contoso Health (a fictitious organization) achieved itss compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso Health.
--   **Reference architecture**. The reference architecture provides the design that was used for the Contoso Health solution. 
+-   **Solution blueprint**. The blueprint provides an understanding of how Contoso Health (a fictitious organization) achieved its compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso Health.
+-   **Reference architecture**. The reference architecture provides the design that was used for the Contoso Health solution.
 -   **Azure Resource Manager (ARM) templates**. In this deployment, JavaScript Object Notation (.JSON) files provide Microsoft Azure the ability to automatically deploy the components of the reference architecture after the configuration parameters are provided during setup.
 -   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
     -   Module installation script that will install required PowerShell modules for
@@ -132,7 +130,8 @@ this solution are as follows:
     -   A post-installation process that deploys an [ARM template, web front-end
     runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by     the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso Clinic Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
 
-    The solution is intended to do the following,  
+
+  The solution is intended to do the following:  
    ![](images/Solution_Context.png)
 
 ## COST MODEL
@@ -168,7 +167,7 @@ vary.
 This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
-> **Note**: The solution requires a paid subscription on Azure, it will not work
+>**Note**: The solution requires `a paid subscription on Azure`, it will not work
 with a Trial subscription.
 
 A small medical clinic, Contoso Health, is ready to move their patient intake
@@ -197,7 +196,7 @@ based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
 your production ready solution.*
 
-The POC solution is designed with the following employees of **Contosohealth**:
+The POC solution is designed with the following employees of `Contosohealth`:
 
 
 #### Role: Receptionist
@@ -205,13 +204,13 @@ The POC solution is designed with the following employees of **Contosohealth**:
 
 |Item      |Example|
 |----------|------|
-|Username:| EdnaB|
-| Password:|!Password111!!!|
-| First name:| Edna|
-|Last name:| Benson|
-| User type: |Member|
+|Username:| `EdnaB`|
+| Password:|``!Password111!!!``|
+| First name:| `Edna`|
+|Last name:| `Benson`|
+| User type: |`Member`|
 
-**Permissions**: Create, read patient information, read date of birth (DOB)* 
+**Permissions**: Create, read patient information, read date of birth (DOB)*
 * Edna will be able to modify patient information but will not be able to alter patient medical records
 * Edna can overwrite (or replace) credit card number, expiration, and CVC verification information
 * Edna can replace stored Social Security number (SSN)
@@ -224,11 +223,11 @@ The POC solution is designed with the following employees of **Contosohealth**:
 
 |Item      |Example|
 |----------|------|
-|Username: |ChrisA|
- | Password: |!Password222!!!|
-| First name: |Chris|
-|Last name: |Aston|
-|User type:| Member|
+|Username: |`ChrisA`|
+ | Password: |``!Password222!!!``|
+| First name: |`Chris`|
+|Last name: |`Aston`|
+|User type:| `Member`|
 
 **Permissions**: Create, read patient information, read DOB
 * Chris can modify patient information, including medical records and date of birth, and can view masked SSN.
@@ -236,7 +235,7 @@ The POC solution is designed with the following employees of **Contosohealth**:
 * All of Chris’s actions are logged
 
 
-In the Contoso Clinic Demo Application, you will be able to test the security
+In the `Contoso Clinic` Demo Application, you will be able to test the security
 measures configured for Edna and Chris to explore their permissions for reading,
 creating, altering, and deleting records in the solution. By default visiting
 the contosoclinic.com site you will be logged in as Edna.
@@ -244,77 +243,65 @@ the contosoclinic.com site you will be logged in as Edna.
 ## DEPLOYMENT GUIDE
 
 This solution used the following Azure services (details to the deployment
-architecture are located in section 5):
+architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture)):
 
--   Application Gateway
 
--   Azure Active Directory
-
--   App Service Environment
-
--   OMS Log Analytics
-
--   Azure Key Vault
-
--   Network Security Groups
-
--   Azure SQL DB
-
--   Azure Load Balancer
-
--   Application Insights
-
--   Azure Security Center
-
--   Azure Web App
-
--   Azure Automation
-
--   Azure Automation Runbooks
-
--   Azure DNS
-
--   Azure Virtual Network
-
--   Azure Virtual Machine
-
--   Azure Resource Group and Policies
-
--   Azure Blob Storage
-
--   Azure Active Directory access control (RBAC)
+>-   Application Gateway
+>
+>-   Azure Active Directory
+>
+>-   App Service Environment
+>
+>-   OMS Log Analytics
+>
+>-   Azure Key Vault
+>
+>-   Network Security Groups
+>
+>-   Azure SQL DB
+>
+>-   Azure Load Balancer
+>
+>-   Application Insights
+>
+>-   Azure Security Center
+>
+>-   Azure Web App
+>
+>-   Azure Automation
+>
+>-   Azure Automation Runbooks
+>
+>-   Azure DNS
+>
+>-   Azure Virtual Network
+>
+>-   Azure Virtual Machine
+>
+>-   Azure Resource Group and Policies
+>
+>-   Azure Blob Storage
+>
+>-   Azure Active Directory access control (RBAC)
 
 ### Installation procedure overview
 
 
 1.  Collect prerequisites such as certificate, azure subscription
-
 2.  Install PowerShell modules on the client computer by running a PowerShell
     install script
-
 3.  Configure global admin on azure subscription in the Azure portal
-
 4.  Acquire initial configuration variables
-
 5.  Set up run-as services to allow installation scripts to execute
-
 6.  Run the pre-installer script
-
 7.  Install the ARM templates (build the Azure service elements)
-
 8.  Run the post-installer script
-
 9.  Validate data in SQL database
-
 10. Run post-installer SQL script to encrypt database
-
 11. Run SQL script to encrypt service elements (patient SSN, DOB, credit card
     \#, Exp date, CVV)
-
 12. Validate data in SQL database is encrypted
-
 13. Review user roles and rights assigned to Edna and Chris
-
 14. If you choose, delete the installation and dependencies by running a
     PowerShell script
 
@@ -350,10 +337,10 @@ create the correct file.
     certificate](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure-ssl-certificate).
 
 2.  Retrieve your private key. This file will have a name structure such as
-    www.contosoclinic.com\_private\_key.key.
+    `www.contosoclinic.com\_private\_key.key`
 
 3.  Retrieve your certificate. This file will have a name structure such as
-    www.contosoclinic.com\_ssl\_certificate.cer.
+    `www.contosoclinic.com\_ssl\_certificate.cer`
 
 4.  [Create a personal information exchange (pfx)
     file](https://technet.microsoft.com/en-us/library/dd261744.aspx) protect
@@ -361,12 +348,9 @@ create the correct file.
 
 5.  Convert the pfx file into a string Base64 text file. For example, in
     PowerShell you can use the following commands:
-
->   \$fileContentBytes = get-content 'contosoclinic.com\_private\_key.pfx'
->   -Encoding Byte
-
->   [System.Convert]::ToBase64String(\$fileContentBytes) \| Out-File
->   'pfx-bytes.txt'
+```powershell
+$fileContentBytes = get-content 'contosoclinic.com\_private\_key.pfx' -Encoding Byte[System.Convert]::ToBase64String(\$fileContentBytes) | Out-File 'pfx-bytes.txt'
+```
 
 **Preserve your SSL 64-bit string and password; you will use them when
 installing the ARM template.**
@@ -397,7 +381,9 @@ computer throughout the installation of this solution.
     v5.x or greater. For example, in PowerShell you can use the following
     commands:
 
-    \$PSVersionTable.psversion
+```powershell
+    .$PSVersionTable.psversion
+```
 
 3.  The Powershell modules referenced in the following PowerShell script, which
     must be installed with local Administrative permissions. To do so,
@@ -847,7 +833,7 @@ in section 4.5in this documentation.
 -   **sqlAdAdminUserPassword**: \<PASSWORD\>
 
 After you have collected all of this information, you can click **Deploy to
-Azure** 
+Azure**
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -1039,8 +1025,8 @@ of the reference architecture. Deployment details can be found in section 6.0.
     -   .\\pre-post-deployment\\PostDeployment.ps1
 
     -   Select **Run Once** to the script warning
-	
-	
+
+
 2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command. You will need to provide the same password you selected for your SQL admin you established in step 4.6
 >Set-MsolUserPassword -userPrincipalName sqladmin@pcidemouseroutlook.onmicrosoft.com -NewPassword ‘<SQLADMINPASSWORD>’ -ForceChangePassword $false
 
@@ -1339,18 +1325,14 @@ A PaaS SQL Database instance was used to showcase various security measures.
     (allowing for ASE worker pools and client IP management)
 
 -   [Enabled Threat
-    Detection](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-threat-detection-get-started) for the database.
+    Detection](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-threat-detection-get-started)
 
 -   [Enabled Always Encrypted
     columns](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault)
 
--   [Enabled Dynamic Data
+[Enabled Dynamic Data
 masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)
 (using the post-deployment PowerShell script)
-
--   [Connection & Transport level Encyption](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-security-overview) Connection string was modified to use *Encrypt=True; TrustServerCertificate=False;*
-
-For more information around SQL database security, refer to the blog and the associated whitepaper here [Securing your SQL Database](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-security-overview) 
 
 ### Logging and Auditing
 
@@ -1384,7 +1366,7 @@ Stores
 * **Keys** - SQL DB Column Encryption keys (customer managed keys)
 * **Secrets** - Bitlocker keys for Azure Disk Encryption
 
- 
+
 
 ### Identity Management
 
@@ -1477,7 +1459,7 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 -   [Disable TLS 1.0](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings) – a deprecated TLS protocol from PCI DSS standpoint
 -   [Change TLS Cipher](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)
 -   [Control inbound traffic N/W    ports](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-control-inbound-traffic)  
--   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall) 
+-   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall)
 -   [Allow SQL DB traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
 
 ### Azure Security Center
@@ -1551,4 +1533,4 @@ The following 9OMS Solutions are pre-installed with this reference solution:
 ### Security Center Integration
 
 Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started).
-Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center. 
+Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
