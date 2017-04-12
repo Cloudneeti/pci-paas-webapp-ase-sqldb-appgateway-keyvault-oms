@@ -167,7 +167,7 @@ vary.
 This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
->**Note**: The solution requires `a paid subscription on Azure`, it will not work
+[!IMPORTANT] The solution requires `a paid subscription on Azure`, it will not work
 with a Trial subscription.
 
 A small medical clinic, Contoso Health, is ready to move their patient intake
@@ -382,7 +382,7 @@ computer throughout the installation of this solution.
     commands:
 
 ```powershell
-    .$PSVersionTable.psversion
+    $PSVersionTable.psversion
 ```
 
 3.  The Powershell modules referenced in the following PowerShell script, which
@@ -391,11 +391,11 @@ computer throughout the installation of this solution.
     -   Open Powershell in Administrator Mode
 
     -   Run the following installation script located in the
-        **./pre-post-deployment** folder of this solution, and accept (or select
+        `./pre-post-deployment` folder of this solution, and accept (or select
         Yes to user commands)
-
->   **Install-azure-powershell-modules.ps1**
-
+```powershell
+   ./Install-azure-powershell-modules.ps1
+```
 
 
 
@@ -406,13 +406,23 @@ for assistance:
  To test [AzureRM](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/)                       run the following commands in PowerShell:
 ```powershell
 $cred = Get-Credential  
-Login-AzureRmAccount -Credential \$cred
+Login-AzureRmAccount -Credential $cred
 ```
 
-To test [Azure AD](https://technet.microsoft.com/en-us/library/dn975125.aspx) Validate by testing                                                                        |
-| **Enable AzureRM Diagnostics**         | <https://www.powershellgallery.com/packages/Enable-AzureRMDiagnostics/1.3/DisplayScript>                                                                    |
-| **Azure Diagnostics and LogAnalytics** | <https://www.powershellgallery.com/packages/AzureDiagnosticsAndLogAnalytics/0.1>                                                                            |
-| **SQL Server PowerShell**              | <https://msdn.microsoft.com/en-us/library/hh231683.aspx?f=255&MSPPError=-2147217396#Installing SQL Server PowerShell Support> Validate by testing   $Credential = Get-Credential   Connect-AzureAD -Credential $Credential   Get-Module -ListAvailable -Name Sqlps;|
+To test [Azure AD](https://technet.microsoft.com/en-us/library/dn975125.aspx) run the following commands in PowerShell:  
+```powershell
+$cred = Get-Credential  
+Login-AzureAD -Credential $cred
+```
+
+ Review the following documentation to test [Enable AzureRM Diagnostics](https://www.powershellgallery.com/packages/Enable-AzureRMDiagnostics/1.3/DisplayScript)                      
+
+ Review the following documentation to test [Azure Diagnostics and LogAnalytics](https://www.powershellgallery.com/packages/AzureDiagnosticsAndLogAnalytics/0.1)                    
+
+ To test [SQL Server PowerShell](https://msdn.microsoft.com/en-us/library/hh231683.aspx?f=255&MSPPError=-2147217396#Installing#SQL#Server#PowerShell#Support) run the following commands in PowerShell:
+```powershell
+ $Credential = Get-Credential   Connect-AzureAD -Credential $Credential   Get-Module -ListAvailable -Name Sqlps;
+```
 
 ### Configure your global admin for the solution
 
