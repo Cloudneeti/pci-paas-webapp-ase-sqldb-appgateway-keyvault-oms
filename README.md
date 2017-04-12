@@ -808,7 +808,7 @@ components. The total time required is approximately 2.5 hours from when the
 
 ![](images/ARM_template_deployment_timeline.png)
 
-### Post-ARM Deployment
+## Post-ARM Deployment
 
 The following post-deployment steps deploy and set up the database, users, and
 data records; the steps also finalize connectivity. Steps in this section
@@ -816,7 +816,7 @@ address PCI and healthcare record protection requirements by encrypting the
 customer records that contain payment card data and personal healthcare
 information (PHI).
 
-#### Update DNS setting with Application Gateway IP
+### Update DNS setting with Application Gateway IP
 
 In the Contoso example, the customer’s DNS settings require the Application
 Gateway IP address to be updated as a DNS record on the hosting site.
@@ -825,22 +825,22 @@ Gateway IP address to be updated as a DNS record on the hosting site.
     command:
 
 ```powershell
->   Get-AzureRmPublicIpAddress \| where {\$\_.Name -eq "publicIp-AppGateway"} \|
->   select IpAddress
+   Get-AzureRmPublicIpAddress \| where {\$\_.Name -eq "publicIp-AppGateway"} |select IpAddress
 ```
 
 
 This command will return the IP address. For example:
 
->   IpAddress  
->   \---------  
->   52.168.0.1
+` IpAddress`  
+` ---------`
+
+` 52.168.0.1`
 
 1.  Log into your DNS hosting provider and update the A/AAAA and CNAME records
     with the Application Gateway IP address.
 
 2.  Verify you can connect to your site by browsing to its domain, for example
-    [www.contosoclinic.com](http://www.contosoclinic.com).
+    `http://www.contosoclinic.com`.
 
     1.  Note that your site will have limited services until the post-deployment
         script is executed.
@@ -854,17 +854,19 @@ Security number (SSN) samples and credit card or payment card information (PCI).
 
 Post-deployment steps require the following information from your installation:
 
--   Your **SubscriptionId**, which was collected in the ARM deployment step.
+1.   Your **SubscriptionId**, which was collected in the ARM deployment step.
 
-    -   For example: 27017c43-3ea4-467a-afa4-7d3d3d9D33232
+    For example: `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
 
--   Your **resource group name**. You can use:
+2.   Your **resource group name**. You can use the following script to identify your resource group:
 
-    Get-AzureRMResourceGroup \| select ResourceGroupName
+```powershell
+Get-AzureRMResourceGroup | select ResourceGroupName
+```
 
-    -   For example, Contosoclinic
+    For example: `Contosoclinic`
 
--   Your **client side IP** address. To retrieve your client IP address,
+3.   Your **client side IP** address. To retrieve your client IP address,
     complete the following steps:
 
     -   Click **Overview**, and select **Set server firewall** in the banner.
@@ -872,39 +874,38 @@ Post-deployment steps require the following information from your installation:
     -   Your client IP address will be displayed in the **Firewall Settings**.
         In this example:
 
-        -   Client IP address is 10.0.1.231
+           Client IP address is `10.0.1.231`
 
--   If you are using NAT, or a firewall it’s recommended you also test your IP
+If you are using NAT, or a firewall it’s recommended you also test your IP
     address with:
-
-    Invoke-RestMethod http://ipinfo.io/json \| Select-Object -exp ip
-
-    and
-
-    Ipconfig \| Select-String “IPv4”
-
+```powershell
+    Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip
+```
+and
+```powershell
+    Ipconfig | Select-String “IPv4”
+```
 >   **NOTE**: While in this configuration it’s advisable to add your client IP
 >   to the firewall setting for the SQL server.
 
--   In Rule name, add – Rule name, Start IP, and End IP. In this example:
+-   In Rule name, add – Rule name, Start IP, and End IP. 
+-   In this example: Client IP `10.0.1.1, 167.0.1.255`
 
->   Client IP, 10.0.1.1, 167.0.1.255
-
--   Your **ASE outbound IP Address**, which you can retrieve using the [Azure
+4. Your **ASE outbound IP Address**, which you can retrieve using the [Azure
     Portal](https://portal.azure.com/). Complete the following steps:
 
     1.  Select your resource group, and select your ase **App Service
         Environments**.
 
-        -   In this example ase-PCI-dzwhejjrwbwdy
+        -   In this example `ase-PCI-dzwhejjrwbwdy`
 
     2.  Click **Properties**.
 
     3.  Record the **Outbound IP addresses**
 
-        -   In this example 52.179.0.1
+        -   In this example `52.179.0.1`
 
--   Your SQL server name (**SQLServerName**), which can be retrieved in the
+5. Your SQL server name **SQLServerName**, which can be retrieved in the
     [Azure Portal](https://portal.azure.com/).
 
     -   To retrieve the SQL server name, you will need to log in to your Azure
@@ -912,60 +913,59 @@ Post-deployment steps require the following information from your installation:
 
         1.  Click **SQL Databases.**
 
-        2.  Select your database. For this example it will be
-            **ContosoClinicDb**.
+        2.  Select your database. For this example it will be `ContosoClinicDb`.
 
-        3.  The SQL server name will display in the **Server name** field. In
-            this example:
+        3.  The SQL server name will display in the **Server name** field. 
+    -   In our example:
 
-            -   Server name fully qualified:
-                sqlserver-dzwhejjrwbwdy.database.windows.net
+           Server name fully qualified:
+                `sqlserver-dzwhejjrwbwdy.database.windows.net`
 
-            -   Server name: **sqlserver-dzwhejjrwbwdy**
+           Server name: `sqlserver-dzwhejjrwbwdy`
 
--   Your **SQL username** and **password** from Azure ARM deployment. In this
-    example
+6. Your **SQL username** and **password** from Azure ARM deployment.
+    
+    -   In our example:
+    
+        sqlAdAdminUserName: `sqladmin`
 
-    -   **sqlAdAdminUserName**: sqladmin
+        sqlAdAdminUserPassword: `PASSWORD`
 
-    -   **sqlAdAdminUserPassword**: PASSWORD
-
--   Your **Key Vault name**, which you can retrieve using the [Azure
+7. Your **Key Vault name**, which you can retrieve using the [Azure
     Portal](https://portal.azure.com/). Complete the following steps:
 
     1.  Click **Filter** and select **Key Vault**.
 
     2.  Select your key vault.
 
-        -   In this example kv-pcisamples-dzwhejjr
+    -   In our example: `kv-pcisamples-dzwhejjr`
 
--   Your **azureAdApplicationClientId** which was collected in the ARM
+8. Your **azureAdApplicationClientId** which was collected in the ARM
     deployment step.
 
-    -   For example: 952b0b1e-2582-4058-a0a0-0abc4210
+    -   In our example: `952b0b1e-2582-4058-a0a0-0abc4210`
 
--   Your **azureAdApplicationClientSecret** which was collected in the ARM
+9.  Your **azureAdApplicationClientSecret** which was collected in the ARM
     deployment step.
 
-    -   For example: Password\@123
+    -   In our example: `Password\@123`
 
--   The SQL AD Admin User created in step
+10. The SQL AD Admin User created in step
 
-    -   For example: sqladmin\@pcidemo.onmicrosoft.com
+    -   In our example: `sqladmin@pcidemo.onmicrosoft.com`
 
--   The SQL AD Admin User password
+11. The SQL AD Admin User password
 
-    -   For example: \<PASSWORD\>
+    -  In our example: `PASSWORD`
 
-#### Run post-deployment PowerShell script
+### Run post-deployment PowerShell script
 
 Running the post-deployment PowerShell script sets up the key vault, the master
 key, configures the SQL database, and sets up rules to configure the remainder
-of the reference architecture. Deployment details can be found in section 6.0.
+of the reference architecture. 
 
-1.  To run the postdeployment.ps1 script you will require to be logged into your
-    PowerShell IDE as defined in section 4.5 of this documentation section
-    ‘Logging in to PowerShell with correct credentials’
+1.  To run the `postdeployment.ps1` script you will require to be logged into your
+    PowerShell IDE **Logging in to PowerShell with correct credentials**
 
 -   In the PowerShell IDE, change directory to the local directory that contains
     the script.
@@ -973,16 +973,19 @@ of the reference architecture. Deployment details can be found in section 6.0.
 -   You will need to change the permission to the script before you run it. You
     can set the permissions by issuing the following command.
 
+```powershell
     Set-ExecutionPolicy Unrestricted
+```
 
 -   Run the PostDeployment.ps1 script
 
-    -   .\\pre-post-deployment\\PostDeployment.ps1
+```powershell
+    .\pre-post-deployment\PostDeployment.ps1
+```
+Select **Run Once** to the script warning
 
-    -   Select **Run Once** to the script warning
 
-
-2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command. You will need to provide the same password you selected for your SQL admin you established in step 4.6
+2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command to the same password used during the ARM deployment. 
 
 
 ```powershell
@@ -995,66 +998,65 @@ in our example
 Set-MsolUserPassword -userPrincipalName sqladmin@pcidemo.onmicrosoft.com -NewPassword 'SECRET' -ForceChangePassword $false
 `
 
-#### Run post-deployment SQL script
+### Run post-deployment SQL script
 
 At this point you will have a fully deployed solution, to which the two administrative user roles will be added. The user roles can be deployed using SQL Management Studio.
 
 Open SQL Server Management Studio using the Active Directory username and password.
 
-```txt
-In this example: **sqladmin\@pcidemo.onmicrosoft.com**
-```
+In our example: `sqladmin@pcidemo.onmicrosoft.com`
 
 
 The following connection information should be used to connect to your SQL
 Server Management Studio:
 
--   Server Type: Database Engine
+-   Server Type:` Database Engine`
 
 -   Server name: Your server string. In this example:
 
-    pcidemo.onmicrosoft.com
+    `pcidemo.onmicrosoft.com`
 
 -   Authentication: **Use Active Directory Password Authentication**
 
--   Username: The AD SQL user account you set up in pre-deployment. In this
-    example:  **sqladmin\@pcidemo.onmicrosoft.com**  
+-   Username: The AD SQL user account you set up in pre-deployment. In our
+    example:  `sqladmin@pcidemo.onmicrosoft.com` 
 
 -   Password: The password for your AD SQL user account. In this example:
 
-    \<PASSWORD\>
+    `PASSWORD`
 
 -   Create a new query and run the following command to see the patient records
     secured
 
-    -   SELECT \* FROM [dbo].[Patients]
+```SQL
+    -   SELECT * FROM [dbo].[Patients]
+```
 
-You will need to edit the PostDeploymentSQL.sql script under the
-.\\pre-post-deployment folder
+You will need to edit the `PostDeploymentSQL.sql` script under the
+pre-post-deployment folder
 
--   Replace XXXX with your AD domain name. In this example:
+-   Replace `XXXX` with your AD domain name. In our example:
 
->   pcidemo.onmicrosoft.com
+   `pcidemo.onmicrosoft.com`
 
 You can copy the script from the deployment file and run it in a new SQL query.
 
--   Please Connect with Active directory password authentication and SQL AD
-    Admin credentials
 
-#### Monitoring, and Security features
+
+## Monitoring, and Security features
 
 The following sections address security controls that are required to enable
-logging, monitoring, security detection, and antimalware protection.
+logging, monitoring, security detection, and anti-malware protection.
 
-##### Operations Management Suite (OMS) configuration
+### Operations Management Suite (OMS) configuration
 
 During the deployment step, OMS scripts were created and installed. In this
 configuration step, the OMS instance is configured.
 
-**NOTE**: Pricing default “free” tier, will not be sufficient for this solution
-to operate correctly, you will be required to change to the “OMS tier”.
+>**NOTE**: Pricing default **free** tier, will not be sufficient for this solution
+to operate correctly, you will be required to change to the **OMS tier**.
 
-##### Start the collection for OMS
+### Start the collection for OMS
 
 1.  Sign in to the Azure Portal with an account that is a member of the
     Subscription Admins role and co-administrator of the subscription.
@@ -1094,7 +1096,7 @@ to operate correctly, you will be required to change to the “OMS tier”.
 
 15.  Click **Yes**
 
-##### Upgrade your OMS instance
+#### Upgrade your OMS instance
 
 
 1.  Sign in to the Azure Portal with an account that is a member of the
@@ -1110,15 +1112,17 @@ to operate correctly, you will be required to change to the “OMS tier”.
 5.  Click **Ok**
 
 
-#### Install OMS Dashboards view
+### Install OMS Dashboards view
 
 Installing the OMS Dashboard view requires deployment of the scripts located in
-the ./omsDashboards folder.
+the `./omsDashboards` folder. 
+
+>**NOTE:** OMS Dashboard will not install correctly, until has been collected information for a period of time. If you receive an error when running the dashboard installation it is due to the lack of collected data. It is recommended that you wait up to 10 minutes to guarantee data is available in OMS. 
 
 1.  Open **Log Analytics**.
 
 2.  Select your OMS Log Analytics in your list of items. In this example:
-    **oms-WS-pci-paas-dzwhejjrwbwdy**
+    `oms-WS-pci-paas-dzwhejjrwbwdy`
 
 3.  Click **Log Analytics**.
 
@@ -1193,7 +1197,7 @@ to enable data collections from Azure Security Center.
 >   the Bastion Host deployment. In this solution, the Security Center VM agent
 >   is not deployed; the reason is to prevent OMS conflict issues.
 
-## DEPLOYMENT ARCHITECTURE
+# DEPLOYMENT ARCHITECTURE
 
 The following section provides insight into the development, and implementation
 elements. The descriptions in this document’s deployment strategies apply to the
@@ -1201,7 +1205,7 @@ following diagram:
 
 ![](images/Azure_PaaS_-_PCI_DSS_Reference_Architecture.png)
 
-### Network Segmentation and Security
+## Network Segmentation and Security
 ---------------------------------
 
 #### Application Gateway
@@ -1259,7 +1263,7 @@ Ensure each subnet is associated with its corresponding NSG
 
 HTTPS traffic enabled using custom domain SSL certificate
 
-### Data at Rest
+## Data at Rest
 
 
 #### Azure storage
@@ -1298,7 +1302,7 @@ A PaaS SQL Database instance was used to showcase various security measures.
 masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)
 (using the post-deployment PowerShell script)
 
-### Logging and Auditing
+## Logging and Auditing
 
 -   **Activity Logs**: Configure [Azure Activity
     Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs) to
@@ -1319,7 +1323,7 @@ masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynami
     retention period (2 days). Logs are then connected to Azure Log Analytics
     (OMS) for processing, storing, and dashboarding.
 
-### Secrets Management
+## Secrets Management
 
 #### Key Vault
 
@@ -1332,7 +1336,7 @@ Stores
 
 
 
-### Identity Management
+## Identity Management
 
 
 #### Azure Active Directory
@@ -1368,7 +1372,7 @@ configurations exist for:
 
 -   Azure Key Vault access
 
-### Web application and Compute
+## Web application and Compute
 
 #### Web Apps
 
@@ -1426,7 +1430,7 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 -   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall)
 -   [Allow SQL DB traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
 
-### Azure Security Center
+## Azure Security Center
 
 With [Azure Security
 Center](https://azure.microsoft.com/en-us/services/security-center/), you get a
@@ -1451,7 +1455,7 @@ Security](https://azure.microsoft.com/en-us/blog/web-vulnerability-scanning-for-
 is a security vulnerability scanning solution built into the Azure App Service
 management experience that provides web app scanning.
 
-### Operations Management
+## Operations Management
 
 #### Application Insights
 
@@ -1494,7 +1498,7 @@ The following 9OMS Solutions are pre-installed with this reference solution:
 -   [Update
     Management](https://docs.microsoft.com/en-us/azure/operations-management-suite/oms-solution-update-management)
 
-### Security Center Integration
+## Security Center Integration
 
 Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started).
 Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
