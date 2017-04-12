@@ -168,8 +168,7 @@ This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
 
-> [!IMPORTANT]  
-> The solution requires `a paid subscription on Azure`, it will not work
+**IMPORTANT**  The solution requires `a paid subscription on Azure`, it will not work
 with a Trial subscription.
 
 
@@ -250,41 +249,23 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 
 
 >-   Application Gateway
->
 >-   Azure Active Directory
->
 >-   App Service Environment
->
 >-   OMS Log Analytics
->
 >-   Azure Key Vault
->
 >-   Network Security Groups
->
 >-   Azure SQL DB
->
 >-   Azure Load Balancer
->
 >-   Application Insights
->
 >-   Azure Security Center
->
 >-   Azure Web App
->
 >-   Azure Automation
->
 >-   Azure Automation Runbooks
->
 >-   Azure DNS
->
 >-   Azure Virtual Network
->
 >-   Azure Virtual Machine
->
 >-   Azure Resource Group and Policies
->
 >-   Azure Blob Storage
->
 >-   Azure Active Directory access control (RBAC)
 
 ### Installation procedure overview
