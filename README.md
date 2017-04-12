@@ -464,8 +464,8 @@ the solution.
 >   [./media/image1.png](./media/image1.png)
 
 1.  Select the Role as **Owner**.
-2.  Select the user – Admin, in our example 
-> `admin@pcidemo.onmicrosoft.com`
+2.  Select the user – Admin, in our example
+`admin@pcidemo.onmicrosoft.com`
 
 3.  Save the configurations.
 
@@ -482,7 +482,7 @@ IDE session. This may not be required at all times, but strongly recommended to
 ensure the correct credentials are cached in your new session. ---at all times
 for this demo log in as the **admin** user in our example.
 
->`admin@pcidemo.onmicrosoft.com`
+`admin@pcidemo.onmicrosoft.com`
 
 Logging in to the powershell administrative
 
@@ -515,8 +515,9 @@ Get-AzureRmSubscription
 ```
 1.  Record the highlighted information as illustrated in the following example.
 
- >`   TenantId : 21d644f0-12av-4043-b0bb-f5acfde12256`
->`   SubscriptionId : 27017c43-3ea4-467a-afa4-7d3d3d9D33232`
+TenantId : `21d644f0-12av-4043-b0bb-f5acfde12256`
+
+SubscriptionId : `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
 
 >**NOTE** – whenever starting or restarting your PowerShell IDE session, it is recommended you run the
 previous four commands to ensure your are logged into the correct services
@@ -539,7 +540,7 @@ subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-dir
 ```powershell
 New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"
 ```
--   In our example we use: 
+-   In our example we use:
 
 `New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"`
 
@@ -553,10 +554,10 @@ by running the runbook examples in the previous step called
 
 3.  Record the information about your resource group, and Automation account:
 
-    |Parameter name|Example from previous step|
-    |______________|__________________________|
-    |Name of automation| `Contosoclinic-Automation`|
-    |Resource group you added| `Contosoclinic`|
+| Parameter name | Example from previous step|
+|----------------|---------------------------|
+| Name of automation | `Contosoclinic-Automation` |
+| Resource group you added | `Contosoclinic` |
 
 
 
@@ -566,14 +567,14 @@ by running the runbook examples in the previous step called
 ```
 
  Select **Run Once** to the script warning if you are prompted
- 
+
 ### PreDeployment Script Output
 
 | Parameter name      | Example from previous steps       |
 |-------------------------|---------------------------------------|
-| \$azureADDomainName | `pcidemo.onmicrosoft.com`               |
-| \$subscriptionID    | `27017c43-3ea4-467a-afa4-7d3d3d9D33232` |
-| \$suffix            | `contosoclinic`                         |
+| $azureADDomainName | `pcidemo.onmicrosoft.com`               |
+| $subscriptionID    | `27017c43-3ea4-467a-afa4-7d3d3d9D33232` |
+| $suffix            | `contosoclinic`                         |
 
 Record the information provided by the script. You will need this information to
 proceed as illustrated in the following example for `contosoclinic.com`.
@@ -589,7 +590,7 @@ proceed as illustrated in the following example for `contosoclinic.com`.
 |Bastion Host Administrator Password: | Password must meet minimum length and complexity requirements|
 |SQL Administrator Login User Name:|Default Value is 'sqladmin'|
 |SQL Administrator Login Password: |Password must meet minimum length and complexity requirements|
-|SQL Threat Detection Alert Email Address:|Email Address to receive alerts for the account| 
+|SQL Threat Detection Alert Email Address:|Email Address to receive alerts for the account|
 |Automation Account Name:|**Automation account** In our example `contosoclinic-automation`|
 |Custom Host Name:|Your registered domain name. In our example `www.contosoclinc.com`|
 |Azure AD Application Client ID:| In our example `27017c43-3ea4-467a-afa4-7d3d3d9D`|
@@ -597,7 +598,7 @@ proceed as illustrated in the following example for `contosoclinic.com`.
 |Azure AD Application Object ID:| In our example `73559c5c-e213-4f10-a88c-546c2`|
 |SQL AD Admin User Name:| Default Value, in our example `sqladmin\@pcidemo.onmicrosoft.com`|
 
-The following additional users have been created in domain. 
+The following additional users have been created in domain.
 
 |User Role| Example for `Contosoclinic.com`|
 |--------------|-----------------------------|
@@ -635,7 +636,7 @@ reliably.
 >   following [guidance from this blog
 >   post](https://blogs.technet.microsoft.com/kv/2016/09/17/accessing-key-vault-from-a-native-application/) for additional guidance.
 
- The following sections will help you configure each **App Registration** permission sets. 
+ The following sections will help you configure each **App Registration** permission sets.
  >**NOTE** the order of your API’s maybe different than listed in this documentation.
 
 1.  Select the **Windows Azure Active Directory** API
@@ -758,19 +759,19 @@ The following example is used to illustrate the ARM information for `contosoclin
 
 -   **\_artifactsLocationSasToken**: NULL
 
--   **certData**: \<The Contoso Base-64 SSL string\>
+-   **certData**: [The Contoso Base-64 SSL string]
 
--   **certPassword**: \<Password you created for the SSL cert\>
+-   **certPassword**: [Password you created for the SSL cert]
 
 -   **bastionHostAdministratorUserName**: `bastionadmin`
 
--   **bastionHostAdministratorPassword**: \<Create a secure password\>
+-   **bastionHostAdministratorPassword**: [Create a secure password]
 
 -   **SqlAdministratorLoginUserName**: `sqladmin`
 
--   **sqlAdministratorLoginPassword**: \<Created password\>
+-   **sqlAdministratorLoginPassword**: [Created password]
 
--   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com` 
+-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com`
 
 -   **automationAccountName**: `Contosoclinic-Automation`
 
@@ -784,7 +785,7 @@ The following example is used to illustrate the ARM information for `contosoclin
 
 -   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
 
--   **sqlAdAdminUserPassword**: \<Created password\>
+-   **sqlAdAdminUserPassword**: [Created password]
 
 After you have collected all of this information, you can click **Deploy to
 Azure**
@@ -888,7 +889,7 @@ and
 >   **NOTE**: While in this configuration it’s advisable to add your client IP
 >   to the firewall setting for the SQL server.
 
--   In Rule name, add – Rule name, Start IP, and End IP. 
+-   In Rule name, add – Rule name, Start IP, and End IP.
 -   In this example: Client IP `10.0.1.1, 167.0.1.255`
 
 4. Your **ASE outbound IP Address**, which you can retrieve using the [Azure
@@ -915,7 +916,7 @@ and
 
         2.  Select your database. For this example it will be `ContosoClinicDb`.
 
-        3.  The SQL server name will display in the **Server name** field. 
+        3.  The SQL server name will display in the **Server name** field.
     -   In our example:
 
            Server name fully qualified:
@@ -924,9 +925,9 @@ and
            Server name: `sqlserver-dzwhejjrwbwdy`
 
 6. Your **SQL username** and **password** from Azure ARM deployment.
-    
+
     -   In our example:
-    
+
         sqlAdAdminUserName: `sqladmin`
 
         sqlAdAdminUserPassword: `PASSWORD`
@@ -962,7 +963,7 @@ and
 
 Running the post-deployment PowerShell script sets up the key vault, the master
 key, configures the SQL database, and sets up rules to configure the remainder
-of the reference architecture. 
+of the reference architecture.
 
 1.  To run the `postdeployment.ps1` script you will require to be logged into your
     PowerShell IDE **Logging in to PowerShell with correct credentials**
@@ -985,14 +986,14 @@ of the reference architecture.
 Select **Run Once** to the script warning
 
 
-2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command to the same password used during the ARM deployment. 
+2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command to the same password used during the ARM deployment.
 
 
 ```powershell
 Set-MsolUserPassword -userPrincipalName [sqladmin@yourdomain] -NewPassword [NEWPASSWORD] -ForceChangePassword $false
 ```
 
-in our example 
+in our example
 
 `
 Set-MsolUserPassword -userPrincipalName sqladmin@pcidemo.onmicrosoft.com -NewPassword 'SECRET' -ForceChangePassword $false
@@ -1019,7 +1020,7 @@ Server Management Studio:
 -   Authentication: **Use Active Directory Password Authentication**
 
 -   Username: The AD SQL user account you set up in pre-deployment. In our
-    example:  `sqladmin@pcidemo.onmicrosoft.com` 
+    example:  `sqladmin@pcidemo.onmicrosoft.com`
 
 -   Password: The password for your AD SQL user account. In this example:
 
@@ -1115,9 +1116,9 @@ to operate correctly, you will be required to change to the **OMS tier**.
 ### Install OMS Dashboards view
 
 Installing the OMS Dashboard view requires deployment of the scripts located in
-the `./omsDashboards` folder. 
+the `./omsDashboards` folder.
 
->**NOTE:** OMS Dashboard will not install correctly, until has been collected information for a period of time. If you receive an error when running the dashboard installation it is due to the lack of collected data. It is recommended that you wait up to 10 minutes to guarantee data is available in OMS. 
+>**NOTE:** OMS Dashboard will not install correctly, until has been collected information for a period of time. If you receive an error when running the dashboard installation it is due to the lack of collected data. It is recommended that you wait up to 10 minutes to guarantee data is available in OMS.
 
 1.  Open **Log Analytics**.
 
