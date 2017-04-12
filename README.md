@@ -167,8 +167,10 @@ vary.
 This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
+
 [!IMPORTANT] The solution requires `a paid subscription on Azure`, it will not work
 with a Trial subscription.
+
 
 A small medical clinic, Contoso Health, is ready to move their patient intake
 and payment system to the cloud. They have selected Microsoft Azure to host the
