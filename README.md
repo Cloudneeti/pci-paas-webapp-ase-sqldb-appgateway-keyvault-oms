@@ -168,8 +168,7 @@ This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
 
-**IMPORTANT**  The solution requires `a paid subscription on Azure`, it will not work
-with a Trial subscription.
+>**IMPORTANT**  The solution requires **a paid subscription** on Azure, a trial subscription account will not work.
 
 
 A small medical clinic, Contoso Health, is ready to move their patient intake
@@ -198,11 +197,13 @@ based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
 your production ready solution.*
 
-The POC solution is designed with the following employees of `Contosohealth`:
+## Contosoclinic Use Case POC
+
+The POC solution is designed with the following fictitious employees of `Contosoclinic.com`:
 
 
 #### Role: Receptionist
-**Name**: Edna Benson is the receptionist, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed.
+Edna Benson is the receptionist, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed.
 
 |Item      |Example|
 |----------|------|
@@ -219,9 +220,7 @@ The POC solution is designed with the following employees of `Contosohealth`:
 * Edna cannot read SSN or credit card information unmasked. In addition, all her actions are logged.
 
 #### Role: Doctor
->   **Name:** Dr. Chris Aston is the clinic’s doctor. He is responsible for
->   patient care, he will be entering patient history and treatment information.
->   Chris can update information for patients.
+Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he will be entering patient history and treatment information. Chris can update information for patients.
 
 |Item      |Example|
 |----------|------|
@@ -268,7 +267,7 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 >-   Azure Blob Storage
 >-   Azure Active Directory access control (RBAC)
 
-### Installation procedure overview
+## Installation procedure overview
 
 
 1.  Collect prerequisites such as certificate, azure subscription
@@ -289,7 +288,7 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 14. If you choose, delete the installation and dependencies by running a
     PowerShell script
 
-### Collect prerequisites certificate, azure subscription
+## Collect prerequisites certificate, azure subscription
 
 
 This section provides detailed information about items you will need during
@@ -298,6 +297,10 @@ that many of the features are not available in an Azure trial account. You will
 also require to have access to manage the subscription as a [Subscription Admins
 role and co-administrator of the
 subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
+
+>If you have not already done so, download, or clone a copy of installation solution from
+    https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms (If you downloaded a .zip file, expand the content of the compressed file to
+    a local directory.)
 
 ### Custom domain and SSL certificate
 
@@ -411,7 +414,7 @@ Login-AzureAD -Credential $cred
 ### Configure your global admin for the solution
 
 An Active Directory Administrator with global privileges is required to run the
-installation. The local administrator must be in the *.onmicrosoft.com* domain
+installation. The local administrator must be in the `.onmicrosoft.com` domain
 name to run this solution, this step will help create the correct administrator
 user.
 
@@ -419,23 +422,23 @@ user.
     Directory**.
 
 2.  Select **Domain Name.** Record the name of your domain registered under
-    “**name**”. This will be used in our domain script as the
-    **\$AzureADDomainName**. In our example
+    **name**. This will be used in our domain script as the
+    `$AzureADDomainName`. In our example
 
->   pcidemo.onmicrosoft.com
+>`pcidemo.onmicrosoft.com`
 
 1.  Select the **Properties**. It will provide your **Directory ID.** This will
-    be used in our domain script as the **\$tenantID**. In our example
+    be used in our domain script as the `$tenantID`. In our example
 
->   **46d804b6-210b-4a4a-9304-83b93**
+>   `46d804b6-210b-4a4a-9304-83b93`
 
 1.  You will require your username, and password that was used to create your
     subscription.
 
-The script CreateGlobalADAdmin.ps1 provides the setup and configuration of the admin user that will be used for the remainder of the installation. This user is essential that it be configured corrected, with the right level of [Subscription Admins role and co-administrator of the subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
+The script `CreateGlobalADAdmin.ps1` provides the setup and configuration of the admin user that will be used for the remainder of the installation. This user is essential that it be configured corrected, with the right level of [Subscription Admins role and co-administrator of the subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
 
-**NOTE**: Strong passwords (Minimum 15 characters, with Upper and Lower case
-letters, at least 1 number and 1 special character) are recommended throughout
+**NOTE**: Strong passwords **(Minimum 15 characters, with Upper and Lower case
+letters, at least 1 number and 1 special character)** are recommended throughout
 the solution.
 
 1.  Open Powershell in Local Administrator Mode (Right click and select **run as
@@ -461,23 +464,25 @@ the solution.
 >   [./media/image1.png](./media/image1.png)
 
 1.  Select the Role as **Owner**.
-2.  Select the user – Admin, in our example **admin\@pcidemo.onmicrosoft.com**
+2.  Select the user – Admin, in our example 
+> `admin@pcidemo.onmicrosoft.com`
+
 3.  Save the configurations.
 
 Return to the Azure portal, and login with your **admin** user. You may need to open a [InPrivate
-browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure you are logging in without cached credentials. And reset your temporary password.
+browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure you are logging in without cached credentials. **Reset** your temporary password.
 
-**NOTE** – The remainder of the installation guidance will use the **admin** user
+>**NOTE** – The remainder of the installation guidance will use the **Admin** user
 for all steps.
 
-#### Logging in to PowerShell with correct credentials
+### Logging in to PowerShell with correct credentials
 
 The following procedure should be followed whenever you restart your PowerShell
 IDE session. This may not be required at all times, but strongly recommended to
 ensure the correct credentials are cached in your new session. ---at all times
 for this demo log in as the **admin** user in our example.
 
-admin\@pcidemo.onmicrosoft.com
+>`admin@pcidemo.onmicrosoft.com`
 
 Logging in to the powershell administrative
 
@@ -487,43 +492,42 @@ Logging in to the powershell administrative
     AD](https://docs.microsoft.com/en-us/powershell/module/azuread/connect-azuread?view=azureadps-2.0)
     service running the following command, with your admin user such as
     admin\@pcidemo.onmicrosoft.com
-
+```powershell
     Connect-AzureAD
-
+```
 3.  [Connect to your Azure Active
     directory](https://docs.microsoft.com/en-us/powershell/module/msonline/connect-msolservice?view=azureadps-1.0)
     running the following command, with your admin user such as
     admin\@pcidemo.onmicrosoft.com
-
+```powershell
     Connect-MsolService
-
+```
 4.  [Connect to your Azure
     Resource](https://msdn.microsoft.com/en-us/library/mt125356.aspx) manager
     running the following commands, with your admin user such as
     admin\@pcidemo.onmicrosoft.com
-
+```powershell
     login-azurermaccount
-
+```
 5.  Retrieve your subscription information running the following commands
-
+```powershell
 Get-AzureRmSubscription
-
+```
 1.  Record the highlighted information as illustrated in the following example.
 
-    TenantId : 21d644f0-12av-4043-b0bb-f5acfde12256
+ >`   TenantId : 21d644f0-12av-4043-b0bb-f5acfde12256`
+>`   SubscriptionId : 27017c43-3ea4-467a-afa4-7d3d3d9D33232`
 
-    SubscriptionId : **27017c43-3ea4-467a-afa4-7d3d3d9D33232**
-
-NOTE – whenever starting your PowerShell IDE it is recommended you run the
+>**NOTE** – whenever starting or restarting your PowerShell IDE session, it is recommended you run the
 previous four commands to ensure your are logged into the correct services
 throughout the installation, and testing of this solution.
 
 ### Pre-ARM template deployment
 
-The script pre-deployment.ps1 provides the setup and configuration of users and
+The script `pre-deployment.ps1` provides the setup and configuration of users and
 other framework elements. The following steps are required to run the script.
 Note that the scripts must complete without errors before the ARM template can
-be deployed successfully. Note use admin and do section 4.5
+be deployed successfully. Note use admin ensure you are [logging in to PowerShell with correct credentials](#logging-in-to-powershell-with-correct-credentials)
 
 Using the [Azure portal](https://portal.azure.com/) with an account that is a
 member of the [Subscription Admins role and co-administrator of the
@@ -531,113 +535,81 @@ subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-dir
 
 1.  Set up your resource group.
 
--   In a PowerShell IDE, execute the following example, replacing the name with
-    the same name outlined in section 3.2.1
-
+-   In a PowerShell IDE, run the following command:
 ```powershell
-New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"
+New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"
 ```
+-   In our example we use: 
 
-1.  Create an Automation account following the instruction create a [runbooks
+`New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"`
+
+2.  Create an Automation account following the instruction create a [runbooks
     with an Azure Run As
     account](https://docs.microsoft.com/en-us/azure/automation/automation-sec-configure-azure-runas-account).
 
-Do not proceed without verifying your Automation account was successful deployed
+> **NOTE:** Do not proceed without verifying your Automation account was successful deployed
 by running the runbook examples in the previous step called
-‘azureautomationtutorialscript’ .
+`azureautomationtutorialscript` Creation of a Service Principal has a **propensity to fail on occasion** troubleshooting this process is essential.
 
-Creation of a Service Principal has a **propensity to fail on occasion**.
+3.  Record the information about your resource group, and Automation account:
 
-2.  Record the information about your resource group, and Automation account:
-
-    Name of automation – **Contosoclinic-Automation** (for example)
-
->   Resource group you added – **Contosoclinic** (for example)
-
-3.  Run the predeployment.ps1 script.
-
--   If you have not already done so, download, or clone a copy of installation
-    solution from
-    https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms
-    (If you downloaded a .zip file, expand the content of the compressed file to
-    a local directory.)
-
--   In the PowerShell IDE, change directory to the local directory that contains
-    the script and run the script.
-
-    -   .\\pre-post-deployment\\PreDeployment.ps1
-
-    -   Select **Run Once** to the script warning if you are prompted
-
-| **Parameter name**      | **Example from previous steps**       |
-|-------------------------|---------------------------------------|
-| **\$azureADDomainName** | pcidemo.onmicrosoft.com               |
-| **\$subscriptionID**    | 27017c43-3ea4-467a-afa4-7d3d3d9D33232 |
-| **\$suffix**            | contosoclinic                         |
-
-Record the information provided by the script. You will need this information to
-proceed as illustrated in the following example for contosoclinic.
-
->   Name of Automation **Contosoclinic-Automation** (for example)
-
->   Parameters to be used in the registration / configuration.
-
->   \_artifactsLocationSasToken:
-
->   Cert Data: **Please see Deployment Guide for instructions**
-
->   Cert Password: **Please see Deployment Guide for instructions**
-
->   Bastion Host Administrator User Name: **Default Value is 'bastionadmin**' If
->   needs change please do so in the next step
-
->   Bastion Host Administrator Password: **Please Provide Host Administrator
->   Password**
-
->   SQL Administrator Login User Name: **Default Value is 'sqladmin'**.
-
->   If needs change please do so in the next step
-
->   SQL Administrator Login Password: **Please Provide SQL Administrator Login
->   Password**
-
->   SQL Threat Detection Alert Email Address: **Please Provide Email Address to
->   get SQL Threat Detection Alerts**
-
->   Automation Account Name: **Please see Deployment Guide for instructions**
-
->   Custom Host Name: **Please see Deployment Guide for instructions**
-
->   Azure AD Application Client ID: **27017c43-3ea4-467a-afa4-7d3d3d9D**
-
->   Azure AD Application Client Secret: **Password\@123**
-
->   Azure AD Application Object ID: **73559c5c-e213-4f10-a88c-546c2**
-
->   SQL AD Admin User Name: **sqladmin\@pcidemo.onmicrosoft.com**
+    |Parameter name|Example from previous step|
+    |______________|__________________________|
+    |Name of automation| `Contosoclinic-Automation`|
+    |Resource group you added| `Contosoclinic`|
 
 
 
->   Please follow the deployment guide for the specific permissions
-
->   The following additional users have been created in domain. These users will
->   be used for trying out various scenarios
-
->   **receptionist\_EdnaB\@pcidemo.onmicrosoft.com** user is created. password
->   is **!Password111!!!**
-
->   **doctor\_ChrisA\@pcidemo.onmicrosoft.com** user is created. password is
->   **!Password222!!!**
-
-It is highly recommended this password be reset using the following command
-
+4. In the PowerShell IDE, change directory to the local directory that contains the script and run the script `predeployment.ps1`.
 ```powershell
-Set-MsolUserPassword -userPrincipalName sqladmin\@pcidemo.onmicrosoft.com
--NewPassword "NEWPASSWORD" -ForceChangePassword \$false
+.\predeployment.ps1
 ```
 
+ Select **Run Once** to the script warning if you are prompted
+ 
+### PreDeployment Script Output
 
-#### Configuring the Active Directory application
+| Parameter name      | Example from previous steps       |
+|-------------------------|---------------------------------------|
+| \$azureADDomainName | `pcidemo.onmicrosoft.com`               |
+| \$subscriptionID    | `27017c43-3ea4-467a-afa4-7d3d3d9D33232` |
+| \$suffix            | `contosoclinic`                         |
+
+Record the information provided by the script. You will need this information to
+proceed as illustrated in the following example for `contosoclinic.com`.
+
+>Name of Automation account `Contosoclinic-Automation`
+
+|Parameter name| Example for `Contosoclinic.com`|
+|--------------|-----------------------------|
+|\_artifactsLocationSasToken:| [BLANK]|
+|Cert Data:| Your base 64 SSL certificate string|
+|Cert Password:| Your certificate password|
+|Bastion Host Administrator User Name:| Default Value 'bastionadmin'|
+|Bastion Host Administrator Password: | Password must meet minimum length and complexity requirements|
+|SQL Administrator Login User Name:|Default Value is 'sqladmin'|
+|SQL Administrator Login Password: |Password must meet minimum length and complexity requirements|
+|SQL Threat Detection Alert Email Address:|Email Address to receive alerts for the account| 
+|Automation Account Name:|**Automation account** In our example `contosoclinic-automation`|
+|Custom Host Name:|Your registered domain name. In our example `www.contosoclinc.com`|
+|Azure AD Application Client ID:| In our example `27017c43-3ea4-467a-afa4-7d3d3d9D`|
+|Azure AD Application Client Secret:| Default Value `Password@123` |
+|Azure AD Application Object ID:| In our example `73559c5c-e213-4f10-a88c-546c2`|
+|SQL AD Admin User Name:| Default Value, in our example `sqladmin\@pcidemo.onmicrosoft.com`|
+
+The following additional users have been created in domain. 
+
+|User Role| Example for `Contosoclinic.com`|
+|--------------|-----------------------------|
+|receptionist|`receptionist_EdnaB@pcidemo.onmicrosoft.com`|
+|password|`!Password111!!!**`|
+|doctor|`doctor_ChrisA@pcidemo.onmicrosoft.com`|
+|password|`!Password222!!!`|
+
+
+
+
+### Configuring the Active Directory application
 
 
 Azure Active Directory application permissions must be configured manually;
@@ -646,32 +618,25 @@ reliably.
 
 1.  In the [Azure Portal](https://portal.azure.com/), select **App
     Registrations**.
-
 2.  Select the application you created. It will be listed with your selected
-    **\$suffix** with the name **Azure PCI PAAS Sample**.
-
+    `$suffix` with the name **Azure PCI PAAS Sample**.
 3.  Click **Required Permissions**.
-
 4.  Click **+Add**.
-
 5.  Click **Select an API**.
-
 6.  In this step you will modify **Windows Azure Active Directory**, **Microsoft
     Graph**, **Windows Azure Service Management API**, and **Azure Key Vault.**
 
->   **NOTE**: If **Azure Key Vault** is not listed, you will need to manually
+>   **NOTE**: If **Azure Key Vault** is not listed in your **App Registration** list, you will need to manually
 >   create a temporary key vault instance by selecting **Key Vault** in [Azure
 >   Portal](https://portal.azure.com/), select **+Add**, you can create a sample
->   Resource group, and name. Once the Vault is created, you will be able to
+>   **Resource group**, and **name**. Once the Vault is created, you will be able to
 >   delete it. This action will force the app. API to register in the App
 >   Registration interface for the next step. Additional you can read the
 >   following [guidance from this blog
->   post](https://blogs.technet.microsoft.com/kv/2016/09/17/accessing-key-vault-from-a-native-application/)
->   for additional information.
+>   post](https://blogs.technet.microsoft.com/kv/2016/09/17/accessing-key-vault-from-a-native-application/) for additional guidance.
 
->   The following subsections will help you configure each of the permission
->   sets. Note the order of the API’s maybe different than listed in this
->   documentation.
+ The following sections will help you configure each **App Registration** permission sets. 
+ >**NOTE** the order of your API’s maybe different than listed in this documentation.
 
 1.  Select the **Windows Azure Active Directory** API
 
@@ -769,77 +734,73 @@ reliably.
 | Azure Key Vault                  | 0                           | 1                         |
 | Windows Azure Service Management | 0                           | 1                         |
 
-Deploying Azure Resource Template (ARM)
----------------------------------------
+
+## Deploying The Azure Resource Template (ARM)
 
 Deploying the ARM template requires the following information, which you should
 collect before clicking **Deploy to Azure** on the following page. (The
-information shown is for a sample deployment.) This information is the same as
-in section 4.5in this documentation.
+information shown is for a sample deployment.) This information used here will be the [predeployment script output.](#predeployment-script-output)
+
+The following example is used to illustrate the ARM information for `contosoclinic.com`
 
 **Basics**
 
--   **Subscription**: Contoso Subscription
+-   **Subscription**: `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
 
--   **Resource group**: Select Use Existing. In our example we use
-    “Contosoclinic”
+-   **Resource group**: `Contosoclinic`
 
 -   **Location**: Greyed out
 
 **Settings**
 
 -   **\_artifactsLocation**:
-    <https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master>
+    `https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master`
 
 -   **\_artifactsLocationSasToken**: NULL
 
--   **certData**: \<The Contoso Base-64 SSL string you created in step 4.2\>
+-   **certData**: \<The Contoso Base-64 SSL string\>
 
--   **certPassword**: \<Password you created for the SSL cert you created in
-    step 4.2\>
+-   **certPassword**: \<Password you created for the SSL cert\>
 
--   **bastionHostAdministratorUserName**: bastionadmin
+-   **bastionHostAdministratorUserName**: `bastionadmin`
 
--   **bastionHostAdministratorPassword**: \<Create a password for this user at
-    this time\>
+-   **bastionHostAdministratorPassword**: \<Create a secure password\>
 
--   **SqlAdministratorLoginUserName**: sqladmin
+-   **SqlAdministratorLoginUserName**: `sqladmin`
 
--   **sqlAdministratorLoginPassword**: \<PASSWORD\>(This password was provided
-    after pre-installation script completed, and revised using the password
-    reset step in 4.5 )
+-   **sqlAdministratorLoginPassword**: \<Created password\>
 
--   **sqlThreatDetectionAlertEmailAddress**: <admin@contosoclinic.com> or enter
-    a designated recipient for alerts.
+-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com` 
 
--   **automationAccountName**: Contosoclinic-Automation
+-   **automationAccountName**: `Contosoclinic-Automation`
 
--   **customHostName**: contosoclinic**.**com
+-   **customHostName**: `contosoclinic.com`
 
--   **azureAdApplicationClientId**: 952b0b1e-2582-4058-a0a0-0abc42107d70
+-   **azureAdApplicationClientId**: `952b0b1e-2582-4058-a0a0-0abc42107d70`
 
--   **azureAdApplicationClientSecret**: Password\@123
+-   **azureAdApplicationClientSecret**: `Password@123`
 
--   **azureAdApplicationObjectId**: e3aa33bb-1cae-4afd-a8ba-9124b2a1838a
+-   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
 
--   **sqlAdAdminUserName**: sqladmin\@pcidemo.onmicrosoft.com
+-   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
 
--   **sqlAdAdminUserPassword**: \<PASSWORD\>
+-   **sqlAdAdminUserPassword**: \<Created password\>
 
 After you have collected all of this information, you can click **Deploy to
 Azure**
 
+### Deploy Azure Resource Resources
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
 
-### Deploy Azure Resource Resources
+
 * Provide all of the deployment information you collected. Then click **I agree to the Terms and conditions stated above.**
 * Click **Purchase**.
 
 
-#### Deployment Timeline
+### Deployment Timeline
 
 The following graphic displays the estimated time to deploy the solution
 components. The total time required is approximately 2.5 hours from when the
@@ -1022,8 +983,17 @@ of the reference architecture. Deployment details can be found in section 6.0.
 
 
 2.	Once the script has completed you must set your ADsqladmin password in PowerShell with the following command. You will need to provide the same password you selected for your SQL admin you established in step 4.6
->Set-MsolUserPassword -userPrincipalName sqladmin@pcidemouseroutlook.onmicrosoft.com -NewPassword ‘<SQLADMINPASSWORD>’ -ForceChangePassword $false
 
+
+```powershell
+Set-MsolUserPassword -userPrincipalName [sqladmin@yourdomain] -NewPassword [NEWPASSWORD] -ForceChangePassword $false
+```
+
+in our example 
+
+`
+Set-MsolUserPassword -userPrincipalName sqladmin@pcidemo.onmicrosoft.com -NewPassword 'SECRET' -ForceChangePassword $false
+`
 
 #### Run post-deployment SQL script
 
