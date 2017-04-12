@@ -5,7 +5,8 @@
 Param(
 	[string] [Parameter(Mandatory=$true)] $azureADDomainName, # Provide your Azure AD Domain Name
 	[string] [Parameter(Mandatory=$true)] $subscriptionID, # Provide your Azure subscription ID
-	[string] [Parameter(Mandatory=$true)] $suffix #This is used to create a unique website name in your organization. This could be your company name or business unit name
+	[string] [Parameter(Mandatory=$true)] $suffix, #This is used to create a unique website name in your organization. This could be your company name or business unit name
+	[string] [Parameter(Mandatory=$true)] $sqlADAdminPassword # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
 )
 
 ###
@@ -17,7 +18,7 @@ Connect-MsolService
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
 $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
 $doctorUserName = "doctor_ChrisA@"+$azureADDomainName
-$SQLADAdminPassword = "!Password333!!!"
+#$sqlADAdminPassword = "!Password333!!!"
 $receptionistPassword = "!Password111!!!"
 $doctorPassword = "!Password222!!!"
 $cloudwiseAppServiceURL = "http://localcloudneeti6i"+$azureADDomainName
@@ -31,7 +32,7 @@ if ($sqlADAdminObjectId -eq $null)
     # Make the new user a Global AD Administrator
 	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
 }
-Set-MsolUserPassword -userPrincipalName $SQLADAdminName -NewPassword $SQLADAdminPassword -ForceChangePassword $false
+Set-MsolUserPassword -userPrincipalName $SQLADAdminName -NewPassword $sqlADAdminPassword -ForceChangePassword $false
 
 $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 $receptionistuserDetails = ""
@@ -53,7 +54,8 @@ Write-Host ("Created AD Users for SQL AD Admin, Receptinist and Doctor to test v
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
 Set-Location ".\"
 $AzureADApplicationClientSecret =        "Password@123" 
-$WebSiteName =         ("cloudwise" + $suffix)
+$suffix = $suffix.Replace(' ', '').Trim()
+$WebSiteName =         ("azurepcipaas" + $suffix)
 $displayName =         ($suffix + "Azure PCI PAAS Sample")
 # To login to Azure Resource Manager
 	Try  
@@ -82,7 +84,7 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
     $defaultPrincipal = ($u1 + $u3 + ".onmicrosoft.com")
     # Get tenant ID
     $tenantID = (Get-AzureRmContext).Tenant.TenantId
-    $homePageURL = ("http://" + $defaultPrincipal + "azurewebsites.net" + "/" + $Web1SiteName)
+    $homePageURL = ("http://" + $defaultPrincipal + "azurewebsites.net" + "/" + $WebSiteName)
     $replyURLs = @( $cloudwiseAppServiceURL, "http://*.azurewebsites.net","http://localhost:62080", "http://localhost:3026/")
     # Create Active Directory Application
     $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $AzureADApplicationClientSecret # -ReplyUrls $replyURLs

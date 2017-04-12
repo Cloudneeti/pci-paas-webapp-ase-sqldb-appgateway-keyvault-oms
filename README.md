@@ -1,94 +1,141 @@
+<H1> Azure PCI and HIPAA validated solution </H1>
 
 
-# Azure PCI and HIPAA validated solution
+<H2>Blueprint and reference architecture with ARM templates </H2>
 
-## Blueprint and reference architecture with ARM templates
-
-
-Disclaimer   
 
 *Published April 2017*
 
-*This document is for informational purposes only. MICROSOFT MAKES NO
+*This document is for informational purposes only. MICROSOFT/AVYAN MAKES NO
 WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, AS TO THE INFORMATION IN THIS
 DOCUMENT.*
-
 *This document is provided “as-is.” Information and views expressed in this
 document, including URL and other Internet website references, may change
-without notice. Customers reading this document bear the risk of using it.*
-
+without notice. Customers reading this document bear the risk of using it.*  
 *This document does not provide customers with any legal rights to any
 intellectual property in any Microsoft product. Customers may copy and use this
-document for their internal, reference purposes.*
-
+document for their internal, reference purposes.*  
 *NOTE: Certain recommendations in this paper may result in increased data,
 network, or compute resource usage, and may increase a customer’s license or
-subscription costs.*
+subscription costs.*  
 
 *© 2016 Microsoft/Avyan. All rights reserved.*
 
-Acknowledgements
+<H2>Acknowledgements </H2>
 
-Authors
-========
+<H2> Authors of the document </H2>
 
-*Frank Simorjay*
+* *Frank Simorjay (Microsoft)*  
+* *Gururaj Pandurangi (Avyan Consulting)* 
 
-*Gururaj Pandurangi (Avyan Consulting)*
+<H2> Disclaimer </H2>
+> This solution is intended as a reference architecture pilot and should not be used as-is for production purposes
+> * Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
+> * If you are a Microsoft internal team member, please refer to the **http://aka.ms/azurepci** and engage your respective DX / CSA /Account teams. 
+> * Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
 
-Contributors and Reviewers
-===========================
+<H2> Contributors and Reviewers </H2>
 
 TBD
 
-SOLUTION OBJECTIVE and SCENARIO
-================================
+<H2> Visualize Azure Resources before you deploy </H2>
+
+For deployment details refer to section DEPLOYMENT GUIDE below
+
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
+<img src="http://armviz.io/visualizebutton.png"/>
+</a>
+
+
+<H2> TABLE OF CONTENTS </H2>
+<!-- TOC -->
+
+- [SOLUTION OBJECTIVE AND SCENARIO](#solution-objective-and-scenario)
+- [COST MODEL](#cost-model)
+- [USER SCENARIO](#user-scenario)
+        - [Role: Receptionist](#role-receptionist)
+        - [Role: Doctor](#role-doctor)
+- [DEPLOYMENT GUIDE](#deployment-guide)
+    - [Installation procedure overview](#installation-procedure-overview)
+    - [Collect prerequisites certificate, azure subscription](#collect-prerequisites-certificate-azure-subscription)
+    - [Custom domain and SSL certificate](#custom-domain-and-ssl-certificate)
+    - [Local computer setup requirements](#local-computer-setup-requirements)
+        - [Client software requirements](#client-software-requirements)
+    - [Configure your global admin for the solution](#configure-your-global-admin-for-the-solution)
+        - [Logging in to PowerShell with correct credentials](#logging-in-to-powershell-with-correct-credentials)
+    - [Pre-ARM template deployment](#pre-arm-template-deployment)
+        - [Configuring the Active Directory application](#configuring-the-active-directory-application)
+    - [Deploy Azure Resource Resources](#deploy-azure-resource-resources)
+        - [Deployment Timeline](#deployment-timeline)
+    - [Post-ARM Deployment](#post-arm-deployment)
+        - [Update DNS setting with Application Gateway IP](#update-dns-setting-with-application-gateway-ip)
+        - [Post-deployment script](#post-deployment-script)
+        - [Run post-deployment PowerShell script](#run-post-deployment-powershell-script)
+        - [Run post-deployment SQL script](#run-post-deployment-sql-script)
+        - [Monitoring, and Security features](#monitoring-and-security-features)
+            - [Operations Management Suite (OMS) configuration](#operations-management-suite-oms-configuration)
+            - [Start the collection for OMS](#start-the-collection-for-oms)
+            - [Upgrade your OMS instance](#upgrade-your-oms-instance)
+        - [Install OMS Dashboards view](#install-oms-dashboards-view)
+    - [Upgrade Azure Security Center](#upgrade-azure-security-center)
+- [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
+    - [Network Segmentation and Security](#network-segmentation-and-security)
+        - [Application Gateway](#application-gateway)
+        - [Virtual network](#virtual-network)
+        - [Network security groups (NSGs)](#network-security-groups-nsgs)
+        - [Subnets](#subnets)
+        - [Custom domain SSL certificates](#custom-domain-ssl-certificates)
+    - [Data at Rest](#data-at-rest)
+        - [Azure storage](#azure-storage)
+        - [SQL Database](#sql-database)
+    - [Logging and Auditing](#logging-and-auditing)
+    - [Secrets Management](#secrets-management)
+        - [Key Vault](#key-vault)
+    - [Identity Management](#identity-management)
+        - [Azure Active Directory](#azure-active-directory)
+        - [Active Directory application](#active-directory-application)
+        - [Role-based Access Control](#role-based-access-control)
+    - [Web application and Compute](#web-application-and-compute)
+        - [Web Apps](#web-apps)
+        - [Azure App Service](#azure-app-service)
+        - [Virtual machine](#virtual-machine)
+        - [App Service Environment](#app-service-environment)
+    - [Azure Security Center](#azure-security-center)
+        - [Antimalware extension for VMs](#antimalware-extension-for-vms)
+        - [Optional Web Apps Vulnerability Assessment via Tinfoil](#optional-web-apps-vulnerability-assessment-via-tinfoil)
+    - [Operations Management](#operations-management)
+        - [Application Insights](#application-insights)
+        - [Log Analytics](#log-analytics)
+        - [OMS Solutions](#oms-solutions)
+    - [Security Center Integration](#security-center-integration)
+
+<!-- /TOC -->
+
+## SOLUTION OBJECTIVE AND SCENARIO
 
 The objective of this solution is to illustrate how a secure and compliant
 solution could be deployed as an end-to-end Azure solution. The components of
 this solution are as follows:
 
--   **Solution blueprint**. The blueprint provides an understanding of how
-    Contoso Health (a fictitious organization) achieved itss compliant state.
-    Included in the solution package is a completed PCI – DSS responsibility
-    matrix for Contoso Health.
-
--   **Reference architecture**. The reference architecture provides the design
-    that was used for the Contoso Health solution.
-
--   **Azure Resource Manager (ARM) templates**. In this deployment, JavaScript
-    Object Notation (.JSON) files provide Microsoft Azure the ability to
-    automatically deploy the components of the reference architecture after the
-    configuration parameters are provided during setup.
-
--   **PowerShell scripts**. The scripts created by Avyan Consulting solution
-    help set up the end-to-end solution. The scripts consist of:
-
--   Module installation script that will install required PowerShell modules for
+-   **Solution blueprint**. The blueprint provides an understanding of how Contoso Health (a fictitious organization) achieved itss compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso Health.
+-   **Reference architecture**. The reference architecture provides the design that was used for the Contoso Health solution. 
+-   **Azure Resource Manager (ARM) templates**. In this deployment, JavaScript Object Notation (.JSON) files provide Microsoft Azure the ability to automatically deploy the components of the reference architecture after the configuration parameters are provided during setup.
+-   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
+    -   Module installation script that will install required PowerShell modules for
     the installation. This script will require local administrator rights.
-
--   Global administrator setup script establishes the needed admin user to
+    -   Global administrator setup script establishes the needed admin user to
     deploy the solution
-
--   A pre-installation process that establishes user roles and establishes
+    -   A pre-installation process that establishes user roles and establishes
     required parameters in Microsoft Active Directory to ensure the correct
     role-based access control mechanisms are deployed. This process includes
     configuring separation of duties for core administrators and users.
+    -   A post-installation process that deploys an [ARM template, web front-end
+    runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by     the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso Clinic Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
 
--   A post-installation process that deploys an [ARM template, web front-end
-    runtime, and SQL
-    backpack](https://github.com/Microsoft/azure-sql-security-sample) built by
-    the Microsoft SQL team, and revised for this scenario by Avyan Consulting.
-    The Contoso Clinic Demo Application provides the framework for the solution
-    user scenario. The templates and scripts build out a web application and SQL
-    database that use the App Service Environment to provide service isolation
-    from the front end to the back end. The script also establishes a means to
-    manage changes in the environment by creating a dev/test environment. For
-    additional details about the reference architecture, data flow, and
-    configuration, see Section 6 of this document.
+    The solution is intended to do the following,  
+   ![](images/Solution_Context.png)
 
-Cost model
-==========
+## COST MODEL
 
 The solution cost model has a monthly fee structure and a use per hr. to
 consider when sizing the solution. This example deployment estimate cost will
@@ -115,13 +162,13 @@ consist of the following items:
 \*The domain name and SSL certificate are external service offerings. Prices may
 vary.
 
-USER SCENARIO
-=============
+## USER SCENARIO
+
 
 This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
-**Note**: The solution requires a paid subscription on Azure, it will not work
+> **Note**: The solution requires a paid subscription on Azure, it will not work
 with a Trial subscription.
 
 A small medical clinic, Contoso Health, is ready to move their patient intake
@@ -138,7 +185,7 @@ understand how Azure can be used to accomplish the following:
 
 -   Collect, store, and retrieve healthcare data that complies with requirements
     for safe patient health information handling practices governed by the
-    Health Insurance Portability and Accountability Ac (HIPAA).
+    Health Insurance Portability and Accountability Act (HIPAA).
 
 Because this is a POC that installs the required elements to operate a service,
 it is not a customer ready-to-go solution. It requires careful understanding of
@@ -152,31 +199,25 @@ your production ready solution.*
 
 The POC solution is designed with the following employees of **Contosohealth**:
 
->   **Name**: Edna Benson is the receptionist, and business manager. She is
->   responsible to ensure that patient customer information is accurate, and
->   billing is completed.
+
+#### Role: Receptionist
+**Name**: Edna Benson is the receptionist, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed.
 
 |Item      |Example|
 |----------|------|
- |Username:| EdnaB|
+|Username:| EdnaB|
 | Password:|!Password111!!!|
 | First name:| Edna|
 |Last name:| Benson|
 | User type: |Member|
 
->   Permissions: Create, read patient information, read date of birth (DOB)
+**Permissions**: Create, read patient information, read date of birth (DOB)* 
+* Edna will be able to modify patient information but will not be able to alter patient medical records
+* Edna can overwrite (or replace) credit card number, expiration, and CVC verification information
+* Edna can replace stored Social Security number (SSN)
+* Edna cannot read SSN or credit card information unmasked. In addition, all her actions are logged.
 
->   Edna will be able to modify patient information but will not be able to
-    alter patient medical records
-
->   Edna can overwrite (or replace) credit card number, expiration, and CVC
-    verification information
-
->   Edna can replace stored Social Security number (SSN)
-
->   Edna cannot read SSN or credit card information unmasked. In addition, all
-    her actions are logged.
-
+#### Role: Doctor
 >   **Name:** Dr. Chris Aston is the clinic’s doctor. He is responsible for
 >   patient care, he will be entering patient history and treatment information.
 >   Chris can update information for patients.
@@ -189,22 +230,18 @@ The POC solution is designed with the following employees of **Contosohealth**:
 |Last name: |Aston|
 |User type:| Member|
 
->   Permissions: Create, read patient information, read DOB
+**Permissions**: Create, read patient information, read DOB
+* Chris can modify patient information, including medical records and date of birth, and can view masked SSN.
+* Chris has **no** access to credit card information
+* All of Chris’s actions are logged
 
->   Chris can modify patient information, including medical records and date of
->   birth, and can view masked SSN.
-
->   Chris has no access to credit card information
-
->   All of Chris’s actions are logged
 
 In the Contoso Clinic Demo Application, you will be able to test the security
 measures configured for Edna and Chris to explore their permissions for reading,
 creating, altering, and deleting records in the solution. By default visiting
 the contosoclinic.com site you will be logged in as Edna.
 
-DEPLOYMENT GUIDE
-================
+## DEPLOYMENT GUIDE
 
 This solution used the following Azure services (details to the deployment
 architecture are located in section 5):
@@ -247,8 +284,8 @@ architecture are located in section 5):
 
 -   Azure Active Directory access control (RBAC)
 
-Installation procedure overview
--------------------------------
+### Installation procedure overview
+
 
 1.  Collect prerequisites such as certificate, azure subscription
 
@@ -281,8 +318,8 @@ Installation procedure overview
 14. If you choose, delete the installation and dependencies by running a
     PowerShell script
 
-Collect prerequisites certificate, azure subscription
------------------------------------------------------
+### Collect prerequisites certificate, azure subscription
+
 
 This section provides detailed information about items you will need during
 installation. To proceed you will require a **paid subscription on Azure**. Note
@@ -340,14 +377,13 @@ Encrypt](https://letsencrypt.org/). However, for PCI compliance, self-signed
 certificates do not comply with requirements and will not pass an audit for PCI
 DSS.
 
-Local computer setup requirements
----------------------------------
+### Local computer setup requirements
 
 The local configuration of PowerShell will require that the installation script
 be run with local admin privileges or remotely signed credentials to ensure that
 local permissions do not prevent the installer from running correctly.
 
-### Client software requirements
+#### Client software requirements
 
 The following software applications and modules are required on the client
 computer throughout the installation of this solution.
@@ -382,17 +418,17 @@ for assistance:
 
 
  To test [AzureRM](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/)                       run the following commands in PowerShell:
-  >$cred = Get-Credential
-
-  >Login-AzureRmAccount -Credential \$cred
+```powershell
+$cred = Get-Credential  
+Login-AzureRmAccount -Credential \$cred
+```
 
 To test [Azure AD](https://technet.microsoft.com/en-us/library/dn975125.aspx) Validate by testing                                                                        |
 | **Enable AzureRM Diagnostics**         | <https://www.powershellgallery.com/packages/Enable-AzureRMDiagnostics/1.3/DisplayScript>                                                                    |
 | **Azure Diagnostics and LogAnalytics** | <https://www.powershellgallery.com/packages/AzureDiagnosticsAndLogAnalytics/0.1>                                                                            |
 | **SQL Server PowerShell**              | <https://msdn.microsoft.com/en-us/library/hh231683.aspx?f=255&MSPPError=-2147217396#Installing SQL Server PowerShell Support> Validate by testing   $Credential = Get-Credential   Connect-AzureAD -Credential $Credential   Get-Module -ListAvailable -Name Sqlps;|
 
-Configure your global admin for the solution
---------------------------------------------
+### Configure your global admin for the solution
 
 An Active Directory Administrator with global privileges is required to run the
 installation. The local administrator must be in the *.onmicrosoft.com* domain
@@ -416,13 +452,9 @@ user.
 1.  You will require your username, and password that was used to create your
     subscription.
 
-The script CreateGlobalADAdmin.ps1 provides the setup and configuration of the
-admin user that will be used for the remainder of the installation. This user is
-essential that it be configured corrected, with the right level of [Subscription
-Admins role and co-administrator of the
-subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
+The script CreateGlobalADAdmin.ps1 provides the setup and configuration of the admin user that will be used for the remainder of the installation. This user is essential that it be configured corrected, with the right level of [Subscription Admins role and co-administrator of the subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
 
-NOTE: Strong passwords (Minimum 15 characters, with Upper and Lower case
+**NOTE**: Strong passwords (Minimum 15 characters, with Upper and Lower case
 letters, at least 1 number and 1 special character) are recommended throughout
 the solution.
 
@@ -432,7 +464,9 @@ the solution.
 2.  change directory to the local directory that contains the script and run the
     script.
 
-    .\\pre-post-deployment\\CreateGlobalADAdmin.ps1
+```powershell
+.\\pre-post-deployment\\CreateGlobalADAdmin.ps1
+```
 
 3.  Provide your **Domain Name, Directory ID (or tenantID), subscription manager
     password.**
@@ -446,23 +480,17 @@ the solution.
 
 >   [./media/image1.png](./media/image1.png)
 
-1.  Select the Role as **– Owner. Select the user – Admin,** in our example
+1.  Select the Role as **Owner**.
+2.  Select the user – Admin, in our example **admin\@pcidemo.onmicrosoft.com**
+3.  Save the configurations.
 
->   admin\@pcidemo.onmicrosoft.com
+Return to the Azure portal, and login with your **admin** user. You may need to open a [InPrivate
+browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure you are logging in without cached credentials. And reset your temporary password.
 
-1.  Save the configurations.
-
-Return to the Azure portal, and login with your **admin** user. You may need to
-open a [InPrivate
-browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure
-you are logging in without cached credentials. And reset your temporary
-password.
-
-NOTE – The remainder of the installation guidance will use the **admin** user
+**NOTE** – The remainder of the installation guidance will use the **admin** user
 for all steps.
 
-Logging in to PowerShell with correct credentials
--------------------------------------------------
+#### Logging in to PowerShell with correct credentials
 
 The following procedure should be followed whenever you restart your PowerShell
 IDE session. This may not be required at all times, but strongly recommended to
@@ -510,8 +538,7 @@ NOTE – whenever starting your PowerShell IDE it is recommended you run the
 previous four commands to ensure your are logged into the correct services
 throughout the installation, and testing of this solution.
 
-Pre-ARM template deployment
-----------------------------
+### Pre-ARM template deployment
 
 The script pre-deployment.ps1 provides the setup and configuration of users and
 other framework elements. The following steps are required to run the script.
@@ -527,7 +554,9 @@ subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-dir
 -   In a PowerShell IDE, execute the following example, replacing the name with
     the same name outlined in section 3.2.1
 
-    New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"
+```powershell
+New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"
+```
 
 1.  Create an Automation account following the instruction create a [runbooks
     with an Azure Run As
@@ -539,13 +568,13 @@ by running the runbook examples in the previous step called
 
 Creation of a Service Principal has a **propensity to fail on occasion**.
 
-1.  Record the information about your resource group, and Automation account:
+2.  Record the information about your resource group, and Automation account:
 
     Name of automation – **Contosoclinic-Automation** (for example)
 
 >   Resource group you added – **Contosoclinic** (for example)
 
-1.  Run the predeployment.ps1 script.
+3.  Run the predeployment.ps1 script.
 
 -   If you have not already done so, download, or clone a copy of installation
     solution from
@@ -622,11 +651,14 @@ proceed as illustrated in the following example for contosoclinic.
 
 It is highly recommended this password be reset using the following command
 
+```powershell
 Set-MsolUserPassword -userPrincipalName sqladmin\@pcidemo.onmicrosoft.com
 -NewPassword "NEWPASSWORD" -ForceChangePassword \$false
+```
 
-Configuring the Active Directory application
---------------------------------------------
+
+#### Configuring the Active Directory application
+
 
 Azure Active Directory application permissions must be configured manually;
 there are no PowerShell scripts available at this time to manage the settings
@@ -815,26 +847,27 @@ in section 4.5in this documentation.
 -   **sqlAdAdminUserPassword**: \<PASSWORD\>
 
 After you have collected all of this information, you can click **Deploy to
-Azure** as shown in the following screen shot.
+Azure** 
 
-![](media/fff823511b4a0fdd69ee92a1270ac7c0.png)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
+<img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
 
-Provide all of the deployment information you collected. Then click **I agree to
-the Terms and conditions stated above.**
 
-Click **Purchase**.
+### Deploy Azure Resource Resources
+* Provide all of the deployment information you collected. Then click **I agree to the Terms and conditions stated above.**
+* Click **Purchase**.
 
-Deployment Timeline
--------------------
+
+#### Deployment Timeline
 
 The following graphic displays the estimated time to deploy the solution
 components. The total time required is approximately 2.5 hours from when the
 **Purchase** button is clicked.
 
-![](media/55b93440ce5d4b431f16fe6125ac72e6.png)
+![](images/ARM_template_deployment_timeline.png)
 
-Post-ARM Deployment
---------------------
+### Post-ARM Deployment
 
 The following post-deployment steps deploy and set up the database, users, and
 data records; the steps also finalize connectivity. Steps in this section
@@ -842,8 +875,7 @@ address PCI and healthcare record protection requirements by encrypting the
 customer records that contain payment card data and personal healthcare
 information (PHI).
 
-Update DNS setting with Application Gateway IP
-----------------------------------------------
+#### Update DNS setting with Application Gateway IP
 
 In the Contoso example, the customer’s DNS settings require the Application
 Gateway IP address to be updated as a DNS record on the hosting site.
@@ -851,15 +883,16 @@ Gateway IP address to be updated as a DNS record on the hosting site.
 1.  Collect the Application Gateway IP address using the following PowerShell
     command:
 
+```powershell
 >   Get-AzureRmPublicIpAddress \| where {\$\_.Name -eq "publicIp-AppGateway"} \|
 >   select IpAddress
+```
 
->   This command will return the IP address. For example:
 
->   IpAddress
+This command will return the IP address. For example:
 
->   \---------
-
+>   IpAddress  
+>   \---------  
 >   52.168.0.1
 
 1.  Log into your DNS hosting provider and update the A/AAAA and CNAME records
@@ -871,8 +904,8 @@ Gateway IP address to be updated as a DNS record on the hosting site.
     1.  Note that your site will have limited services until the post-deployment
         script is executed.
 
-Post-deployment script
-----------------------
+#### Post-deployment script
+
 
 The post-deployment script is designed to run after the ARM templates are
 successfully deployed. The script sets up security for the protection of Social
@@ -983,8 +1016,7 @@ Post-deployment steps require the following information from your installation:
 
     -   For example: \<PASSWORD\>
 
-Run post-deployment PowerShell script
--------------------------------------
+#### Run post-deployment PowerShell script
 
 Running the post-deployment PowerShell script sets up the key vault, the master
 key, configures the SQL database, and sets up rules to configure the remainder
@@ -1013,14 +1045,16 @@ of the reference architecture. Deployment details can be found in section 6.0.
 >Set-MsolUserPassword -userPrincipalName sqladmin@pcidemouseroutlook.onmicrosoft.com -NewPassword ‘<SQLADMINPASSWORD>’ -ForceChangePassword $false
 
 
-Run post-deployment SQL script
-------------------------------
+#### Run post-deployment SQL script
 
-### At this point you will have a fully deployed solution, to which the two administrative user roles will be added. The user roles can be deployed using SQL Management Studio.
+At this point you will have a fully deployed solution, to which the two administrative user roles will be added. The user roles can be deployed using SQL Management Studio.
 
-### Open SQL Server Management Studio using the Active Directory username and password.
+Open SQL Server Management Studio using the Active Directory username and password.
 
-### In this example: **sqladmin\@pcidemo.onmicrosoft.com**
+```txt
+In this example: **sqladmin\@pcidemo.onmicrosoft.com**
+```
+
 
 The following connection information should be used to connect to your SQL
 Server Management Studio:
@@ -1034,9 +1068,7 @@ Server Management Studio:
 -   Authentication: **Use Active Directory Password Authentication**
 
 -   Username: The AD SQL user account you set up in pre-deployment. In this
-    example:
-
-    sqladmin\@pcidemo.onmicrosoft.com
+    example:  **sqladmin\@pcidemo.onmicrosoft.com**  
 
 -   Password: The password for your AD SQL user account. In this example:
 
@@ -1059,14 +1091,12 @@ You can copy the script from the deployment file and run it in a new SQL query.
 -   Please Connect with Active directory password authentication and SQL AD
     Admin credentials
 
-Monitoring, and Security features
----------------------------------
+#### Monitoring, and Security features
 
 The following sections address security controls that are required to enable
 logging, monitoring, security detection, and antimalware protection.
 
-Operations Management Suite (OMS) configuration
------------------------------------------------
+##### Operations Management Suite (OMS) configuration
 
 During the deployment step, OMS scripts were created and installed. In this
 configuration step, the OMS instance is configured.
@@ -1074,8 +1104,7 @@ configuration step, the OMS instance is configured.
 **NOTE**: Pricing default “free” tier, will not be sufficient for this solution
 to operate correctly, you will be required to change to the “OMS tier”.
 
-Start the collection for OMS
-----------------------------
+##### Start the collection for OMS
 
 1.  Sign in to the Azure Portal with an account that is a member of the
     Subscription Admins role and co-administrator of the subscription.
@@ -1095,28 +1124,28 @@ Start the collection for OMS
 
 7.  Click **Yes**
 
->   [./media/image4.png](./media/image4.png)
+    ![](images/runbook_schedule_ingestion.png)
 
-1.  Return to your runbook blade
+8.  Return to your runbook blade
 
-2.  Select the **sqlAzureIngestion** runbook that was installed by the
+9.  Select the **sqlAzureIngestion** runbook that was installed by the
     post-installation script.
 
-3.  Click **Start** to launch the OMS data intake runbook.
+10.  Click **Start** to launch the OMS data intake runbook.
 
-4.  Click **Yes**
+11.  Click **Yes**
 
-5.  Return to your runbook blade
+12.  Return to your runbook blade
 
-6.  Select the **webAzureIngestion** runbook that was installed by the
+13.  Select the **webAzureIngestion** runbook that was installed by the
     post-installation script.
 
-7.  Click **Start** to launch the OMS data intake runbook.
+14.  Click **Start** to launch the OMS data intake runbook.
 
-8.  Click **Yes**
+15.  Click **Yes**
 
-Upgrade your OMS instance
--------------------------
+##### Upgrade your OMS instance
+
 
 1.  Sign in to the Azure Portal with an account that is a member of the
     Subscription Admins role and co-administrator of the subscription.
@@ -1126,11 +1155,12 @@ Upgrade your OMS instance
 3.  Click **Pricing Tier**.
 
 4.  Select **Per Node (OMS)** plan to continue with this solution.
+    ![](images/OMS_Upgrade.png)
 
 5.  Click **Ok**
 
-Install OMS Dashboards view
----------------------------
+
+#### Install OMS Dashboards view
 
 Installing the OMS Dashboard view requires deployment of the scripts located in
 the ./omsDashboards folder.
@@ -1144,17 +1174,17 @@ the ./omsDashboards folder.
 
 4.  Click **OMS Portal**.
 
-    ![](media/3a4afba2bb3a88fb539a6fd2c1b600bf.png)
+    ![](images/OMS_Portal.png)
 
 5.  The Microsoft Operations Management Suite will open in a new browser window,
     or tab.
 
-    ![](media/1a0a50f332dcef2f975fcedff6499692.png)
+    ![](images/OMS_workspace_open.png)
 
 6.  Click **View Designer** on your Microsoft Operations Management Suite home
     page.
 
-    ![](media/2781cbee9973e7510279b6f26795f4aa.png)
+    ![](images/OMS_View_Designer.png)
 
 7.  In the designer, select **import**.
 
@@ -1164,7 +1194,7 @@ the ./omsDashboards folder.
 
 9.  Select **Save**.
 
-    ![](media/2f6da89628fa1e1f605936d0317a2906.png)
+    ![](images/OMS_SQL_Azure_Analytics.png)
 
 10. Repeat steps 8 through 11 for the web application monitoring solution;
     import the file with OMSWebApp in the file name. In this example:
@@ -1175,10 +1205,9 @@ complete.
 
 You can now review your data collection in OMS.
 
-![](media/16e8964e5de5283a649e00c1eb8196b1.png)
+![](images/OMS_Workspace_and_Solutions.png)
 
-Upgrade Azure Security Center
-------------------------------
+### Upgrade Azure Security Center
 
 Azure Security Center was enabled in the deployment of your subscription.
 However, to ensure that the antimalware and threat detection capabilities are
@@ -1214,19 +1243,18 @@ to enable data collections from Azure Security Center.
 >   the Bastion Host deployment. In this solution, the Security Center VM agent
 >   is not deployed; the reason is to prevent OMS conflict issues.
 
-Deployment Architecture
-=======================
+## DEPLOYMENT ARCHITECTURE
 
 The following section provides insight into the development, and implementation
 elements. The descriptions in this document’s deployment strategies apply to the
 following diagram:
 
-![](media/e588daa3cdc15a8e041a137abf636c11.png)
+![](images/Azure_PaaS_-_PCI_DSS_Reference_Architecture.png)
 
-Network Segmentation and Security
+### Network Segmentation and Security
 ---------------------------------
 
-### Application Gateway
+#### Application Gateway
 
 -   [SSL
     Offload](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-ssl-portal)
@@ -1248,11 +1276,11 @@ Network Segmentation and Security
 -   [Custom health
     probes](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal)
 
-### Virtual network
+#### Virtual network
 
 -   A private virtual network with address spacing 10.0.0.0/16
 
-### Network security groups (NSGs)
+#### Network security groups (NSGs)
 
 Each of the network tiers have a dedicated NSG
 
@@ -1273,18 +1301,18 @@ In addition, the following configurations are enabled for each NSG
 -   [Connected OMS Log Analytics to the NSGs
     diagnostics](https://github.com/krnese/AzureDeploy/blob/master/AzureMgmt/AzureMonitor/nsgWithDiagnostics.json)
 
-### Subnets
+#### Subnets
 
 Ensure each subnet is associated with its corresponding NSG
 
-### Custom domain SSL certificates
+#### Custom domain SSL certificates
 
 HTTPS traffic enabled using custom domain SSL certificate
 
-Data at Rest
-------------
+### Data at Rest
 
-### Azure storage
+
+#### Azure storage
 
 To meet encrypted data-at-rest requirements, all [Azure
 Storage](https://azure.microsoft.com/en-us/services/storage/) uses the
@@ -1293,7 +1321,7 @@ following:
 [Storage Service
 Encryption](https://docs.microsoft.com/en-us/azure/storage/storage-service-encryption)
 
-### SQL Database
+#### SQL Database
 
 A PaaS SQL Database instance was used to showcase various security measures.
 
@@ -1320,8 +1348,7 @@ A PaaS SQL Database instance was used to showcase various security measures.
 masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)
 (using the post-deployment PowerShell script)
 
-**Logging and Auditing**
--------------------------
+### Logging and Auditing
 
 -   **Activity Logs**: Configure [Azure Activity
     Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs) to
@@ -1342,23 +1369,23 @@ masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynami
     retention period (2 days). Logs are then connected to Azure Log Analytics
     (OMS) for processing, storing, and dashboarding.
 
-Secrets Management
-------------------
+### Secrets Management
 
-### Key Vault
+#### Key Vault
 
-Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps
-safeguard cryptographic keys and secrets used by cloud applications and
-services.
+Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps safeguard cryptographic keys and secrets used by cloud applications and services.
 
 Stores
 
--   SQL DB Column Encryption keys (customer managed keys)
+* **Keys** - SQL DB Column Encryption keys (customer managed keys)
+* **Secrets** - Bitlocker keys for Azure Disk Encryption
 
-Identity Management
--------------------
+ 
 
-### Azure Active Directory
+### Identity Management
+
+
+#### Azure Active Directory
 
 [Azure Active
 Directory](https://azure.microsoft.com/en-us/services/active-directory/) (Azure
@@ -1368,7 +1395,7 @@ from Microsoft.
 All users for the solution were created in Azure Active Directory, including
 users accessing the SQL Database.
 
-### Active Directory application
+#### Active Directory application
 
 Authentication to the app is done through the [Azure AD
 application](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-integrating-applications)
@@ -1380,7 +1407,7 @@ is conducted using the AD app. Refer to [this
 sample](https://github.com/Microsoft/azure-sql-security-sample) from the Azure
 SQL DB team for more details.
 
-### Role-based Access Control
+#### Role-based Access Control
 
 Azure [Role-based Access
 Control](https://docs.microsoft.com/en-us/azure/active-directory/role-based-access-control-configure)
@@ -1391,10 +1418,9 @@ configurations exist for:
 
 -   Azure Key Vault access
 
-Web application and Compute
----------------------------
+### Web application and Compute
 
-### Web Apps
+#### Web Apps
 
 The [Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/)
 feature in Azure App Service lets developers rapidly build, deploy, and manage
@@ -1403,7 +1429,7 @@ powerful websites and web apps. Build standards-based web apps and APIs using
 employees or customers using a single back end. Securely deliver APIs that
 enable additional apps and devices.
 
-### Azure App Service
+#### Azure App Service
 
 With [App
 Service](https://azure.microsoft.com/en-us/services/app-service/?b=16.52),
@@ -1411,7 +1437,7 @@ develop powerful applications for any platform or device, faster than ever
 before. Meet rigorous performance, scalability, security, and compliance
 requirements using a single back end.
 
-### Virtual machine
+#### Virtual machine
 
 As the App Service Environment is secured and locked down, there needs to be a
 mechanism to allow for any DevOps releases/changes that might be necessary, such
@@ -1438,34 +1464,17 @@ configurations:
     Policy](https://azure.microsoft.com/en-us/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/)
     to reduce consumption of virtual machine resources when not in use.
 
-### App Service Environment
+#### App Service Environment
 
-An [App Service
-Environment](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-intro)
-is a Premium service plan is used for compliance reasons. Use of this plan
-allowed for the following controls/configurations:
+An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-intro) is a Premium service plan is used for compliance reasons. Use of this plan allowed for the following controls/configurations:
 
 -   Host inside a secured Virtual Network and Network security rules
-
--   [Internal Load Balancing
-    mode](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-environment-with-internal-load-balancer)
-    (mode 3)
-
--   [Disable TLS
-    1.0](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)
-    – a deprecated TLS protocol from PCI DSS standpoint
-
--   [Change TLS
-    cipher](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)
-
--   [Control inbound traffic N/W
-    ports](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-control-inbound-traffic)
-
--   [WAF – Restrict
-    Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall)
-
--   [Allow SQL DB
-    traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
+-   [Internal Load Balancing     mode](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-environment-with-internal-load-balancer) (mode 3)
+-   [Disable TLS 1.0](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings) – a deprecated TLS protocol from PCI DSS standpoint
+-   [Change TLS Cipher](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)
+-   [Control inbound traffic N/W    ports](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-control-inbound-traffic)  
+-   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall) 
+-   [Allow SQL DB traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
 
 ### Azure Security Center
 
@@ -1476,7 +1485,7 @@ you can verify that the appropriate security controls are in place and
 configured correctly and be able to quickly identify any resources that require
 attention.
 
-### Antimalware extension for VMs
+#### Antimalware extension for VMs
 
 [Microsoft
 Antimalware](https://docs.microsoft.com/en-us/azure/security/azure-security-antimalware)
@@ -1485,29 +1494,28 @@ that helps identify and remove viruses, spyware, and other malicious software,
 with configurable alerts when known malicious or unwanted software attempts to
 install itself or run on your Azure systems.
 
-### Optional Web Apps Vulnerability Assessment via Tinfoil
+#### Optional Web Apps Vulnerability Assessment via Tinfoil
 
 For Azure Web Apps, [Tinfoil
 Security](https://azure.microsoft.com/en-us/blog/web-vulnerability-scanning-for-azure-app-service-powered-by-tinfoil-security/)
 is a security vulnerability scanning solution built into the Azure App Service
 management experience that provides web app scanning.
 
-Operations Management
----------------------
+### Operations Management
 
-### Application Insights
+#### Application Insights
 
 Gain [actionable
 insights](https://azure.microsoft.com/en-us/services/application-insights/)
 through application performance management and instant analytics.
 
-### Log Analytics
+#### Log Analytics
 
 [Log Analytics](https://azure.microsoft.com/en-us/services/log-analytics/) is a
 service in Operations Management Suite (OMS) that helps you collect and analyze
 data generated by resources in your cloud and on-premises environments.
 
-OMS Solutions
+#### OMS Solutions
 
 The following 9OMS Solutions are pre-installed with this reference solution:
 
@@ -1536,14 +1544,7 @@ The following 9OMS Solutions are pre-installed with this reference solution:
 -   [Update
     Management](https://docs.microsoft.com/en-us/azure/operations-management-suite/oms-solution-update-management)
 
-Security Center integration
----------------------------
+### Security Center Integration
 
-Default deployment is intended to provide for a clean chit of security center
-recommendations, indicating a healthy and secure configuration state of the
-solution. You can review additional information about Azure Security Center in
-the [getting started
-guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started).
-Complete the instructions at this link
-<https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started>
-to enable data collections from Azure Security Center.
+Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started).
+Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center. 

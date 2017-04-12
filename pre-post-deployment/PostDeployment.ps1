@@ -51,9 +51,6 @@ Param(
 )
 
 
-
-
-
 $DatabaseName = "ContosoClinicDB"
 $StorageName = "stgreleases"+$SQLServerName.Substring(10,5).ToLower()
 $StorageKeyType = "StorageAccessKey"
