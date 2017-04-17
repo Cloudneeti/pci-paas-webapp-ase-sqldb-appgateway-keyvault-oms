@@ -426,7 +426,7 @@ browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure 
 >**NOTE** – The remainder of the installation guidance will use the **Admin** user
 for all steps.
 
-### LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS
+## LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS
 
 The following procedure should be followed whenever you restart your PowerShell
 IDE session. This may not be required at all times, but strongly recommended to
@@ -479,8 +479,7 @@ throughout the installation, and testing of this solution.
 The script `pre-deployment.ps1` provides the setup and configuration of users and
 other framework elements. The following steps are required to run the script.
 Note that the scripts must complete without errors before the ARM template can
-be deployed successfully. Note use admin ensure you are [LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS](#LOGGING-INTO-POWERSHELL-WITH-CORRECT-CREDENTIALS)
-
+be deployed successfully. Note use admin ensure you are [LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS](#logging-into-powershell-with-correct-credentials)
 
 
 Using the [Azure portal](https://portal.azure.com/) with an account that is a
