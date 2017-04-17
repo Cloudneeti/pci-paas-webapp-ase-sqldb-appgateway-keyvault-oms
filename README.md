@@ -1187,7 +1187,7 @@ In addition, the following configurations are enabled for each NSG
 
 To meet encrypted data-at-rest requirements, all [Azure Storage](https://azure.microsoft.com/en-us/services/storage/) uses the following:
 
-####Azure storage
+#### Azure storage
 -	[Storage Service Encryption](https://docs.microsoft.com/en-us/azure/storage/storage-service-encryption)
 
 #### SQL Database
