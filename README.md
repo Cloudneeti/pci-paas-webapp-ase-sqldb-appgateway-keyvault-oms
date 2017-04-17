@@ -54,58 +54,8 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 - [COST MODEL](#cost-model)
 - [USER SCENARIO](#user-scenario)
 - [DEPLOYMENT GUIDE](#deployment-guide)
-    - [Installation procedure overview](#installation-procedure-overview)
-    - [Collect prerequisites certificate, azure subscription](#collect-prerequisites-certificate-azure-subscription)
-    - [Custom domain and SSL certificate](#custom-domain-and-ssl-certificate)
-    - [Local computer setup requirements](#local-computer-setup-requirements)
-        - [Client software requirements](#client-software-requirements)
-    - [Configure your global admin for the solution](#configure-your-global-admin-for-the-solution)
-        - [Logging in to PowerShell with correct credentials](#logging-in-to-powershell-with-correct-credentials)
-    - [Pre-ARM template deployment](#pre-arm-template-deployment)
-        - [Configuring the Active Directory application](#configuring-the-active-directory-application)
-    - [Deploy Azure Resource Resources](#deploy-azure-resource-resources)
-        - [Deployment Timeline](#deployment-timeline)
-    - [Post-ARM Deployment](#post-arm-deployment)
-        - [Update DNS setting with Application Gateway IP](#update-dns-setting-with-application-gateway-ip)
-        - [Post-deployment script](#post-deployment-script)
-        - [Run post-deployment PowerShell script](#run-post-deployment-powershell-script)
-        - [Run post-deployment SQL script](#run-post-deployment-sql-script)
-        - [Monitoring, and Security features](#monitoring-and-security-features)
-            - [Operations Management Suite (OMS) configuration](#operations-management-suite-oms-configuration)
-            - [Start the collection for OMS](#start-the-collection-for-oms)
-            - [Upgrade your OMS instance](#upgrade-your-oms-instance)
-        - [Install OMS Dashboards view](#install-oms-dashboards-view)
-    - [Upgrade Azure Security Center](#upgrade-azure-security-center)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
-    - [Network Segmentation and Security](#network-segmentation-and-security)
-        - [Application Gateway](#application-gateway)
-        - [Virtual network](#virtual-network)
-        - [Network security groups (NSGs)](#network-security-groups-nsgs)
-        - [Subnets](#subnets)
-        - [Custom domain SSL certificates](#custom-domain-ssl-certificates)
-    - [Data at Rest](#data-at-rest)
-        - [Azure storage](#azure-storage)
-        - [SQL Database](#sql-database)
-    - [Logging and Auditing](#logging-and-auditing)
-    - [Secrets Management](#secrets-management)
-        - [Key Vault](#key-vault)
-    - [Identity Management](#identity-management)
-        - [Azure Active Directory](#azure-active-directory)
-        - [Active Directory application](#active-directory-application)
-        - [Role-based Access Control](#role-based-access-control)
-    - [Web application and Compute](#web-application-and-compute)
-        - [Web Apps](#web-apps)
-        - [Azure App Service](#azure-app-service)
-        - [Virtual machine](#virtual-machine)
-        - [App Service Environment](#app-service-environment)
-    - [Azure Security Center](#azure-security-center)
-        - [Antimalware extension for VMs](#antimalware-extension-for-vms)
-        - [Optional Web Apps Vulnerability Assessment via Tinfoil](#optional-web-apps-vulnerability-assessment-via-tinfoil)
-    - [Operations Management](#operations-management)
-        - [Application Insights](#application-insights)
-        - [Log Analytics](#log-analytics)
-        - [OMS Solutions](#oms-solutions)
-    - [Security Center Integration](#security-center-integration)
+   
 
 <!-- /TOC -->
 
@@ -390,7 +340,7 @@ If any of the commands from the script fail, see the following reference links
 for assistance:
 
 
- To test [AzureRM](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/)                       run the following commands in PowerShell:
+ To test [AzureRM](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/) run the following commands in PowerShell:
 ```powershell
 $cred = Get-Credential  
 Login-AzureRmAccount -Credential $cred
@@ -476,7 +426,7 @@ browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure 
 >**NOTE** – The remainder of the installation guidance will use the **Admin** user
 for all steps.
 
-### Logging in to PowerShell with correct credentials
+### LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS
 
 The following procedure should be followed whenever you restart your PowerShell
 IDE session. This may not be required at all times, but strongly recommended to
@@ -529,7 +479,9 @@ throughout the installation, and testing of this solution.
 The script `pre-deployment.ps1` provides the setup and configuration of users and
 other framework elements. The following steps are required to run the script.
 Note that the scripts must complete without errors before the ARM template can
-be deployed successfully. Note use admin ensure you are [logging in to PowerShell with correct credentials](#logging-in-to-powershell-with-correct-credentials)
+be deployed successfully. Note use admin ensure you are [LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS](#LOGGING-INTO-POWERSHELL-WITH-CORRECT-CREDENTIALS)
+
+
 
 Using the [Azure portal](https://portal.azure.com/) with an account that is a
 member of the [Subscription Admins role and co-administrator of the
