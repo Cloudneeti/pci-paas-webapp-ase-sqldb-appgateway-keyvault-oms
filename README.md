@@ -698,46 +698,45 @@ The following example is used to illustrate the ARM information for `contosoclin
 
 **Basics**
 
--   **Subscription**: `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
+>-   **Subscription**: `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
 
--   **Resource group**: `Contosoclinic`
+>-   **Resource group**: `Contosoclinic`
 
--   **Location**: Greyed out
+>-   **Location**: Greyed out
 
 **Settings**
 
--   **\_artifactsLocation**:
-    `https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master`
+>-   **\_artifactsLocation**: `https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master`
 
--   **\_artifactsLocationSasToken**: NULL
+>-   **\_artifactsLocationSasToken**: NULL
 
--   **certData**: [The Contoso Base-64 SSL string]
+>-   **certData**: [The Contoso Base-64 SSL string]
 
--   **certPassword**: [Password you created for the SSL cert]
+>-   **certPassword**: [Password you created for the SSL cert]
 
--   **bastionHostAdministratorUserName**: `bastionadmin`
+>-   **bastionHostAdministratorUserName**: `bastionadmin`
 
--   **bastionHostAdministratorPassword**: [Create a secure password]
+>-   **bastionHostAdministratorPassword**: [Create a secure password]
 
--   **SqlAdministratorLoginUserName**: `sqladmin`
+>-   **SqlAdministratorLoginUserName**: `sqladmin`
 
--   **sqlAdministratorLoginPassword**: [Created password]
+>-   **sqlAdministratorLoginPassword**: [Created password]
 
--   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com`
+>-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com`
 
--   **automationAccountName**: `Contosoclinic-Automation`
+>-   **automationAccountName**: `Contosoclinic-Automation`
 
--   **customHostName**: `contosoclinic.com`
+>-   **customHostName**: `contosoclinic.com`
 
--   **azureAdApplicationClientId**: `952b0b1e-2582-4058-a0a0-0abc42107d70`
+>-   **azureAdApplicationClientId**: `952b0b1e-2582-4058-a0a0-0abc42107d70`
 
--   **azureAdApplicationClientSecret**: `Password@123`
+>-   **azureAdApplicationClientSecret**: `Password@123`
 
--   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
+>-   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
 
--   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
+>-   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
 
--   **sqlAdAdminUserPassword**: [Created password]
+>-   **sqlAdAdminUserPassword**: [Created password]
 
 After you have collected all of this information, you can click **Deploy to
 Azure**
