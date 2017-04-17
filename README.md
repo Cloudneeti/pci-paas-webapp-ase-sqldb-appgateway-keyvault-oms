@@ -461,7 +461,8 @@ the solution.
 
 6.  Select **+Add**
 
->   [./media/image1.png](./media/image1.png)
+
+![](images/image1.png)
 
 1.  Select the Role as **Owner**.
 2.  Select the user – Admin, in our example
