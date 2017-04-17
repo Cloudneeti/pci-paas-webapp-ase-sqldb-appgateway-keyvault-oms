@@ -699,43 +699,26 @@ The following example is used to illustrate the ARM information for `contosoclin
 **Basics**
 
 >-   **Subscription**: `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
-
 >-   **Resource group**: `Contosoclinic`
-
 >-   **Location**: Greyed out
 
 **Settings**
 
 >-   **\_artifactsLocation**: `https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master`
-
 >-   **\_artifactsLocationSasToken**: NULL
-
 >-   **certData**: [The Contoso Base-64 SSL string]
-
 >-   **certPassword**: [Password you created for the SSL cert]
-
 >-   **bastionHostAdministratorUserName**: `bastionadmin`
-
 >-   **bastionHostAdministratorPassword**: [Create a secure password]
-
 >-   **SqlAdministratorLoginUserName**: `sqladmin`
-
 >-   **sqlAdministratorLoginPassword**: [Created password]
-
 >-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com`
-
 >-   **automationAccountName**: `Contosoclinic-Automation`
-
 >-   **customHostName**: `contosoclinic.com`
-
 >-   **azureAdApplicationClientId**: `952b0b1e-2582-4058-a0a0-0abc42107d70`
-
 >-   **azureAdApplicationClientSecret**: `Password@123`
-
 >-   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
-
 >-   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
-
 >-   **sqlAdAdminUserPassword**: [Created password]
 
 After you have collected all of this information, you can click **Deploy to
