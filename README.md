@@ -766,10 +766,9 @@ Gateway IP address to be updated as a DNS record on the hosting site.
 
 This command will return the IP address. For example:
 
-` IpAddress`  
-` ---------`
-
-` 52.168.0.1`
+>` IpAddress`  
+>` ---------`
+>` 52.168.0.1`
 
 1.  Log into your DNS hosting provider and update the A/AAAA and CNAME records
     with the Application Gateway IP address.
@@ -964,7 +963,7 @@ Server Management Studio:
     secured
 
 ```SQL
-    -   SELECT * FROM [dbo].[Patients]
+    SELECT * FROM [dbo].[Patients]
 ```
 
 You will need to edit the `PostDeploymentSQL.sql` script under the
@@ -1052,7 +1051,7 @@ to operate correctly, you will be required to change to the **OMS tier**.
 Installing the OMS Dashboard view requires deployment of the scripts located in
 the `./omsDashboards` folder.
 
->**NOTE:** OMS Dashboard will not install correctly, until has been collected information for a period of time. If you receive an error when running the dashboard installation it is due to the lack of collected data. It is recommended that you wait up to 10 minutes to guarantee data is available in OMS.
+>**NOTE:** OMS Dashboard will not install correctly, until has collected information for a period of time. If you receive an error when running the dashboard import it is due to the lack of collected data. It is recommended that you wait up to 10 minutes to guarantee data is available in OMS.
 
 1.  Open **Log Analytics**.
 
@@ -1132,6 +1131,8 @@ to enable data collections from Azure Security Center.
 >   the Bastion Host deployment. In this solution, the Security Center VM agent
 >   is not deployed; the reason is to prevent OMS conflict issues.
 
+>!Installation Complete!
+
 # DEPLOYMENT ARCHITECTURE
 
 The following section provides insight into the development, and implementation
@@ -1145,25 +1146,12 @@ following diagram:
 
 #### Application Gateway
 
--   [SSL
-    Offload](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-ssl-portal)
-
--   [Disable TLS v1.0 and
-    v1.1](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-end-to-end-ssl-powershell)
-
--   [Web application
-    firewall](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-webapplicationfirewall-overview)
-    (WAF mode)
-
--   [Prevention
-    mode](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-web-application-firewall-portal)
-    with OWASP 3.0 ruleset
-
--   [Diagnostics
-    logging](file:///\\WWHYPERV5\UsersShare\stevew\Documents\Wadeware\Azure%20editing%202015-16-17%20-%20Frank\2017%20Eric-Frank\Diagnostics%20Logging%20for%20Application%20Gateway)
-
--   [Custom health
-    probes](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal)
+-   [SSL Offload](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-ssl-portal)
+-   [Disable TLS v1.0 and v1.1](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-end-to-end-ssl-powershell)
+-   [Web application firewall](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-webapplicationfirewall-overview)(WAF mode)
+-   [Prevention mode](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-web-application-firewall-portal) with OWASP 3.0 ruleset
+-   [Diagnostics logging](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-diagnostics)
+-   [Custom health probes](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal)
 
 #### Virtual network
 
@@ -1174,9 +1162,7 @@ following diagram:
 Each of the network tiers have a dedicated NSG
 
 -   A DMZ network security group for firewall and Application Gateway WAF
-
 -   An NSG for management jumpbox (bastion host)
-
 -   An NSG for the app service environment
 
 Each of the NSGs have specific ports and protocols opened for the secure and
@@ -1184,87 +1170,50 @@ correct working of the solution.
 
 In addition, the following configurations are enabled for each NSG
 
--   [Enabled diagnostics logs and events are stored in storage
-    account](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log)
-
--   [Connected OMS Log Analytics to the NSGs
-    diagnostics](https://github.com/krnese/AzureDeploy/blob/master/AzureMgmt/AzureMonitor/nsgWithDiagnostics.json)
+-   [Enabled diagnostics logs and events are stored in storage account](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log)
+-   [Connected OMS Log Analytics to the NSGs diagnostics](https://github.com/krnese/AzureDeploy/blob/master/AzureMgmt/AzureMonitor/nsgWithDiagnostics.json)
 
 #### Subnets
 
-Ensure each subnet is associated with its corresponding NSG
+-	Ensure each subnet is associated with its corresponding NSG
 
 #### Custom domain SSL certificates
 
-HTTPS traffic enabled using custom domain SSL certificate
+-	HTTPS traffic enabled using custom domain SSL certificate
 
 ## Data at Rest
 
 
-#### Azure storage
 
-To meet encrypted data-at-rest requirements, all [Azure
-Storage](https://azure.microsoft.com/en-us/services/storage/) uses the
-following:
+To meet encrypted data-at-rest requirements, all [Azure Storage](https://azure.microsoft.com/en-us/services/storage/) uses the following:
 
-[Storage Service
-Encryption](https://docs.microsoft.com/en-us/azure/storage/storage-service-encryption)
+####Azure storage
+-	[Storage Service Encryption](https://docs.microsoft.com/en-us/azure/storage/storage-service-encryption)
 
 #### SQL Database
 
-A PaaS SQL Database instance was used to showcase various security measures.
+A PaaS SQL Database instance was used to showcase  security measures.
 
--   [AD Authentication and
-    Authorization](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-aad-authentication)
-
--   [Enabled Auditing
-    logging](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing-get-started)
-
--   [Enabled Transparent Data Encryption
-    ](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing-get-started)
-
--   [Enabled SQL DB Firewall
-    rules](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-firewall-configure)
-    (allowing for ASE worker pools and client IP management)
-
--   [Enabled Threat
-    Detection](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-threat-detection-get-started)
-
--   [Enabled Always Encrypted
-    columns](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault)
-
-[Enabled Dynamic Data
-masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)
-(using the post-deployment PowerShell script)
+-   [AD Authentication and Authorization](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-aad-authentication)
+-   [Enabled Auditing logging](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing-get-started)
+-   [Enabled Transparent Data Encryption](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing-get-started)
+-   [Enabled SQL DB Firewall rules](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-firewall-configure)(allowing for ASE worker pools and client IP management)
+-   [Enabled Threat Detection](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-threat-detection-get-started)
+-   [Enabled Always Encrypted columns](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault)
+-	[Enabled Dynamic Data masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)(using the post-deployment PowerShell script)
 
 ## Logging and Auditing
 
--   **Activity Logs**: Configure [Azure Activity
-    Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs) to
-    provide insight into the operations that were performed on resources in your
-    subscription.
-
--   **Diagnostic Logs:** [Diagnostic
-    Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-of-diagnostic-logs) are
-    all logs emitted by every resource. These logs could include Windows event
-    system logs, Azure Blob storage, tables, and queue logs.
-
--   **Firewall Logs:** The Application Gateway provides full diagnostics and
-    access logs. Firewall logs are available for Application Gateway resources
-    that have WAF enabled.
-
--   **Log Archiving:** All diagnostics logs are configured to write to a
-    centralized and encrypted Azure storage account for archival and a defined
-    retention period (2 days). Logs are then connected to Azure Log Analytics
-    (OMS) for processing, storing, and dashboarding.
+-   **Activity Logs**: Configure [Azure Activity Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs) to provide insight into the operations that were performed on resources in your subscription.
+-   **Diagnostic Logs:** [Diagnostic Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-of-diagnostic-logs) are all logs emitted by every resource. These logs could include Windows event system logs, Azure Blob storage, tables, and queue logs.
+-   **Firewall Logs:** The Application Gateway provides full diagnostics and access logs. Firewall logs are available for Application Gateway resources that have WAF enabled.
+-   **Log Archiving:** All diagnostics logs are configured to write to a centralized and encrypted Azure storage account for archival and a defined retention period (2 days). Logs are then connected to Azure Log Analytics (OMS) for processing, storing, and dashboarding.
 
 ## Secrets Management
 
 #### Key Vault
 
-Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps safeguard cryptographic keys and secrets used by cloud applications and services.
-
-Stores
+Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps safeguard cryptographic keys and secrets used by cloud applications and services. Stores
 
 * **Keys** - SQL DB Column Encryption keys (customer managed keys)
 * **Secrets** - Bitlocker keys for Azure Disk Encryption
@@ -1276,32 +1225,18 @@ Stores
 
 #### Azure Active Directory
 
-[Azure Active
-Directory](https://azure.microsoft.com/en-us/services/active-directory/) (Azure
-AD) is the multi-tenant cloud-based directory and identity management service
-from Microsoft.
+-	[Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/) (Azure AD) is the multi-tenant cloud-based directory and identity management service from Microsoft.
 
-All users for the solution were created in Azure Active Directory, including
-users accessing the SQL Database.
-
+-	All users for the solution were created in Azure Active Directory, including users accessing the SQL Database. 
 #### Active Directory application
 
-Authentication to the app is done through the [Azure AD
-application](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-integrating-applications)
-and associated service principals.
+-	Authentication to the app is done through the [Azure AD application](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-integrating-applications) and associated service principals.
 
-Also, the [SQL DB Column
-Encryption](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault)
-is conducted using the AD app. Refer to [this
-sample](https://github.com/Microsoft/azure-sql-security-sample) from the Azure
-SQL DB team for more details.
+-	Also, the [SQL DB Column Encryption](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault) is conducted using the AD app. Refer to [this sample](https://github.com/Microsoft/azure-sql-security-sample) from the Azure SQL DB team for more details.
 
 #### Role-based Access Control
 
-Azure [Role-based Access
-Control](https://docs.microsoft.com/en-us/azure/active-directory/role-based-access-control-configure)
-(RBAC) enables precisely focused access management for Azure. Specific
-configurations exist for:
+-Azure [Role-based Access Control](https://docs.microsoft.com/en-us/azure/active-directory/role-based-access-control-configure)(RBAC) enables precisely focused access management for Azure. Specific configurations exist for:
 
 -   Subscription access
 
@@ -1311,46 +1246,30 @@ configurations exist for:
 
 #### Web Apps
 
-The [Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/)
-feature in Azure App Service lets developers rapidly build, deploy, and manage
-powerful websites and web apps. Build standards-based web apps and APIs using
-.NET, Node.js, PHP, Python, and Java. Deliver both web and mobile apps for
-employees or customers using a single back end. Securely deliver APIs that
-enable additional apps and devices.
+The [Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/)feature in Azure App Service lets developers rapidly build, deploy, and manage powerful websites and web apps. Build standards-based web apps and APIs using .NET, Node.js, PHP, Python, and Java. Deliver both web and mobile apps for employees or customers using a single back end. Securely deliver APIs that enable additional apps and devices.
 
 #### Azure App Service
 
 With [App
-Service](https://azure.microsoft.com/en-us/services/app-service/?b=16.52),
-develop powerful applications for any platform or device, faster than ever
-before. Meet rigorous performance, scalability, security, and compliance
-requirements using a single back end.
+Service](https://azure.microsoft.com/en-us/services/app-service/?b=16.52), develop powerful applications for any platform or device, faster than ever before. Meet rigorous performance, scalability, security, and compliance requirements using a single back end.
 
 #### Virtual machine
 
-As the App Service Environment is secured and locked down, there needs to be a
-mechanism to allow for any DevOps releases/changes that might be necessary, such
-as the ability to monitor WebApp using Kudu.
+As the App Service Environment is secured and locked down, there needs to be a mechanism to allow for any DevOps releases/changes that might be necessary, such as the ability to monitor WebApp using Kudu.
 
-A virtual machine was stood up as a Jumpbox / Bastion host with the following
-configurations:
+A virtual machine was stood up as a Jumpbox / Bastion host with the following configurations:
 
--   [Antimalware
-    extension](https://docs.microsoft.com/en-us/azure/security/azure-security-antimalware)
+-   [Antimalware extension](https://docs.microsoft.com/en-us/azure/security/azure-security-antimalware)
 
--   [OMS Monitoring
-    extension](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-windows-extensions-oms)
+-   [OMS Monitoring extension](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-windows-extensions-oms)
 
--   [VM Diagnostics
-    extension](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-windows-extensions-diagnostics-template)
+-   [VM Diagnostics extension](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-windows-extensions-diagnostics-template)
 
--   [Bitlocker Encrypted
-    Disk](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption)
+-   [Bitlocker Encrypted Disk](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption)
     using Azure Key Vault (respects Azure Government, PCI DSS, and HIPAA
     requirements)
 
--   An [AutoShutDown
-    Policy](https://azure.microsoft.com/en-us/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/)
+-   An [AutoShutDown Policy](https://azure.microsoft.com/en-us/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/)
     to reduce consumption of virtual machine resources when not in use.
 
 #### App Service Environment
@@ -1358,7 +1277,7 @@ configurations:
 An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-intro) is a Premium service plan is used for compliance reasons. Use of this plan allowed for the following controls/configurations:
 
 -   Host inside a secured Virtual Network and Network security rules
--   [Internal Load Balancing     mode](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-environment-with-internal-load-balancer) (mode 3)
+-   [Internal Load Balancing mode](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-environment-with-internal-load-balancer) (mode 3)
 -   [Disable TLS 1.0](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings) – a deprecated TLS protocol from PCI DSS standpoint
 -   [Change TLS Cipher](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)
 -   [Control inbound traffic N/W    ports](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-control-inbound-traffic)  
@@ -1368,72 +1287,42 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 ## Azure Security Center
 
 With [Azure Security
-Center](https://azure.microsoft.com/en-us/services/security-center/), you get a
-central view of the security state of all of your Azure resources. At a glance,
-you can verify that the appropriate security controls are in place and
-configured correctly and be able to quickly identify any resources that require
-attention.
+Center](https://azure.microsoft.com/en-us/services/security-center/), you get a central view of the security state of all of your Azure resources. At a glance, you can verify that the appropriate security controls are in place and configured correctly and be able to quickly identify any resources that require attention.
 
 #### Antimalware extension for VMs
 
-[Microsoft
-Antimalware](https://docs.microsoft.com/en-us/azure/security/azure-security-antimalware)
-for Azure Cloud Services and Virtual Machines is real-time protection capability
-that helps identify and remove viruses, spyware, and other malicious software,
-with configurable alerts when known malicious or unwanted software attempts to
-install itself or run on your Azure systems.
+[Microsoft Antimalware](https://docs.microsoft.com/en-us/azure/security/azure-security-antimalware)
+for Azure Cloud Services and Virtual Machines is real-time protection capability that helps identify and remove viruses, spyware, and other malicious software, with configurable alerts when known malicious or unwanted software attempts to install itself or run on your Azure systems.
 
 #### Optional Web Apps Vulnerability Assessment via Tinfoil
-
-For Azure Web Apps, [Tinfoil
-Security](https://azure.microsoft.com/en-us/blog/web-vulnerability-scanning-for-azure-app-service-powered-by-tinfoil-security/)
-is a security vulnerability scanning solution built into the Azure App Service
-management experience that provides web app scanning.
+For Azure Web Apps, [Tinfoil Security](https://azure.microsoft.com/en-us/blog/web-vulnerability-scanning-for-azure-app-service-powered-by-tinfoil-security/)
+is a security vulnerability scanning solution built into the Azure App Service management experience that provides web app scanning.
 
 ## Operations Management
 
 #### Application Insights
 
 Gain [actionable
-insights](https://azure.microsoft.com/en-us/services/application-insights/)
-through application performance management and instant analytics.
+insights](https://azure.microsoft.com/en-us/services/application-insights/) through application performance management and instant analytics.
 
 #### Log Analytics
 
-[Log Analytics](https://azure.microsoft.com/en-us/services/log-analytics/) is a
-service in Operations Management Suite (OMS) that helps you collect and analyze
-data generated by resources in your cloud and on-premises environments.
+[Log Analytics](https://azure.microsoft.com/en-us/services/log-analytics/) is a service in Operations Management Suite (OMS) that helps you collect and analyze data generated by resources in your cloud and on-premises environments.
 
 #### OMS Solutions
 
-The following 9OMS Solutions are pre-installed with this reference solution:
+The following OMS Solutions are pre-installed with this reference solution:
 
--   [Activity Log
-    Analytics](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs)
-
--   [Azure Networking
-    Analytics](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-azure-networking-analytics?toc=%2fazure%2foperations-management-suite%2ftoc.json)
-
+-   [Activity Log Analytics](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs)
+-   [Azure Networking Analytics](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-azure-networking-analytics?toc=%2fazure%2foperations-management-suite%2ftoc.json)
 -   Azure SQL Analytics
-
--   [Change
-    Tracking](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-change-tracking?toc=%2fazure%2foperations-management-suite%2ftoc.json)
-
--   [Key Vault
-    Analytics](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-azure-key-vault?toc=%2fazure%2foperations-management-suite%2ftoc.json)
-
--   [Service
-    Map](https://docs.microsoft.com/en-us/azure/operations-management-suite/operations-management-suite-service-map)
-
--   [Security and
-    Audit](https://www.microsoft.com/en-us/cloud-platform/security-and-compliance)
-
+-   [Change Tracking](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-change-tracking?toc=%2fazure%2foperations-management-suite%2ftoc.json)
+-   [Key Vault Analytics](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-azure-key-vault?toc=%2fazure%2foperations-management-suite%2ftoc.json)
+-   [Service Map](https://docs.microsoft.com/en-us/azure/operations-management-suite/operations-management-suite-service-map)
+-   [Security and Audit](https://www.microsoft.com/en-us/cloud-platform/security-and-compliance)
 -   [Antimalware](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-malware?toc=%2fazure%2foperations-management-suite%2ftoc.json)
-
--   [Update
-    Management](https://docs.microsoft.com/en-us/azure/operations-management-suite/oms-solution-update-management)
+-   [Update Management](https://docs.microsoft.com/en-us/azure/operations-management-suite/oms-solution-update-management)
 
 ## Security Center Integration
 
-Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started).
-Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
+Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started). Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
