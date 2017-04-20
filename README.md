@@ -29,10 +29,10 @@ subscription costs.*
 * *Gururaj Pandurangi (Avyan Consulting)*
 
 <H2> Disclaimer </H2>
-> This solution is intended as a reference architecture pilot and should not be used as-is for production purposes
-> * Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
-> * If you are a Microsoft internal team member, please refer to the **http://aka.ms/azurepci** and engage your respective DX / CSA /Account teams.
-> * Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
+This solution is intended as a reference architecture pilot and should not be used as-is for production purposes
+ * Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
+ * If you are a Microsoft internal team member, please refer to the **http://aka.ms/azurepci** and engage your respective DX / CSA /Account teams.
+ * Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
 
 <H2> Contributors and Reviewers </H2>
 
@@ -60,10 +60,19 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 <!-- /TOC -->
 
 ## SOLUTION OBJECTIVE AND SCENARIO
+  The solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution:  
+   ![](images/Solution_Context.png)
+   
+The objective of this solution is to illustrate how 4 tier secure and compliant solution could be deployed as an end-to-end Azure solution. 
 
-The objective of this solution is to illustrate how a secure and compliant
-solution could be deployed as an end-to-end Azure solution. The components of
-this solution are as follows:
+![](images/4tier.png)
+
+- Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
+-Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA).
+
+
+
+The elements of this solution are as follows:
 
 -   **Solution blueprint**. The blueprint provides an understanding of how Contoso Health (a fictitious organization) achieved its compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso Health.
 -   **Reference architecture**. The reference architecture provides the design that was used for the Contoso Health solution.
@@ -81,8 +90,7 @@ this solution are as follows:
     runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by     the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso Clinic Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
 
 
-  The solution is intended to do the following:  
-   ![](images/Solution_Context.png)
+
 
 ## COST MODEL
 
@@ -118,7 +126,6 @@ This scenario provides the opportunity to illustrate the following end-to-end
 solution
 
 
->**IMPORTANT**  The solution requires **a paid subscription** on Azure, a trial subscription account will not work.
 
 
 A small medical clinic, Contoso Health, is ready to move their patient intake
@@ -241,12 +248,11 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 ## Collect prerequisites certificate, azure subscription
 
 
-This section provides detailed information about items you will need during
-installation. To proceed you will require a **paid subscription on Azure**. Note
-that many of the features are not available in an Azure trial account. You will
-also require to have access to manage the subscription as a [Subscription Admins
-role and co-administrator of the
-subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
+This section provides detailed information about items you will need during installation. 
+
+>**IMPORTANT**  The solution requires **a paid subscription** on Azure, a **trial** subscription account will not work.
+
+ Note that many of the features are not available in an Azure trial account. You will also require to have access to manage the subscription as a [Subscription Admins role and co-administrator of the subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
 
 >If you have not already done so, download, or clone a copy of installation solution from
     https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms (If you downloaded a .zip file, expand the content of the compressed file to
