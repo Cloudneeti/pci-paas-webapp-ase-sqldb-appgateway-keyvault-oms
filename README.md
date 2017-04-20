@@ -130,19 +130,17 @@ vary.
 ## USER SCENARIO
 
 
-This scenario provides the opportunity to illustrate the following end-to-end
-solution
+> This scenario illustrates how a ficticious medical clinic migrated their patient intake, and payment card processing to Azure. 
 
 
 
 
-A small medical clinic, Contoso Health, is ready to move their patient intake
+A small medical clinic called, Contoso Health is ready to move their patient intake
 and payment system to the cloud. They have selected Microsoft Azure to host the
 intake process of patients and to allow a clinic manager or receptionist to
-collect credit card payments from patients when a visit is completed.
+collect credit card payments from patients for a visit.
 
-The solution can be viewed as a quickly deployable proof-of-concept (POC) to
-understand how Azure can be used to accomplish the following:
+The administrator is looking for a solution can be quickly deployabled to achive his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
 
 -   Collect, store, and retrieve payment card data while complying with
     stringent Payment Card Industry, Data Security Standards (PCI DSS)
