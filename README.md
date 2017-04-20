@@ -55,15 +55,23 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 - [USER SCENARIO](#user-scenario)
 - [DEPLOYMENT GUIDE](#deployment-guide)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
-   
+
 
 <!-- /TOC -->
 
 ## SOLUTION OBJECTIVE AND SCENARIO
   The solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution:  
-   ![](images/Solution_Context.png)
+
+
+
+
+  ![](images/Solution_Context.png)
+
+
+
+
    
-The objective of this solution is to illustrate how 4 tier secure and compliant solution could be deployed as an end-to-end Azure solution. 
+The objective of this solution is to illustrate how 4 tier secure and compliant solution could be deployed as an end-to-end Azure solution.
 
 ![](images/4tier.png)
 
@@ -248,7 +256,7 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 ## Collect prerequisites certificate, azure subscription
 
 
-This section provides detailed information about items you will need during installation. 
+This section provides detailed information about items you will need during installation.
 
 >**IMPORTANT**  The solution requires **a paid subscription** on Azure, a **trial** subscription account will not work.
 
@@ -1233,7 +1241,7 @@ Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps s
 
 -	[Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/) (Azure AD) is the multi-tenant cloud-based directory and identity management service from Microsoft.
 
--	All users for the solution were created in Azure Active Directory, including users accessing the SQL Database. 
+-	All users for the solution were created in Azure Active Directory, including users accessing the SQL Database.
 #### Active Directory application
 
 -	Authentication to the app is done through the [Azure AD application](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-integrating-applications) and associated service principals.
