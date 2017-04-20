@@ -76,7 +76,7 @@ The objective of this solution is to illustrate how 4 tier secure and compliant 
 ![](images/4tier.png)
 
 - Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
--Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA).
+- Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA).
 
 
 
