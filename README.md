@@ -1,7 +1,7 @@
-<H1> Azure PCI and HIPAA validated solution </H1>
+# Azure PCI and HIPAA validated solution 
 
 
-<H2>Blueprint and reference architecture with ARM templates </H2>
+## Blueprint and reference architecture with ARM templates 
 
 
 *Published April 2017*
@@ -21,24 +21,24 @@ subscription costs.*
 
 *© 2016 Microsoft/Avyan. All rights reserved.*
 
-<H2>Acknowledgements </H2>
+## ACKNOWLEDGEMENTS
 
-<H2> Authors of the document </H2>
+### Authors of the document 
 
 * *Frank Simorjay (Microsoft)*  
 * *Gururaj Pandurangi (Avyan Consulting)*
 
-<H2> Disclaimer </H2>
+### Disclaimer 
 This solution is intended as a reference architecture pilot and should not be used as-is for production purposes.
 * Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
-* Please contact  <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a> if you need further info or support on this QuickStart solution.
+* Please contact  <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank"> azurecompliance@avyanconsulting.com </a> if you need further info or support on this QuickStart solution.
 
 
-<H2> Contributors and Reviewers </H2>
+### Contributors and Reviewers 
 
 TBD
 
-<H2> Visualize Azure Resources before you deploy </H2>
+### Visualize Azure Resources before you deploy 
 
 For deployment details refer to section DEPLOYMENT GUIDE below
 
@@ -47,7 +47,7 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 </a>
 
 
-<H2> TABLE OF CONTENTS </H2>
+## TABLE OF CONTENTS 
 <!-- TOC -->
 
 - [SOLUTION OBJECTIVE AND SCENARIO](#solution-objective-and-scenario)
@@ -231,7 +231,7 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 >-   Azure Blob Storage
 >-   Azure Active Directory access control (RBAC)
 
-## Installation procedure overview
+### Installation procedure overview
 
 
 1.  Collect prerequisites such as certificate, azure subscription
@@ -252,7 +252,7 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 14. If you choose, delete the installation and dependencies by running a
     PowerShell script
 
-## Collect prerequisites certificate, azure subscription
+### Collect prerequisites certificate, azure subscription
 
 
 This section provides detailed information about items you will need during installation.
@@ -265,7 +265,7 @@ This section provides detailed information about items you will need during inst
     https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms (If you downloaded a .zip file, expand the content of the compressed file to
     a local directory.)
 
-### Custom domain and SSL certificate
+#### Custom domain and SSL certificate
 
 The installation requires a custom domain and SSL certificate. Microsoft
 recommends that a custom domain be purchased with [an SSL
@@ -439,7 +439,7 @@ browser](http://www.thewindowsclub.com/launch-start-private-browsing) to ensure 
 >**NOTE** – The remainder of the installation guidance will use the **Admin** user
 for all steps.
 
-## LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS
+### LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS
 
 The following procedure should be followed whenever you restart your PowerShell
 IDE session. This may not be required at all times, but strongly recommended to
