@@ -99,34 +99,6 @@ The elements of this solution are as follows:
 
 
 
-
-## COST MODEL
-
-The solution cost model has a monthly fee structure and a use per hr. to
-consider when sizing the solution. This example deployment estimate cost will
-consist of the following items:
-
-| **Resource**                  | **Cost/Month** |
-|-------------------------------|----------------|
-| S1 SQL Database               | $30.00        |
-| B1 App Service Plan           | $55.80        |
-| Storage Plan                  | $0.36         |
-| Azure Key Vault               | $0.00         |
-| OMS                           | $10.00        |
-| Domain name/SSL certificate\* | $10.00        |
-| Security Center               | $15.00        |
-| Key Vault                     | $0.03         |
-| Azure Active Directory        | $126.60       |
-| App Service                   | $74.40        |
-| SQL Database                  | $15.03        |
-| Virtual Machines              | $104.93       |
-| Application Gateway           | $93.74        |
-| \*Azure DNS                   | $0.90         |
-| **Total monthly estimate**    | **$536.79**   |
-
-\*The domain name and SSL certificate are external service offerings. Prices may
-vary.
-
 ## USER SCENARIO
 
 
@@ -203,6 +175,34 @@ Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he
 
 
 In the `Contoso Clinic` Demo Application, you will be logged in as **Edna** and able to test the capabilities of the deployed environment.
+
+
+## CONTOSOCLINIC COSTING SAMPLE
+
+The solution cost sample has a monthly fee structure and a use per hr. to
+consider when sizing the solution. This example deployment **estimate** cost will
+consist of the following items:
+
+| **Resource**                  | **Cost/Month** |
+|-------------------------------|----------------|
+| S1 SQL Database               | $30.00        |
+| B1 App Service Plan           | $55.80        |
+| Storage Plan                  | $0.36         |
+| Azure Key Vault               | $0.00         |
+| OMS                           | $10.00        |
+| Domain name/SSL certificate\* | $10.00        |
+| Security Center               | $15.00        |
+| Key Vault                     | $0.03         |
+| Azure Active Directory        | $126.60       |
+| App Service                   | $74.40        |
+| SQL Database                  | $15.03        |
+| Virtual Machines              | $104.93       |
+| Application Gateway           | $93.74        |
+| \*Azure DNS                   | $0.90         |
+| **Total monthly estimate**    | **$536.79**   |
+
+\*The domain name and SSL certificate are external service offerings. Prices may
+vary.
 
 
 ## DEPLOYMENT GUIDE
