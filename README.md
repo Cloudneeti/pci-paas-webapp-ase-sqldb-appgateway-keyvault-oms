@@ -160,13 +160,13 @@ based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
 your production ready solution.*
 
-## Contosoclinic Use Case POC
+## THE CONTOSOCLINIC POC
 
 The POC solution is designed with the following fictitious employees of `Contosoclinic.com`:
 
+These roles are used only to illustrate use case, and provide insight into the user interface
 
 #### Role: Receptionist
-Edna Benson is the receptionist, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed.
 
 |Item      |Example|
 |----------|------|
@@ -176,14 +176,16 @@ Edna Benson is the receptionist, and business manager. She is responsible to ens
 |Last name:| `Benson`|
 | User type: |`Member`|
 
-**Permissions**: Create, read patient information, read date of birth (DOB)*
-* Edna will be able to modify patient information but will not be able to alter patient medical records
+Edna Benson is the receptionist, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed. Edna will use the **patient** data in the following manner:
+
+
+* Edna can Create, read patient information, read date of birth (DOB)*
+* Edna will be able to modify patient information 
 * Edna can overwrite (or replace) credit card number, expiration, and CVC verification information
 * Edna can replace stored Social Security number (SSN)
 * Edna cannot read SSN or credit card information unmasked. In addition, all her actions are logged.
 
 #### Role: Doctor
-Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he will be entering patient history and treatment information. Chris can update information for patients.
 
 |Item      |Example|
 |----------|------|
@@ -193,16 +195,15 @@ Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he
 |Last name: |`Aston`|
 |User type:| `Member`|
 
-**Permissions**: Create, read patient information, read DOB
+Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he will be entering patient history and treatment information. Chris can update information for patients.
+
+* Chris can Create, read patient information, read DOB
 * Chris can modify patient information, including medical records and date of birth, and can view masked SSN.
-* Chris has **no** access to credit card information
 * All of Chris’s actions are logged
 
 
-In the `Contoso Clinic` Demo Application, you will be able to test the security
-measures configured for Edna and Chris to explore their permissions for reading,
-creating, altering, and deleting records in the solution. By default visiting
-the contosoclinic.com site you will be logged in as Edna.
+In the `Contoso Clinic` Demo Application, you will be logged in as **Edna** and able to test the capabilities of the deployed environment.
+
 
 ## DEPLOYMENT GUIDE
 
