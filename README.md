@@ -31,8 +31,8 @@ subscription costs.*
 <H2> Disclaimer </H2>
 This solution is intended as a reference architecture pilot and should not be used as-is for production purposes.
 * Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
-* If you are a Microsoft internal team member, please refer to the **http://aka.ms/azurepci** and engage your respective DX / CSA /Account teams.
-* Please contact  **<a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a>** if you need further info or support on this QuickStart solution.
+* Please contact  <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank">azurecompliance@avyanconsulting.com</a> if you need further info or support on this QuickStart solution.
+
 
 <H2> Contributors and Reviewers </H2>
 
