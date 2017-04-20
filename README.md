@@ -43,7 +43,6 @@ TBD
 <!-- TOC -->
 
 - [SOLUTION OBJECTIVE AND SCENARIO](#solution-objective-and-scenario)
-- [COST MODEL](#cost-model)
 - [USER SCENARIO](#user-scenario)
 - [DEPLOYMENT GUIDE](#deployment-guide)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
