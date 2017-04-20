@@ -38,14 +38,6 @@ This solution is intended as a reference architecture pilot and should not be us
 
 TBD
 
-### Visualize Azure Resources before you deploy 
-
-For deployment details refer to section DEPLOYMENT GUIDE below
-
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
-<img src="http://armviz.io/visualizebutton.png"/>
-</a>
-
 
 ## TABLE OF CONTENTS 
 <!-- TOC -->
@@ -80,7 +72,7 @@ The objective of this solution is to illustrate how 4 tier secure and compliant 
 
 
 
-The elements of this solution are as follows:
+### Components of the Blue print
 
 -   **Solution blueprint**. The blueprint provides an understanding of how Contoso Health (a fictitious organization) achieved its compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso Health.
 -   **Reference architecture**. The reference architecture provides the design that was used for the Contoso Health solution.
@@ -96,6 +88,15 @@ The elements of this solution are as follows:
     configuring separation of duties for core administrators and users.
     -   A post-installation process that deploys an [ARM template, web front-end
     runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by     the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso Clinic Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
+
+### Visualize Azure Resources before you deploy 
+
+For deployment details refer to section DEPLOYMENT GUIDE below
+
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
+<img src="http://armviz.io/visualizebutton.png"/>
+</a>
+
 
 
 
@@ -132,7 +133,7 @@ based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
 your production ready solution.*
 
-## THE CONTOSOCLINIC POC
+### The Contosoclinic POC
 
 The POC solution is designed with the following fictitious employees of `Contosoclinic.com`:
 
@@ -177,7 +178,7 @@ Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he
 In the `Contoso Clinic` Demo Application, you will be logged in as **Edna** and able to test the capabilities of the deployed environment.
 
 
-## CONTOSOCLINIC COSTING SAMPLE
+### Contosoclinic Azure pricing sample calculation
 
 The solution cost sample has a monthly fee structure and a use per hr. to
 consider when sizing the solution. This example deployment **estimate** cost will
@@ -701,7 +702,7 @@ reliably.
 | Windows Azure Service Management | 0                           | 1                         |
 
 
-## Deploying The Azure Resource Template (ARM)
+### Deploying The Azure Resource Template (ARM)
 
 Deploying the ARM template requires the following information, which you should
 collect before clicking **Deploy to Azure** on the following page. (The
@@ -737,7 +738,7 @@ The following example is used to illustrate the ARM information for `contosoclin
 After you have collected all of this information, you can click **Deploy to
 Azure**
 
-### Deploy Azure Resource Resources
+### DEPLOY AZURE RESOURCE USING (ARM)
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
@@ -756,7 +757,7 @@ components. The total time required is approximately 2.5 hours from when the
 
 ![](images/ARM_template_deployment_timeline.png)
 
-## Post-ARM Deployment
+### Post-ARM Deployment
 
 The following post-deployment steps deploy and set up the database, users, and
 data records; the steps also finalize connectivity. Steps in this section
@@ -764,7 +765,7 @@ address PCI and healthcare record protection requirements by encrypting the
 customer records that contain payment card data and personal healthcare
 information (PHI).
 
-### Update DNS setting with Application Gateway IP
+#### Update DNS setting with Application Gateway IP
 
 In the Contoso example, the customer’s DNS settings require the Application
 Gateway IP address to be updated as a DNS record on the hosting site.
@@ -990,12 +991,12 @@ You can copy the script from the deployment file and run it in a new SQL query.
 
 
 
-## Monitoring, and Security features
+### Monitoring, and Security features
 
 The following sections address security controls that are required to enable
 logging, monitoring, security detection, and anti-malware protection.
 
-### Operations Management Suite (OMS) configuration
+#### Operations Management Suite (OMS) configuration
 
 During the deployment step, OMS scripts were created and installed. In this
 configuration step, the OMS instance is configured.
@@ -1003,7 +1004,7 @@ configuration step, the OMS instance is configured.
 >**NOTE**: Pricing default **free** tier, will not be sufficient for this solution
 to operate correctly, you will be required to change to the **OMS tier**.
 
-### Start the collection for OMS
+#### Start the collection for OMS
 
 1.  Sign in to the Azure Portal with an account that is a member of the
     Subscription Admins role and co-administrator of the subscription.
@@ -1059,7 +1060,7 @@ to operate correctly, you will be required to change to the **OMS tier**.
 5.  Click **Ok**
 
 
-### Install OMS Dashboards view
+#### Install OMS Dashboards view
 
 Installing the OMS Dashboard view requires deployment of the scripts located in
 the `./omsDashboards` folder.
@@ -1146,7 +1147,7 @@ to enable data collections from Azure Security Center.
 
 >!Installation Complete!
 
-# DEPLOYMENT ARCHITECTURE
+## DEPLOYMENT ARCHITECTURE
 
 The following section provides insight into the development, and implementation
 elements. The descriptions in this document’s deployment strategies apply to the
@@ -1154,8 +1155,8 @@ following diagram:
 
 ![](images/Azure_PaaS_-_PCI_DSS_Reference_Architecture.png)
 
-## Network Segmentation and Security
----------------------------------
+### Network Segmentation and Security
+
 
 #### Application Gateway
 
@@ -1194,7 +1195,7 @@ In addition, the following configurations are enabled for each NSG
 
 -	HTTPS traffic enabled using custom domain SSL certificate
 
-## Data at Rest
+### Data at Rest
 
 
 
@@ -1215,14 +1216,15 @@ A PaaS SQL Database instance was used to showcase  security measures.
 -   [Enabled Always Encrypted columns](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault)
 -	[Enabled Dynamic Data masking](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-dynamic-data-masking-get-started)(using the post-deployment PowerShell script)
 
-## Logging and Auditing
+### Logging and Auditing
 
+Logging using OMS, and Runbook to collect logs.
 -   **Activity Logs**: Configure [Azure Activity Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs) to provide insight into the operations that were performed on resources in your subscription.
 -   **Diagnostic Logs:** [Diagnostic Logs](https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-of-diagnostic-logs) are all logs emitted by every resource. These logs could include Windows event system logs, Azure Blob storage, tables, and queue logs.
 -   **Firewall Logs:** The Application Gateway provides full diagnostics and access logs. Firewall logs are available for Application Gateway resources that have WAF enabled.
 -   **Log Archiving:** All diagnostics logs are configured to write to a centralized and encrypted Azure storage account for archival and a defined retention period (2 days). Logs are then connected to Azure Log Analytics (OMS) for processing, storing, and dashboarding.
 
-## Secrets Management
+### Secrets Management
 
 #### Key Vault
 
@@ -1233,7 +1235,7 @@ Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps s
 
 
 
-## Identity Management
+### Identity Management
 
 
 #### Azure Active Directory
@@ -1255,7 +1257,7 @@ Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps s
 
 -   Azure Key Vault access
 
-## Web application and Compute
+### Web application and Compute
 
 #### Web Apps
 
@@ -1297,7 +1299,7 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 -   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall)
 -   [Allow SQL DB traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
 
-## Azure Security Center
+### Azure Security Center
 
 With [Azure Security
 Center](https://azure.microsoft.com/en-us/services/security-center/), you get a central view of the security state of all of your Azure resources. At a glance, you can verify that the appropriate security controls are in place and configured correctly and be able to quickly identify any resources that require attention.
@@ -1311,7 +1313,7 @@ for Azure Cloud Services and Virtual Machines is real-time protection capability
 For Azure Web Apps, [Tinfoil Security](https://azure.microsoft.com/en-us/blog/web-vulnerability-scanning-for-azure-app-service-powered-by-tinfoil-security/)
 is a security vulnerability scanning solution built into the Azure App Service management experience that provides web app scanning.
 
-## Operations Management
+### Operations Management
 
 #### Application Insights
 
@@ -1336,6 +1338,6 @@ The following OMS Solutions are pre-installed with this reference solution:
 -   [Antimalware](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-malware?toc=%2fazure%2foperations-management-suite%2ftoc.json)
 -   [Update Management](https://docs.microsoft.com/en-us/azure/operations-management-suite/oms-solution-update-management)
 
-## Security Center Integration
+### Security Center Integration
 
 Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started). Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
