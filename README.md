@@ -184,12 +184,12 @@ consider when sizing the solution. This example deployment **estimate** cost usi
 consist of the following items:
 
 |**Service type**|**Custom name**|**Region**|**Description**|**Estimated Cost**|
-------------------------------------------------------------
+|-----------------|---------------|-----------|--------------|-----------------|
 |Virtual Machines|Virtual Machines|South Central US|1 Standard virtual machine(s), D1 (1 cores, 3.5 GB RAM, 50 GB disk) size: 1 months|$96.72|
 |App Service|App Service|South Central US|1 instance(s), 744 hours, size: s1, standard tier, 0 SNI connection(s), 0 IP connection(s)|$74.40|
 |IP Addresses|IP Addresses|East US|arm type, 1 public IP Address(es) x 1 months|$2.98|
 |SQL Database|SQL Database|East US|1 standard database(s) x 1 months, size: s0|$15.03|
-|Storage|Storage|West US|5/GB storage: Block blob type, Basic tier, LRS redundancy, hot access tier. , 1 x10,000 put/create container transactions , 1 x10,000 others transactions (except delete which is free), 1/GB data retrieval, 1/GB data write, 1/GB data geo-replication.|$0.10|
+|Storage|Storage|West US|5/GB storage: Block blob type, Basic tier, LRS redundancy|$0.10|
 |Storage|Storage|East US|1 GB storage Table and Queue type. Basic tier, LRS redundancy, 1 x100,000 transactions|$0.07|
 |Storage|Storage|West US|standard-s4 Disk type with 1 Managed disks|$0.77|
 |Application Insights|Application Insights|East US|basic tier in us-east region with 2 GBs and 0 multi-step web test(s).|$2.30|
