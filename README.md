@@ -180,29 +180,34 @@ In the `Contoso Clinic` Demo Application, you will be logged in as **Edna** and 
 ### Contosoclinic Azure pricing sample calculation
 
 The solution cost sample has a monthly fee structure and a use per hr. to
-consider when sizing the solution. This example deployment **estimate** cost will
+consider when sizing the solution. This example deployment **estimate** cost using the [Azure costing calculator](https://azure.microsoft.com/en-us/pricing/calculator/). The solution 
 consist of the following items:
 
-| **Resource**                  | **Cost/Month** |
-|-------------------------------|----------------|
-| S1 SQL Database               | $30.00        |
-| B1 App Service Plan           | $55.80        |
-| Storage Plan                  | $0.36         |
-| Azure Key Vault               | $0.00         |
-| OMS                           | $10.00        |
-| Domain name/SSL certificate\* | $10.00        |
-| Security Center               | $15.00        |
-| Key Vault                     | $0.03         |
-| Azure Active Directory        | $126.60       |
-| App Service                   | $74.40        |
-| SQL Database                  | $15.03        |
-| Virtual Machines              | $104.93       |
-| Application Gateway           | $93.74        |
-| \*Azure DNS                   | $0.90         |
-| **Total monthly estimate**    | **$536.79**   |
+|**Service type**|**Custom name**|**Region**|**Description**|**Estimated Cost**|
+------------------------------------------------------------
+|Virtual Machines|Virtual Machines|South Central US|1 Standard virtual machine(s), D1 (1 cores, 3.5 GB RAM, 50 GB disk) size: 1 months|$96.72|
+|App Service|App Service|South Central US|1 instance(s), 744 hours, size: s1, standard tier, 0 SNI connection(s), 0 IP connection(s)|$74.40|
+|IP Addresses|IP Addresses|East US|arm type, 1 public IP Address(es) x 1 months|$2.98|
+|SQL Database|SQL Database|East US|1 standard database(s) x 1 months, size: s0|$15.03|
+|Storage|Storage|West US|5/GB storage: Block blob type, Basic tier, LRS redundancy, hot access tier. , 1 x10,000 put/create container transactions , 1 x10,000 others transactions (except delete which is free), 1/GB data retrieval, 1/GB data write, 1/GB data geo-replication.|$0.10|
+|Storage|Storage|East US|1 GB storage Table and Queue type. Basic tier, LRS redundancy, 1 x100,000 transactions|$0.07|
+|Storage|Storage|West US|standard-s4 Disk type with 1 Managed disks|$0.77|
+|Application Insights|Application Insights|East US|basic tier in us-east region with 2 GBs and 0 multi-step web test(s).|$2.30|
+|Log Analytics|Log Analytics|East US|1 GB(s), standalone tier|$2.30|
+|Traffic Manager|Traffic Manager|East US|2 million(s)/mo queries, 2 Azure endpoints, 0 external endpoints|$1.80|
+|Security Center|Security Center|West US||$15.00|
+|Key Vault|Key Vault|East US|1 operations, 1 certificate renewals, 1 HSM keys in the us-east region|$4.03|
+|Azure Active Directory|Azure Active Directory|West US|free tier, per-user MFA billing model, 10 MFA user(s), 25001-100000 directory objects, 0 hours|$14.00|
+|Application Gateway|Application Gateway|East US|1 instance(s) x 1 months, 1 GB data processed, outbound transfers:: 5 GB|$93.74|
+|Azure DNS|Azure DNS|East US|1 zone(s), 0 million queries|$0.50|
+|Traffic Manager|Traffic Manager|East US|1 million(s)/mo queries, 1 Azure endpoints, 0 external endpoints|$0.90|
 
-\*The domain name and SSL certificate are external service offerings. Prices may
-vary.
+
+**Monthly Total $324.64**
+**Annual Total  $3,895.73**
+ 
+Disclaimer 
+All prices shown are in US Dollar ($). This estimate was created in April 2017 
 
 
 ## DEPLOYMENT GUIDE
