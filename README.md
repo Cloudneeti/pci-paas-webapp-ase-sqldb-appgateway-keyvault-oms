@@ -512,6 +512,8 @@ New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"
 
 `New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"`
 
+>**NOTE** - This demo currently ONLY runs correctly in the location **East**, **East US**
+
 2.  Create an Automation account following the instruction create a [runbooks
     with an Azure Run As
     account](https://docs.microsoft.com/en-us/azure/automation/automation-sec-configure-azure-runas-account).
