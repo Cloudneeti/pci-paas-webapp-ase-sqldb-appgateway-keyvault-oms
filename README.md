@@ -189,22 +189,20 @@ consist of the following items:
 | App Service | App Service | South Central US | 1 instance(s), 744 hours, size: s1, standard tier, 0 SNI connection(s), 0 IP connection(s) | $74.40 | 
 | IP Addresses | IP Addresses | East US | arm type, 1 public IP Address(es) x 1 months | $2.98 | 
 | SQL Database | SQL Database | East US | 1 standard database(s) x 1 months, size: s0 | $15.03 | 
-| Storage | Storage | West US | 5/GB storage: Block blob type, Basic tier, LRS redundancy | $0.10 | 
+| Storage | Storage | East US | 5/GB storage: Block blob type, Basic tier, LRS redundancy | $0.10 | 
 | Storage | Storage | East US | 1 GB storage Table and Queue type. Basic tier, LRS redundancy, 1 x100,000 transactions | $0.07 | 
-| Storage | Storage | West US | standard-s4 Disk type with 1 Managed disks | $0.77 | 
+| Storage | Storage | East US | standard-s4 Disk type with 1 Managed disks | $0.77 | 
 | Application Insights | Application Insights | East US | basic tier in us-east region with 2 GBs and 0 multi-step web test(s). | $2.30 | 
 | Log Analytics | Log Analytics | East US | 1 GB(s), standalone tier | $2.30 | 
 | Traffic Manager | Traffic Manager | East US | 2 million(s)/mo queries, 2 Azure endpoints, 0 external endpoints | $1.80 | 
-| Security Center | Security Center | West US |  | $15.00 | 
+| Security Center | Security Center | East US |  | $15.00 | 
 | Key Vault | Key Vault | East US | 1 operations, 1 certificate renewals, 1 HSM keys in the us-east region | $4.03 | 
 | Azure Active Directory | Azure Active Directory | West US | free tier, per-user MFA billing model, 10 MFA user(s), 25001-100000 directory objects, 0 hours | $14.00 | 
 | Application Gateway | Application Gateway | East US | 1 instance(s) x 1 months, 1 GB data processed, outbound transfers:: 5 GB | $93.74 | 
 | Azure DNS | Azure DNS | East US | 1 zone(s), 0 million queries | $0.50 | 
 | Traffic Manager | Traffic Manager | East US | 1 million(s)/mo queries, 1 Azure endpoints, 0 external endpoints | $0.90 | 
-
-
-**Monthly Total $324.64**
-**Annual Total  $3,895.73**
+| | | | | **Monthly Total $324.64** |
+| | | | | **Annual Total  $3,895.73** |
  
 Disclaimer 
 All prices shown are in US Dollar ($). This estimate was created in April 2017 
