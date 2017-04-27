@@ -1143,7 +1143,7 @@ Complete the instructions at this link
 <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started>
 to enable data collections from Azure Security Center.
 
-[Azure Advisor] (https://docs.microsoft.com/en-us/azure/advisor/advisor-overview) Advisor is a 
+[Azure Advisor](https://docs.microsoft.com/en-us/azure/advisor/advisor-overview) Advisor is a 
 personalized cloud consultant that helps you follow best practices to optimize your Azure deployments.
  It analyzes your resource configuration and usage telemetry and then recommends solutions that can help you 
  improve the cost effectiveness, performance, high availability, and security of your Azure resources. 
@@ -1321,7 +1321,7 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 With [Azure Security
 Center](https://azure.microsoft.com/en-us/services/security-center/), you get a central view of the security state of all of your Azure resources. At a glance, you can verify that the appropriate security controls are in place and configured correctly and be able to quickly identify any resources that require attention.
 
-And [Azure Advisor] (https://docs.microsoft.com/en-us/azure/advisor/advisor-overview)
+And [Azure Advisor](https://docs.microsoft.com/en-us/azure/advisor/advisor-overview)
 - Advisor is a personalized cloud consultant that helps you follow best practices to optimize your Azure deployments. It analyzes your resource configuration and usage telemetry and then recommends solutions that can help you improve the cost effectiveness, performance, high availability, and security of your Azure resources.
 
 #### Antimalware extension for VMs
