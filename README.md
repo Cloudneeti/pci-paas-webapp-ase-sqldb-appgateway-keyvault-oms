@@ -1113,7 +1113,7 @@ You can now review your data collection in OMS.
 
 ![](images/OMS_Workspace_and_Solutions.png)
 
-### Upgrade Azure Security Center
+### Upgrade Azure Security Center review Security Advisor messages
 
 Azure Security Center was enabled in the deployment of your subscription.
 However, to ensure that the antimalware and threat detection capabilities are
@@ -1143,11 +1143,22 @@ Complete the instructions at this link
 <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started>
 to enable data collections from Azure Security Center.
 
+[Azure Advisor] (https://docs.microsoft.com/en-us/azure/advisor/advisor-overview) Advisor is a 
+personalized cloud consultant that helps you follow best practices to optimize your Azure deployments.
+ It analyzes your resource configuration and usage telemetry and then recommends solutions that can help you 
+ improve the cost effectiveness, performance, high availability, and security of your Azure resources. 
+ 1. Select **Browse**, and then scroll to **Azure Advisor**. 
+ 2. The Advisor dashboard displays personalized recommendations for contoso clinic subscription.
+ 
+
 **NOTE:**
 
 >   Currently, the OMS Monitoring agent is automatically installed along with
 >   the Bastion Host deployment. In this solution, the Security Center VM agent
 >   is not deployed; the reason is to prevent OMS conflict issues.
+
+
+
 
 >!Installation Complete!
 
@@ -1252,6 +1263,8 @@ Azure [Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) helps s
 -	Authentication to the app is done through the [Azure AD application](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-integrating-applications) and associated service principals.
 
 -	Also, the [SQL DB Column Encryption](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-always-encrypted-azure-key-vault) is conducted using the AD app. Refer to [this sample](https://github.com/Microsoft/azure-sql-security-sample) from the Azure SQL DB team for more details.
+-   Azure [Identity Protection] (https://docs.microsoft.com/en-us/azure/active-directory/active-directory-identityprotection) provides additional safeguards that can be implemented. such as detect potential vulnerabilities affecting your organization’s identities
+, configure automated responses to detected suspicious actions that are related to your organization’s identities, and investigate suspicious incidents and take appropriate action to resolve them.
 
 #### Role-based Access Control
 
@@ -1303,10 +1316,13 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 -   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall)
 -   [Allow SQL DB traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
 
-### Azure Security Center
+### Azure Security Center and Azure advisor
 
 With [Azure Security
 Center](https://azure.microsoft.com/en-us/services/security-center/), you get a central view of the security state of all of your Azure resources. At a glance, you can verify that the appropriate security controls are in place and configured correctly and be able to quickly identify any resources that require attention.
+
+And [Azure Advisor] (https://docs.microsoft.com/en-us/azure/advisor/advisor-overview)
+- Advisor is a personalized cloud consultant that helps you follow best practices to optimize your Azure deployments. It analyzes your resource configuration and usage telemetry and then recommends solutions that can help you improve the cost effectiveness, performance, high availability, and security of your Azure resources.
 
 #### Antimalware extension for VMs
 
