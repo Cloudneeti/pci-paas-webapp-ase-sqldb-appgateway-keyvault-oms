@@ -46,7 +46,7 @@ TBD
 - [USER SCENARIO](#user-scenario)
 - [DEPLOYMENT GUIDE](#deployment-guide)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
-- [FREQUENTLY ASKED QUESTIONS AND TROUBLESOOTING GUIDE](#frequently-asked-questions-and-troubleshooting-guide)
+- [FREQUENTLY ASKED QUESTIONS AND TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
   
 <!-- /TOC -->
@@ -1364,7 +1364,7 @@ The following OMS Solutions are pre-installed with this reference solution:
 Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started). Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
 
 
-## FREQUENTLY ASKED QUESTIONS AND TROUBLESOOTING GUIDE 
+## TROUBLESOOTING GUIDE 
 
 #### I can't seem to be able to log in, or run the PowerShell scripts with my Subscription user? 
 > You require to create an AAD admin as identified in the document. This is required as a subscription admin does not automatically receive DS or AAD credentials. This is a security feature that enables RBAC and role separation in Azure.
@@ -1375,6 +1375,6 @@ Default deployment is intended to provide for a clean chit of security center re
 
 Data Flow Diagram for Contoso clinic
 
-![](images/Threat_Model.png)
+  ![](images/Threat_Model.png)
 
 
