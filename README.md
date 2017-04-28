@@ -46,7 +46,7 @@ TBD
 - [USER SCENARIO](#user-scenario)
 - [DEPLOYMENT GUIDE](#deployment-guide)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
-- [FREQUENTLY ASKED QUESTIONS AND TROUBLESOOTING GUIDE](#troubleshooting-guide)
+- [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
   
 <!-- /TOC -->
