@@ -47,7 +47,7 @@ TBD
 - [DEPLOYMENT GUIDE](#deployment-guide)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [FREQUENTLY ASKED QUESTIONS AND TROUBLESOOTING GUIDE](#frequently-asked-questions-and-troubleshooting-guide)
-  
+- [THREAT MODEL](#threat-model)
   
 <!-- /TOC -->
 
@@ -1370,4 +1370,11 @@ Default deployment is intended to provide for a clean chit of security center re
 > You require to create an AAD admin as identified in the document. This is required as a subscription admin does not automatically receive DS or AAD credentials. This is a security feature that enables RBAC and role separation in Azure.
 #### Why do I need the reboot AES runbook? 
 > Currently there is a limitation in how AES handles webapps. This reboot solution will be removed once the AES issues is resolved.
+
+## THREAT MODEL
+
+Data Flow Diagram for Contoso clinic
+
+![](images/Threat Model.png)
+
 
