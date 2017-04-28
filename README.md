@@ -1363,6 +1363,12 @@ The following OMS Solutions are pre-installed with this reference solution:
 
 Default deployment is intended to provide for a clean chit of security center recommendations, indicating a healthy and secure configuration state of the solution. You can review additional information about Azure Security Center in the [getting started guidance](https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started). Complete the instructions at this link <https://docs.microsoft.com/en-us/azure/security-center/security-center-get-started> to enable data collections from Azure Security Center.
 
+## THREAT MODEL
+
+Data Flow Diagram and sample threat model for Contoso clinic provided in the documents folder `./documents`
+
+  ![](images/Threat_Model.png)
+
 
 ## TROUBLESOOTING GUIDE 
 
@@ -1371,10 +1377,6 @@ Default deployment is intended to provide for a clean chit of security center re
 #### Why do I need the reboot AES runbook? 
 > Currently there is a limitation in how AES handles webapps. This reboot solution will be removed once the AES issues is resolved.
 
-## THREAT MODEL
 
-Data Flow Diagram for Contoso clinic
-
-  ![](images/Threat_Model.png)
 
 
