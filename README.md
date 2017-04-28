@@ -1375,6 +1375,6 @@ Default deployment is intended to provide for a clean chit of security center re
 
 Data Flow Diagram for Contoso clinic
 
-![](images/Threat Model.png)
+![](images/Threat_Model.png)
 
 
