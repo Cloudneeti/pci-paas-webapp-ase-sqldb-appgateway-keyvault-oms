@@ -36,7 +36,7 @@ This solution is intended as a reference architecture pilot and should not be us
 
 ### Contributors and Reviewers 
 
-TBD
+
 
 
 ## TABLE OF CONTENTS 
@@ -137,7 +137,40 @@ your production ready solution.*
 
 The POC solution is designed with the following fictitious employees of `Contosoclinic.com`:
 
-These roles are used only to illustrate use case, and provide insight into the user interface
+Two user roles are used only to illustrate use case, and provide insight into the user interface, and two service backend users are created durring the installation of this solution.  
+
+The following two service users are created to manage and administer the solution.
+
+
+
+#### Role: Site and Subscription Admin
+
+|Item      |Example|
+|----------|------|
+|Username: |`admin`|
+| First name: |`Admin`|
+|Last name: |`Admin`|
+|User type:| `Subscription Administrator`|
+
+
+* admin cannot read SSN or credit card information unmasked. In addition, all actions are logged.
+* admin cannot manage SQL database.
+* admin can manage active directory, and subscription
+
+#### Role: Sql Administrator
+
+|Item      |Example|
+|----------|------|
+|Username: |`sqladmin`|
+| First name: |`SQL`|
+|Last name: |`Admin`|
+|User type:| `Administrator`|
+
+
+* sqladmin cannot read SSN or credit card information unmasked. In addition, all actions are logged.
+* sqladmin can manage SQL database.
+
+
 
 #### Role: Receptionist
 
@@ -153,10 +186,10 @@ Edna Benson is the receptionist, and business manager. She is responsible to ens
 
 
 * Edna can Create, read patient information, read date of birth (DOB)*
-* Edna will be able to modify patient information 
-* Edna can overwrite (or replace) credit card number, expiration, and CVC verification information
+* Edna will be able to modify patient information.
+* Edna can overwrite (or replace) credit card number, expiration, and CVC verification information.
 * Edna can replace stored Social Security number (SSN)
-* Edna cannot read SSN or credit card information unmasked. In addition, all her actions are logged.
+* Edna cannot read stored SSN or credit card information unmasked. In addition, all her actions are logged.
 
 #### Role: Doctor
 
@@ -172,10 +205,12 @@ Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he
 
 * Chris can Create, read patient information, read DOB
 * Chris can modify patient information, including medical records and date of birth, and can view masked SSN.
-* All of Chris’s actions are logged
+* All of Chris’s actions are logged.
 
 
-In the `Contoso Clinic` Demo Application, you will be logged in as **Edna** and able to test the capabilities of the deployed environment.
+In the `Contoso Clinic` Demo User Application, you will be logged in to is configured to use **Edna** and able to test the capabilities of the deployed environment.
+
+
 
 
 ### Contosoclinic Azure pricing sample calculation
@@ -1376,7 +1411,32 @@ Data Flow Diagram and sample threat model for Contoso clinic provided in the doc
 > You require to create an AAD admin as identified in the document. This is required as a subscription admin does not automatically receive DS or AAD credentials. This is a security feature that enables RBAC and role separation in Azure.
 #### Why do I need the reboot AES runbook? 
 > Currently there is a limitation in how AES handles webapps. This reboot solution will be removed once the AES issues is resolved.
+#### Why do I need to add my subscription administrator to the AAD Admin role?
+>Role based access control requires that a administrator grants themselfs administrative rights in AAD. Refer to this blog for a detailed explaination.
+> [Delegating Admin Rights in Microsoft Azure](https://www.petri.com/delegating-admin-rights-in-microsoft-azure)
+> [PowerShell - Connecting to Azure Active Directory using Microsoft Account](http://stackoverflow.com/questions/29485364/powershell-connecting-to-azure-active-directory-using-microsoft-account)
+#### What should I do if my SSL pxf files is not working?
+> Consider reviewing the following artiles, and blogs.
+> [How to install a SSL certification on Azure](https://www.ssl.com/how-to/install-a-ssl-certificate-on-a-microsoft-azure-web-appwebsite-and-cloud-service/)
+> [Web sites configuring SSL certificate](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure-ssl-certificate)
+#### Why do I required a paid Azure account to use this solution?
+> Many of the features used in the solution are not available in an Azure trial account. You will also require to have access to manage the subscription as a [Subscription Admins role and co-administrator of the subscription](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-assign-admin-roles#global-administrator).
+#### Why do I need an SSL certificate?
+The installation requires a custom domain and SSL certificate to meet PCI DSS requirements and protect the client side traffic from snooping. Microsoft
+recommends that a custom domain be purchased with [an SSL package](https://d.docs.live.net/7b2b5032e10686e1/Azure%20Compliance/PCI%20DSS%20quickstart/1.%09https:/docs.microsoft.com/en-us/azure/app-service-web/web-sites-purchase-ssl-web-site).
+Microsoft offers the ability to create a domain and request an SSL certificate from a Microsoft partner.
+#### Why do I need local admin rights to run the `./pre-post-deployment` script ?
+> PowerShell modules require elivated privileges to install service modules on your PC. This solution provides several scripts, and commands to verify that all the modules are installed, in the 'Client software requirements' section of the deployment guide.
 
-
-
-
+#### How do I set up the administrator properly to use this solution.
+> Review the 'Configure your global admin for the solution' section of the installation guide
+#### I get a script failed, error. User permission error. Insuficient permission error?
+> Review 'LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS' section of the installation guide
+#### The ARM template fails to run because of my password complexity?
+> **NOTE**: Strong passwords **(Minimum 15 characters, with Upper and Lower case letters, at least 1 number and 1 special character)** are recommended throughout
+the solution.
+#### The ARM template fails to deploy 'xxxxxxxx' service
+> Currently this solution requires that you deploy in US EAST. Limitation to service avalibility in all regions may prevent the solution from deploying storage accounts, or the AES. This solution was tested with the following resource group `New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"`
+#### The deployment of my services is taking a long time (over two hours), is that normal?
+> The total deployment of the services is estimated to take approximately 2.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
+[How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
