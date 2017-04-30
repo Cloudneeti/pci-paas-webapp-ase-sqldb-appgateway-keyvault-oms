@@ -1,7 +1,7 @@
-# Azure PCI and HIPAA validated solution 
+#Azure PCI DSS or HIPAA compliance blueprint
+##A Banking, Retail or Healthcare quickstart compliant solutions 
 
 
-## Blueprint and reference architecture with ARM templates 
 
 
 *Published April 2017*
