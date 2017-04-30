@@ -1,5 +1,5 @@
-#Azure PCI DSS or HIPAA compliance blueprint
-##A Banking, Retail or Healthcare quickstart compliant solutions 
+# Azure PCI DSS or HIPAA compliance blueprint
+## A Banking, Retail or Healthcare quickstart compliant solutions 
 
 
 
