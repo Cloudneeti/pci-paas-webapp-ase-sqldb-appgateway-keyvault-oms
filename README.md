@@ -52,7 +52,7 @@ This solution is intended as a reference architecture pilot and should not be us
 <!-- /TOC -->
 
 ## SOLUTION OBJECTIVE AND SCENARIO
-  The solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution:  
+  
 
 
 
@@ -60,15 +60,17 @@ This solution is intended as a reference architecture pilot and should not be us
   ![](images/Solution_Context.png)
 
 
+The Azure PaaS PCI DSS and HIPAA blueprint solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution for customer considering the complexities of storing sensitive payment card, or health related data. 
+The solution joint developed with Avyan consulting (Microsoft MVP partner) was designed to illustrate an end to end solution that can satisfy the needs in retail, bank, or health that maybe looking for a cloud solution to reduce the burden, or cost of deployment.
+This solution enables the ability to:
+-	Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
+-	Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA). 
+This solution illustrates the management of credit card data including card number, expiration, CVC (Card Verification Check), and social security numbers securely in a four-tier secure and compliant solution could be deployed as an end-to-end Azure solution.
 
-
-   
-The objective of this solution is to illustrate how 4 tier secure and compliant solution could be deployed as an end-to-end Azure solution.
 
 ![](images/4tier.png)
 
-- Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
-- Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA).
+
 
 
 
