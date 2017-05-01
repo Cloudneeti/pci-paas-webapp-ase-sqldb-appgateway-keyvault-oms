@@ -105,7 +105,7 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 ## USER SCENARIO
 
 
-> This scenario illustrates how a ficticious medical clinic migrated their patient intake, and payment card processing to Azure. 
+> This scenario illustrates how a fictitious medical clinic migrated their patient intake, and payment card processing to Azure. 
 
 
 
@@ -115,7 +115,7 @@ and payment system to the cloud. They have selected Microsoft Azure to host the
 intake process of patients and to allow a clinic manager or receptionist to
 collect credit card payments from patients for a visit.
 
-The administrator is looking for a solution can be quickly deployabled to achive his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
+The administrator is looking for a solution can be quickly deployable to achieve his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
 
 -   Collect, store, and retrieve payment card data while complying with
     stringent Payment Card Industry, Data Security Standards (PCI DSS)
