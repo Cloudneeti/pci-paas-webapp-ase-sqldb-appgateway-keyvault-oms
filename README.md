@@ -156,7 +156,7 @@ The following two service users are created to manage and administer the solutio
 
 
 * admin cannot read SSN or credit card information unmasked. In addition, all actions are logged.
-* admin cannot manage SQL database.
+* admin cannot manage or log into SQL database.
 * admin can manage active directory, and subscription
 
 #### Role: Sql Administrator
@@ -169,7 +169,7 @@ The following two service users are created to manage and administer the solutio
 |User type:| `Administrator`|
 
 
-* sqladmin cannot read SSN or credit card information unmasked. In addition, all actions are logged.
+* sqladmin cannot credit card information. sqladmin can read SSN information. In addition, all actions are logged.
 * sqladmin can manage SQL database.
 
 
