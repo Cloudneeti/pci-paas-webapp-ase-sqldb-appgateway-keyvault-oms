@@ -50,7 +50,6 @@ This solution is intended as a reference architecture pilot and should not be us
 - [LOGGING AND MONITORING](#logging-and-monitoring)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [FAQ AND FIXES](#faq-and-fixes)
-- [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
 - [SUPPORT PROCESS](#support-process)
 <!-- /TOC -->
@@ -1391,7 +1390,6 @@ Data Flow Diagram and sample threat model for Contoso clinic provided in the doc
   ![](images/Threat_Model.png)
 
 # FAQ AND FIXES
-# TROUBLESOOTING GUIDE 
 
 #### I can't seem to be able to log in, or run the PowerShell scripts with my Subscription user? 
 > You require to create an AAD admin as identified in the document. This is required as a subscription admin does not automatically receive DS or AAD credentials. This is a security feature that enables RBAC and role separation in Azure.
