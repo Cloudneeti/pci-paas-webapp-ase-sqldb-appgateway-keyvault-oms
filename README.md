@@ -732,8 +732,8 @@ reliably.
 
 
 
-Deploying solution requires that the pre-deployment steps be completed. The ARM deployment ustilizes our refernece architecture and is an implementation of the contoso user scenario. 
-> The information needed in the ARM deployment was collected using the [predeployment script output.](#predeployment-script-output)
+Deploying solution requires that the pre-deployment steps be completed. 
+> The fields in the ARM deployment can be retrieved using the [predeployment script output.](#predeployment-script-output)
 
 
 The following example is used to illustrate the ARM information for `contosoclinic.com`
@@ -763,8 +763,6 @@ The following example is used to illustrate the ARM information for `contosoclin
 >-   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
 >-   **sqlAdAdminUserPassword**: [Created password]
 
-After you have collected all of this information, you can click **Deploy to
-Azure**
 
 ### Deployment Timeline
 
@@ -775,7 +773,7 @@ components. The total time required is approximately 2.5 hours from when the
 ![](images/ARM_template_deployment_timeline.png)
 
 
-## DEPLOY AZURE RESOURCE USING (ARM)
+## DEPLOY AZURE RESOURCE (ARM) TEMPLATE
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
@@ -1021,7 +1019,7 @@ You can copy the script from the deployment file and run it in a new SQL query.
 
 
 
-# UPDATES TO LOGGING AND MONITORING
+## UPDATES TO LOGGING AND MONITORING
 
 The following sections address security controls that are required to enable
 extensive logging, monitoring, security detection, and anti-malware protection.
