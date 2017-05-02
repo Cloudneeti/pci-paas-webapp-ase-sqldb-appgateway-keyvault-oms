@@ -1,5 +1,5 @@
 # Azure BluePrint for Payment Handling Solution
-##PCI DSS Compliance focus
+## PCI DSS Compliance focus
 
 
 
