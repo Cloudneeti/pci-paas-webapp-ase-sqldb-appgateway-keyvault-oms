@@ -49,9 +49,9 @@ This solution is intended as a reference architecture pilot and should not be us
 - [POST DEPLOYMENT USER EXPERIENCE SETUP](#post-deployment-user-experience-setup)
 - [LOGGING AND MONITORING](#logging-and-monitoring)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
+- [FAQ AND FIXES](#faq-and-fixes)
 - [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
-- [SUPPORT MAINTENANCE](#support-maintenace)
 - [SUPPORT PROCESS](#support-process)
 <!-- /TOC -->
 
@@ -1390,7 +1390,7 @@ Data Flow Diagram and sample threat model for Contoso clinic provided in the doc
 
   ![](images/Threat_Model.png)
 
-
+# FAQ AND FIXES
 # TROUBLESOOTING GUIDE 
 
 #### I can't seem to be able to log in, or run the PowerShell scripts with my Subscription user? 
@@ -1428,7 +1428,7 @@ the solution.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
 
 # SUPPORT PROCESS
-# SUPPORT AND MAINTENANCE
+
 This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, please contact your Microsoft account representative or get in touch with the Avyan Consulting team. azurecompliance@avyanconsulting.com
 
 The current and stable version of the blueprint is avalible at [PCI Blueprint Marketplace Repo](https://azuremarketplace.microsoft.com/en-us/marketplace/apps)
