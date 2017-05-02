@@ -42,20 +42,22 @@ This solution is intended as a reference architecture pilot and should not be us
 ## TABLE OF CONTENTS 
 <!-- TOC -->
 
-- [SOLUTION OBJECTIVE AND SCENARIO](#solution-objective-and-scenario)
+- [SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO](#solution-description-objective-and-scenario)
 - [USER SCENARIO](#user-scenario)
-- [DEPLOYMENT GUIDE](#deployment-guide)
+- [PRE DEPLOYMENT REQUIREMENTS](#pre-deployment-requirements)
+- [SOLUTION DEPLOYMENT](#solution-deployment)
+- [POST DEPLOYMENT USER EXPERIENCE SETUP](#post-deployment-user-experience-setup)
+- [UPDATES TO LOGGING AND MONITORING](updates-to-logging-and-monitoring)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
-- [DEPLOYMENT SITES](#deploymet)
+- [SUPPORT AND MAINTENANCE](#support-and-maintenace)
   
 <!-- /TOC -->
 
-## SOLUTION OBJECTIVE AND SCENARIO
+
+# SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO
   
-
-
 
 
   ![](images/Solution_Context.png)
@@ -103,7 +105,7 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 
 
 
-## USER SCENARIO
+# USER SCENARIO
 
 
 > This scenario illustrates how a fictitious medical clinic migrated their patient intake, and payment card processing to Azure. 
@@ -246,9 +248,6 @@ consist of the following items:
 Disclaimer 
 All prices shown are in US Dollar ($). This estimate was created in April 2017 
 
-
-## DEPLOYMENT GUIDE
-
 This solution used the following Azure services (details to the deployment
 architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture)):
 
@@ -273,31 +272,15 @@ architecture are located in [DEPLOYMENT ARCHITECTURE](#deployment-architecture))
 >-   Azure Blob Storage
 >-   Azure Active Directory access control (RBAC)
 
-### Installation procedure overview
 
 
-1.  Collect prerequisites such as certificate, azure subscription
-2.  Install PowerShell modules on the client computer by running a PowerShell
-    install script
-3.  Configure global admin on azure subscription in the Azure portal
-4.  Acquire initial configuration variables
-5.  Set up run-as services to allow installation scripts to execute
-6.  Run the pre-installer script
-7.  Install the ARM templates (build the Azure service elements)
-8.  Run the post-installer script
-9.  Validate data in SQL database
-10. Run post-installer SQL script to encrypt database
-11. Run SQL script to encrypt service elements (patient SSN, DOB, credit card
-    \#, Exp date, CVV)
-12. Validate data in SQL database is encrypted
-13. Review user roles and rights assigned to Edna and Chris
-14. If you choose, delete the installation and dependencies by running a
-    PowerShell script
+# PRE DEPLOYMENT REQUIREMENTS
+
 
 ### Collect prerequisites certificate, azure subscription
 
 
-This section provides detailed information about items you will need during installation.
+This section provides detailed information about items you will need during installation you must have the following items ready for the deployment to succeed.
 
 >**IMPORTANT**  The solution requires **a paid subscription** on Azure, a **trial** subscription account will not work.
 
@@ -577,7 +560,7 @@ by running the runbook examples in the previous step called
 
  Select **Run Once** to the script warning if you are prompted
 
-### PreDeployment Script Output
+### Pre Deployment Script Output
 
 | Parameter name      | Example from previous steps       |
 |-------------------------|---------------------------------------|
@@ -603,7 +586,7 @@ proceed as illustrated in the following example for `contosoclinic.com`.
 |Automation Account Name:|**Automation account** In our example `contosoclinic-automation`|
 |Custom Host Name:|Your registered domain name. In our example `www.contosoclinc.com`|
 |Azure AD Application Client ID:| In our example `27017c43-3ea4-467a-afa4-7d3d3d9D`|
-|Azure AD Application Client Secret:| Default Value `Password@123` |
+|Azure AD Application Client Secret:| Value `QW#2wFRE12df` |
 |Azure AD Application Object ID:| In our example `73559c5c-e213-4f10-a88c-546c2`|
 |SQL AD Admin User Name:| Default Value, in our example `sqladmin\@pcidemo.onmicrosoft.com`|
 
@@ -745,11 +728,13 @@ reliably.
 | Windows Azure Service Management | 0                           | 1                         |
 
 
-### Deploying The Azure Resource Template (ARM)
+# SOLUTION DEPLOYMENT 
 
-Deploying the ARM template requires the following information, which you should
-collect before clicking **Deploy to Azure** on the following page. (The
-information shown is for a sample deployment.) This information used here will be the [predeployment script output.](#predeployment-script-output)
+
+
+Deploying solution requires that the pre-deployment steps be completed. The ARM deployment ustilizes our refernece architecture and is an implementation of the contoso user scenario. 
+> The information needed in the ARM deployment was collected using the [predeployment script output.](#predeployment-script-output)
+
 
 The following example is used to illustrate the ARM information for `contosoclinic.com`
 
@@ -773,7 +758,7 @@ The following example is used to illustrate the ARM information for `contosoclin
 >-   **automationAccountName**: `Contosoclinic-Automation`
 >-   **customHostName**: `contosoclinic.com`
 >-   **azureAdApplicationClientId**: `952b0b1e-2582-4058-a0a0-0abc42107d70`
->-   **azureAdApplicationClientSecret**: `Password@123`
+>-   **azureAdApplicationClientSecret**: `QW#2wFRE12df`
 >-   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
 >-   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
 >-   **sqlAdAdminUserPassword**: [Created password]
@@ -781,7 +766,16 @@ The following example is used to illustrate the ARM information for `contosoclin
 After you have collected all of this information, you can click **Deploy to
 Azure**
 
-### DEPLOY AZURE RESOURCE USING (ARM)
+### Deployment Timeline
+
+The following graphic displays the estimated time to deploy the solution
+components. The total time required is approximately 2.5 hours from when the
+**Purchase** button is clicked.
+
+![](images/ARM_template_deployment_timeline.png)
+
+
+## DEPLOY AZURE RESOURCE USING (ARM)
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
@@ -792,21 +786,14 @@ Azure**
 * Click **Purchase**.
 
 
-### Deployment Timeline
 
-The following graphic displays the estimated time to deploy the solution
-components. The total time required is approximately 2.5 hours from when the
-**Purchase** button is clicked.
 
-![](images/ARM_template_deployment_timeline.png)
+# POST DEPLOYMENT USER EXPERIENCE SETUP
 
-### Post-ARM Deployment
+The following post-deployment steps deploy and set up the contoso user experience. This portion of the deploment helps illustrate how the database, users, and
+data records help meet the PCI DSS compliance process. The steps in this section will illustrate how record protection requirements are enabled by encrypting the
+customer records that contain payment card data.
 
-The following post-deployment steps deploy and set up the database, users, and
-data records; the steps also finalize connectivity. Steps in this section
-address PCI and healthcare record protection requirements by encrypting the
-customer records that contain payment card data and personal healthcare
-information (PHI).
 
 #### Update DNS setting with Application Gateway IP
 
@@ -939,7 +926,7 @@ and
 9.  Your **azureAdApplicationClientSecret** which was collected in the ARM
     deployment step.
 
-    -   In our example: `Password\@123`
+    -   In our example: `PASSWORD`
 
 10. The SQL AD Admin User created in step
 
@@ -1034,10 +1021,10 @@ You can copy the script from the deployment file and run it in a new SQL query.
 
 
 
-### Monitoring, and Security features
+# UPDATES TO LOGGING AND MONITORING
 
 The following sections address security controls that are required to enable
-logging, monitoring, security detection, and anti-malware protection.
+extensive logging, monitoring, security detection, and anti-malware protection.
 
 #### Operations Management Suite (OMS) configuration
 
@@ -1198,8 +1185,6 @@ personalized cloud consultant that helps you follow best practices to optimize y
 
 
 
-
->!Installation Complete!
 
 ## DEPLOYMENT ARCHITECTURE
 
@@ -1445,6 +1430,11 @@ the solution.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
 
 
-# DEPLOYMENT 
+# SUPPORT AND MAINTENANCE
+This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, please contact your Microsoft account representative or get in touch with the Avyan Consulting team. azurecompliance@avyanconsulting.com
+
+The current and stable version of the blueprint is avalible at [PCI Blueprint Marketplace Repo](https://azuremarketplace.microsoft.com/en-us/marketplace/apps)
+The next version pre-release, fixes and updates are located at [Avyan Consulting Git Repo](https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/)
+
 
   ![](images/deploy.png)
