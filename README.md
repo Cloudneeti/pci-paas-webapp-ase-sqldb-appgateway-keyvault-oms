@@ -51,7 +51,7 @@ This solution is intended as a reference architecture pilot and should not be us
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
-- [SUPPORT AND MAINTENANCE](#support-and-maintenace)
+- [SUPPORT MAINTENANCE](#support-maintenace)
   
 <!-- /TOC -->
 
