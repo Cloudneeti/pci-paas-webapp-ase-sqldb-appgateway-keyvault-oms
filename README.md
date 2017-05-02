@@ -48,6 +48,7 @@ This solution is intended as a reference architecture pilot and should not be us
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
+- [DEPLOYMENT SITES](#deploymet)
   
 <!-- /TOC -->
 
@@ -1442,3 +1443,8 @@ the solution.
 #### The deployment of my services is taking a long time (over two hours), is that normal?
 > The total deployment of the services is estimated to take approximately 2.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
+
+
+# DEPLOYMENT 
+
+  ![](images/deployment.png)
