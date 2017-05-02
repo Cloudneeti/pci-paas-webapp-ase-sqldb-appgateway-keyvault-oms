@@ -1447,4 +1447,4 @@ the solution.
 
 # DEPLOYMENT 
 
-  ![](images/deployment.png)
+  ![](images/deploy.png)
