@@ -47,7 +47,7 @@ This solution is intended as a reference architecture pilot and should not be us
 - [PRE DEPLOYMENT REQUIREMENTS](#pre-deployment-requirements)
 - [SOLUTION DEPLOYMENT](#solution-deployment)
 - [POST DEPLOYMENT USER EXPERIENCE SETUP](#post-deployment-user-experience-setup)
-- [UPDATES TO LOGGING AND MONITORING](updates-to-logging-and-monitoring)
+- [LOGGING AND MONITORING](#logging-and-monitoring)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
@@ -1019,7 +1019,7 @@ You can copy the script from the deployment file and run it in a new SQL query.
 
 
 
-## UPDATES TO LOGGING AND MONITORING
+# LOGGING AND MONITORING
 
 The following sections address security controls that are required to enable
 extensive logging, monitoring, security detection, and anti-malware protection.
