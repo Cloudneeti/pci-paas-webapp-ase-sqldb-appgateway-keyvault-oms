@@ -52,7 +52,7 @@ This solution is intended as a reference architecture pilot and should not be us
 - [TROUBLESOOTING GUIDE](#troubleshooting-guide)
 - [THREAT MODEL](#threat-model)
 - [SUPPORT MAINTENANCE](#support-maintenace)
-  
+- [SUPPORT PROCESS](#support-process)
 <!-- /TOC -->
 
 
@@ -1427,7 +1427,7 @@ the solution.
 > The total deployment of the services is estimated to take approximately 2.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
 
-
+# SUPPORT PROCESS
 # SUPPORT AND MAINTENANCE
 This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, please contact your Microsoft account representative or get in touch with the Avyan Consulting team. azurecompliance@avyanconsulting.com
 
