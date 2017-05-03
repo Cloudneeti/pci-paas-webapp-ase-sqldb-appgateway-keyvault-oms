@@ -21,7 +21,7 @@ subscription costs.*
 
 *© 2016 Microsoft/Avyan. All rights reserved.*
 
-# ACKNOWLEDGEMENTS
+## ACKNOWLEDGEMENTS
 
 ### Authors of the document 
 
@@ -39,10 +39,9 @@ This solution is intended as a reference architecture pilot and should not be us
 
 
 
-# TABLE OF CONTENTS 
+## TABLE OF CONTENTS 
 <!-- TOC -->
-- [ACKNOWLEDGEMENTS](#acknowledgements)
-- [TABLE OF CONTENTS](#table-of-contents)
+
 - [SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO](#solution-description-objective-and-scenario)
 - [USER SCENARIO](#user-scenario)
 - [PRE DEPLOYMENT REQUIREMENTS](#pre-deployment-requirements)
