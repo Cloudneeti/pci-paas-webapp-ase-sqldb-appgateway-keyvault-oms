@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 # Azure BluePrint for Payment Handling Solution
 ## PCI DSS Compliance focus
+=======
+# Azure PCI DSS or HIPAA Compliance Blueprint
+## A Banking, Retail or Healthcare quickstart Compliant Solutions 
+>>>>>>> parent of 60377d7... HIPAA REMOVED FROM README --------
 
 
 
@@ -30,7 +35,7 @@ subscription costs.*
 
 ### Disclaimer 
 This solution is intended as a reference architecture pilot and should not be used as-is for production purposes.
-* Achieving PCI Compliance requires Customers to consult with their QSA.
+* Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
 * Please contact  <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank"> azurecompliance@avyanconsulting.com </a> if you need further info or support on this QuickStart solution.
 
 
@@ -62,11 +67,11 @@ This solution is intended as a reference architecture pilot and should not be us
   ![](images/Solution_Context.png)
 
 
-The Azure blueprint solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution for customer considering the complexities of storing sensitive payment card, or health related data. 
-The solution joint developed with Avyan consulting (Microsoft MVP partner) was designed to illustrate an end to end solution that can satisfy the needs in organizations that maybe looking for a cloud solution to reduce the burden, or cost of deployment.
+The Azure PaaS PCI DSS and HIPAA blueprint solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution for customer considering the complexities of storing sensitive payment card, or health related data. 
+The solution joint developed with Avyan consulting (Microsoft MVP partner) was designed to illustrate an end to end solution that can satisfy the needs in retail, bank, or health that maybe looking for a cloud solution to reduce the burden, or cost of deployment.
 This solution enables the ability to:
 -	Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
-
+-	Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA). 
 This solution illustrates the management of credit card data including card number, expiration, CVC (Card Verification Check), and social security numbers securely in a four-tier secure and compliant solution could be deployed as an end-to-end Azure solution.
 
 
@@ -122,6 +127,10 @@ The administrator is looking for a solution can be quickly deployable to achieve
 -   Collect, store, and retrieve payment card data while complying with
     stringent Payment Card Industry, Data Security Standards (PCI DSS)
     requirements
+
+-   Collect, store, and retrieve healthcare data that complies with requirements
+    for safe patient health information handling practices governed by the
+    Health Insurance Portability and Accountability Act (HIPAA).
 
 Because this is a POC that installs the required elements to operate a service,
 it is not a customer ready-to-go solution. It requires careful understanding of
@@ -1315,7 +1324,8 @@ A virtual machine was stood up as a Jumpbox / Bastion host with the following co
 -   [VM Diagnostics extension](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-windows-extensions-diagnostics-template)
 
 -   [Bitlocker Encrypted Disk](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption)
-    using Azure Key Vault (respects Azure Government, PCI DSS, HIPAA and other requirements)
+    using Azure Key Vault (respects Azure Government, PCI DSS, and HIPAA
+    requirements)
 
 -   An [AutoShutDown Policy](https://azure.microsoft.com/en-us/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/)
     to reduce consumption of virtual machine resources when not in use.
