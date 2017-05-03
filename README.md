@@ -1,12 +1,11 @@
-
-# Azure PCI DSS or HIPAA Compliance Blueprint
-## A Banking, Retail or Healthcare quickstart Compliant Solutions 
->>>>>>> parent of 60377d7... HIPAA REMOVED FROM README --------
+# Azure Webstore Blueprint 
+## Payment processing solution for PCI DSS
 
 
 
 
-*Published April 2017*
+
+*Published May 2017*
 
 *This document is for informational purposes only. MICROSOFT/AVYAN MAKES NO
 WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, AS TO THE INFORMATION IN THIS
@@ -23,7 +22,7 @@ subscription costs.*
 
 *© 2016 Microsoft/Avyan. All rights reserved.*
 
-## ACKNOWLEDGEMENTS
+# ACKNOWLEDGEMENTS
 
 ### Authors of the document 
 
@@ -32,7 +31,7 @@ subscription costs.*
 
 ### Disclaimer 
 This solution is intended as a reference architecture pilot and should not be used as-is for production purposes.
-* Achieving PCI / HIPAA Compliance requires Customers to consult with their QSA.
+* Achieving PCI Compliance requires Customers to consult with their QSA.
 * Please contact  <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank"> azurecompliance@avyanconsulting.com </a> if you need further info or support on this QuickStart solution.
 
 
@@ -41,9 +40,10 @@ This solution is intended as a reference architecture pilot and should not be us
 
 
 
-## TABLE OF CONTENTS 
+# TABLE OF CONTENTS 
 <!-- TOC -->
-
+- [ACKNOWLEDGEMENTS](#acknowledgements)
+- [TABLE OF CONTENTS](#table-of-contents)
 - [SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO](#solution-description-objective-and-scenario)
 - [USER SCENARIO](#user-scenario)
 - [PRE DEPLOYMENT REQUIREMENTS](#pre-deployment-requirements)
@@ -64,12 +64,13 @@ This solution is intended as a reference architecture pilot and should not be us
   ![](images/Solution_Context.png)
 
 
-The Azure PaaS PCI DSS and HIPAA blueprint solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution for customer considering the complexities of storing sensitive payment card, or health related data. 
-The solution joint developed with Avyan consulting (Microsoft MVP partner) was designed to illustrate an end to end solution that can satisfy the needs in retail, bank, or health that maybe looking for a cloud solution to reduce the burden, or cost of deployment.
+The Azure blueprint solution is intended to simplify azure adoption, showcase commonly used reference architecture, and teach how to deploy a secure and compliant PaaS solution for customer considering the complexities of storing sensitive payment card, or health related data. 
+The solution joint developed with Avyan consulting (Microsoft MVP partner) was designed to illustrate an end to end solution that can satisfy the needs in organizations that maybe looking for a cloud solution to reduce the burden, or cost of deployment.
 This solution enables the ability to:
+
 -	Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
--	Collect, store, and retrieve healthcare data that complies with requirements for safe patient health information handling practices governed by the Health Insurance Portability and Accountability Act (HIPAA). 
-This solution illustrates the management of credit card data including card number, expiration, CVC (Card Verification Check), and social security numbers securely in a four-tier secure and compliant solution could be deployed as an end-to-end Azure solution.
+
+This solution illustrates the management of credit card data including card number, expiration, CVC (Card Verification Check) numbers securely in a four-tier secure and compliant solution could be deployed as an end-to-end Azure solution.
 
 
 ![](images/4tier.png)
@@ -80,8 +81,8 @@ This solution illustrates the management of credit card data including card numb
 
 ### Components of the Blue print
 
--   **Solution blueprint**. The blueprint provides an understanding of how Contoso Health (a fictitious organization) achieved its compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso Health.
--   **Reference architecture**. The reference architecture provides the design that was used for the Contoso Health solution.
+-   **Solution blueprint**. The blueprint provides an understanding of how Contoso webstore (a fictitious organization) achieved its compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso webstore.
+-   **Reference architecture**. The reference architecture provides the design that was used for the Contoso webstore solution.
 -   **Azure Resource Manager (ARM) templates**. In this deployment, JavaScript Object Notation (.JSON) files provide Microsoft Azure the ability to automatically deploy the components of the reference architecture after the configuration parameters are provided during setup.
 -   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
     -   Module installation script that will install required PowerShell modules for
@@ -93,7 +94,7 @@ This solution illustrates the management of credit card data including card numb
     role-based access control mechanisms are deployed. This process includes
     configuring separation of duties for core administrators and users.
     -   A post-installation process that deploys an [ARM template, web front-end
-    runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by     the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso Clinic Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
+    runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso webstore Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
 
 ### Visualize Azure Resources before you deploy 
 
@@ -109,25 +110,19 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 # USER SCENARIO
 
 
-> This scenario illustrates how a fictitious medical clinic migrated their patient intake, and payment card processing to Azure. 
+> This scenario illustrates how a fictitious webstore clinic migrated their patient intake, and payment card processing to Azure. 
 
 
 
 
-A small medical clinic called, Contoso Health is ready to move their patient intake
-and payment system to the cloud. They have selected Microsoft Azure to host the
-intake process of patients and to allow a clinic manager or receptionist to
-collect credit card payments from patients for a visit.
+A small webstore called, Contoso webstore is ready to move their payment system to the cloud. They have selected Microsoft Azure to host the
+ process for purchasing and to allow a  clerk to collect credit card payments from their customer.
 
 The administrator is looking for a solution can be quickly deployable to achieve his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
 
 -   Collect, store, and retrieve payment card data while complying with
     stringent Payment Card Industry, Data Security Standards (PCI DSS)
     requirements
-
--   Collect, store, and retrieve healthcare data that complies with requirements
-    for safe patient health information handling practices governed by the
-    Health Insurance Portability and Accountability Act (HIPAA).
 
 Because this is a POC that installs the required elements to operate a service,
 it is not a customer ready-to-go solution. It requires careful understanding of
@@ -139,9 +134,9 @@ based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
 your production ready solution.*
 
-### The Contosoclinic POC
+### The contosowebstore POC
 
-The POC solution is designed with the following fictitious employees of `Contosoclinic.com`:
+The POC solution is designed with the following fictitious employees of `contosowebstore.com`:
 
 Two user roles are used only to illustrate use case, and provide insight into the user interface, and two service backend users are created durring the installation of this solution.  
 
@@ -178,7 +173,7 @@ The following two service users are created to manage and administer the solutio
 
 
 
-#### Role: Receptionist
+#### Role: Clerk
 
 |Item      |Example|
 |----------|------|
@@ -188,7 +183,7 @@ The following two service users are created to manage and administer the solutio
 |Last name:| `Benson`|
 | User type: |`Member`|
 
-Edna Benson is the receptionist, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed. Edna will use the **patient** data in the following manner:
+Edna Benson is the Clerk, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed. Edna will use the **patient** data in the following manner:
 
 
 * Edna can Create, read patient information, read date of birth (DOB)*
@@ -197,29 +192,15 @@ Edna Benson is the receptionist, and business manager. She is responsible to ens
 * Edna can replace stored Social Security number (SSN)
 * Edna cannot read stored SSN or credit card information unmasked. In addition, all her actions are logged.
 
-#### Role: Doctor
-
-|Item      |Example|
-|----------|------|
-|Username: |`ChrisA`|
- | Password: |``!Password222!!!``|
-| First name: |`Chris`|
-|Last name: |`Aston`|
-|User type:| `Member`|
-
-Dr. Chris Aston is the clinic’s doctor. He is responsible for patient care, he will be entering patient history and treatment information. Chris can update information for patients.
-
-* Chris can Create, read patient information, read DOB
-* Chris can modify patient information, including medical records and date of birth, and can view masked SSN.
-* All of Chris’s actions are logged.
 
 
-In the `Contoso Clinic` Demo User Application, you will be logged in to is configured to use **Edna** and able to test the capabilities of the deployed environment.
+
+In the `Contoso webstore` Demo User Application, you will be logged in to is configured to use **Edna** and able to test the capabilities of the deployed environment.
 
 
 
 
-### Contosoclinic Azure pricing sample calculation
+### contosowebstore Azure pricing sample calculation
 
 The solution cost sample has a monthly fee structure and a use per hr. to
 consider when sizing the solution. This example deployment **estimate** cost using the [Azure costing calculator](https://azure.microsoft.com/en-us/pricing/calculator/). The solution 
@@ -305,7 +286,7 @@ and a root domain can be configured in the [Azure
 Portal](https://portal.azure.com/).
 
 The installation of the ARM template requires the domain name, such as
-contosoclinic.com, and the .pfx file from the SSL provider that will be
+contosowebstore.com, and the .pfx file from the SSL provider that will be
 Base64-encrypted before uploading to Azure. The following process can be used to
 create the correct file.
 
@@ -313,10 +294,10 @@ create the correct file.
     certificate](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure-ssl-certificate).
 
 2.  Retrieve your private key. This file will have a name structure such as
-    `www.contosoclinic.com\_private\_key.key`
+    `www.contosowebstore.com\_private\_key.key`
 
 3.  Retrieve your certificate. This file will have a name structure such as
-    `www.contosoclinic.com\_ssl\_certificate.cer`
+    `www.contosowebstore.com\_ssl\_certificate.cer`
 
 4.  [Create a personal information exchange (pfx)
     file](https://technet.microsoft.com/en-us/library/dd261744.aspx) protect
@@ -325,7 +306,7 @@ create the correct file.
 5.  Convert the pfx file into a string Base64 text file. For example, in
     PowerShell you can use the following commands:
 ```powershell
-$fileContentBytes = get-content 'contosoclinic.com\_private\_key.pfx' -Encoding Byte[System.Convert]::ToBase64String(\$fileContentBytes) | Out-File 'pfx-bytes.txt'
+$fileContentBytes = get-content 'contosowebstore.com\_private\_key.pfx' -Encoding Byte[System.Convert]::ToBase64String(\$fileContentBytes) | Out-File 'pfx-bytes.txt'
 ```
 
 **Preserve your SSL 64-bit string and password; you will use them when
@@ -533,7 +514,7 @@ New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"
 ```
 -   In our example we use:
 
-`New-AzureRmResourceGroup -Name Contosoclinic -Location "East US"`
+`New-AzureRmResourceGroup -Name contosowebstore -Location "East US"`
 
 >**NOTE** - This demo currently ONLY runs correctly in the location **East**, **East US**
 
@@ -549,8 +530,8 @@ by running the runbook examples in the previous step called
 
 | Parameter name | Example from previous step|
 |----------------|---------------------------|
-| Name of automation | `Contosoclinic-Automation` |
-| Resource group you added | `Contosoclinic` |
+| Name of automation | `contosowebstore-Automation` |
+| Resource group you added | `contosowebstore` |
 
 
 
@@ -567,14 +548,14 @@ by running the runbook examples in the previous step called
 |-------------------------|---------------------------------------|
 | $azureADDomainName | `pcidemo.onmicrosoft.com`               |
 | $subscriptionID    | `27017c43-3ea4-467a-afa4-7d3d3d9D33232` |
-| $suffix            | `contosoclinic`                         |
+| $suffix            | `contosowebstore`                         |
 
 Record the information provided by the script. You will need this information to
-proceed as illustrated in the following example for `contosoclinic.com`.
+proceed as illustrated in the following example for `contosowebstore.com`.
 
->Name of Automation account `Contosoclinic-Automation`
+>Name of Automation account `contosowebstore-Automation`
 
-|Parameter name| Example for `Contosoclinic.com`|
+|Parameter name| Example for `contosowebstore.com`|
 |--------------|-----------------------------|
 |\_artifactsLocationSasToken:| [BLANK]|
 |Cert Data:| Your base 64 SSL certificate string|
@@ -584,7 +565,7 @@ proceed as illustrated in the following example for `contosoclinic.com`.
 |SQL Administrator Login User Name:|Default Value is 'sqladmin'|
 |SQL Administrator Login Password: |Password must meet minimum length and complexity requirements|
 |SQL Threat Detection Alert Email Address:|Email Address to receive alerts for the account|
-|Automation Account Name:|**Automation account** In our example `contosoclinic-automation`|
+|Automation Account Name:|**Automation account** In our example `contosowebstore-automation`|
 |Custom Host Name:|Your registered domain name. In our example `www.contosoclinc.com`|
 |Azure AD Application Client ID:| In our example `27017c43-3ea4-467a-afa4-7d3d3d9D`|
 |Azure AD Application Client Secret:| Value `QW#2wFRE12df` |
@@ -593,9 +574,9 @@ proceed as illustrated in the following example for `contosoclinic.com`.
 
 The following additional users have been created in domain.
 
-|User Role| Example for `Contosoclinic.com`|
+|User Role| Example for `contosowebstore.com`|
 |--------------|-----------------------------|
-|receptionist|`receptionist_EdnaB@pcidemo.onmicrosoft.com`|
+|Clerk|`Clerk_EdnaB@pcidemo.onmicrosoft.com`|
 |password|`!Password111!!!**`|
 |doctor|`doctor_ChrisA@pcidemo.onmicrosoft.com`|
 |password|`!Password222!!!`|
@@ -737,12 +718,12 @@ Deploying solution requires that the pre-deployment steps be completed.
 > The fields in the ARM deployment can be retrieved using the [predeployment script output.](#predeployment-script-output)
 
 
-The following example is used to illustrate the ARM information for `contosoclinic.com`
+The following example is used to illustrate the ARM information for `contosowebstore.com`
 
 **Basics**
 
 >-   **Subscription**: `27017c43-3ea4-467a-afa4-7d3d3d9D33232`
->-   **Resource group**: `Contosoclinic`
+>-   **Resource group**: `contosowebstore`
 >-   **Location**: Greyed out
 
 **Settings**
@@ -755,13 +736,13 @@ The following example is used to illustrate the ARM information for `contosoclin
 >-   **bastionHostAdministratorPassword**: [Create a secure password]
 >-   **SqlAdministratorLoginUserName**: `sqladmin`
 >-   **sqlAdministratorLoginPassword**: [Created password]
->-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosoclinic.com`
->-   **automationAccountName**: `Contosoclinic-Automation`
->-   **customHostName**: `contosoclinic.com`
+>-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosowebstore.com`
+>-   **automationAccountName**: `contosowebstore-Automation`
+>-   **customHostName**: `contosowebstore.com`
 >-   **azureAdApplicationClientId**: `952b0b1e-2582-4058-a0a0-0abc42107d70`
 >-   **azureAdApplicationClientSecret**: `QW#2wFRE12df`
 >-   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
->-   **sqlAdAdminUserName**: `sqladmin@pcidemo.onmicrosoft.com`
+>-   **sqlAdAdminUserName**: `sqladmin@contosowebstore.onmicrosoft.com`
 >-   **sqlAdAdminUserPassword**: [Created password]
 
 
@@ -817,7 +798,7 @@ This command will return the IP address. For example:
     with the Application Gateway IP address.
 
 2.  Verify you can connect to your site by browsing to its domain, for example
-    `http://www.contosoclinic.com`.
+    `http://www.contosowebstore.com`.
 
     1.  Note that your site will have limited services until the post-deployment
         script is executed.
@@ -841,7 +822,7 @@ Post-deployment steps require the following information from your installation:
 Get-AzureRMResourceGroup | select ResourceGroupName
 ```
 
-    For example: `Contosoclinic`
+    For example: `contosowebstore`
 
 3.   Your **client side IP** address. To retrieve your client IP address,
     complete the following steps:
@@ -890,7 +871,7 @@ and
 
         1.  Click **SQL Databases.**
 
-        2.  Select your database. For this example it will be `ContosoClinicDb`.
+        2.  Select your database. For this example it will be `contosowebstoreDb`.
 
         3.  The SQL server name will display in the **Server name** field.
     -   In our example:
@@ -929,7 +910,7 @@ and
 
 10. The SQL AD Admin User created in step
 
-    -   In our example: `sqladmin@pcidemo.onmicrosoft.com`
+    -   In our example: `sqladmin@contosowebstore.onmicrosoft.com`
 
 11. The SQL AD Admin User password
 
@@ -972,7 +953,7 @@ Set-MsolUserPassword -userPrincipalName [sqladmin@yourdomain] -NewPassword [NEWP
 in our example
 
 `
-Set-MsolUserPassword -userPrincipalName sqladmin@pcidemo.onmicrosoft.com -NewPassword 'SECRET' -ForceChangePassword $false
+Set-MsolUserPassword -userPrincipalName sqladmin@contosowebstore.onmicrosoft.com -NewPassword 'SECRET' -ForceChangePassword $false
 `
 
 ### Run post-deployment SQL script
@@ -981,7 +962,7 @@ At this point you will have a fully deployed solution, to which the two administ
 
 Open SQL Server Management Studio using the Active Directory username and password.
 
-In our example: `sqladmin@pcidemo.onmicrosoft.com`
+In our example: `sqladmin@contosowebstore.onmicrosoft.com`
 
 
 The following connection information should be used to connect to your SQL
@@ -991,12 +972,12 @@ Server Management Studio:
 
 -   Server name: Your server string. In this example:
 
-    `pcidemo.onmicrosoft.com`
+    `contosowebstore.onmicrosoft.com`
 
 -   Authentication: **Use Active Directory Password Authentication**
 
 -   Username: The AD SQL user account you set up in pre-deployment. In our
-    example:  `sqladmin@pcidemo.onmicrosoft.com`
+    example:  `sqladmin@contosowebstore.onmicrosoft.com`
 
 -   Password: The password for your AD SQL user account. In this example:
 
@@ -1014,7 +995,7 @@ pre-post-deployment folder
 
 -   Replace `XXXX` with your AD domain name. In our example:
 
-   `pcidemo.onmicrosoft.com`
+   `contosowebstore.onmicrosoft.com`
 
 You can copy the script from the deployment file and run it in a new SQL query.
 
@@ -1041,10 +1022,10 @@ to operate correctly, you will be required to change to the **OMS tier**.
 2.  Click **Automation Accounts**.
 
 3.  In the Automation Accounts blade, select your automation. For example:
-    **Contosoclinic-Automation**
+    **contosowebstore-Automation**
 
 4.  In Process Automation, click **Runbooks**. For example:
-    **Contosoclinic-Automation – Runbooks**
+    **contosowebstore-Automation – Runbooks**
 
 5.  Select the **scheduleIngestion** runbook that was installed by the
     post-installation script.
@@ -1173,7 +1154,7 @@ personalized cloud consultant that helps you follow best practices to optimize y
  It analyzes your resource configuration and usage telemetry and then recommends solutions that can help you 
  improve the cost effectiveness, performance, high availability, and security of your Azure resources. 
  1. Select **Browse**, and then scroll to **Azure Advisor**. 
- 2. The Advisor dashboard displays personalized recommendations for contoso clinic subscription.
+ 2. The Advisor dashboard displays personalized recommendations for Contoso webstore subscription.
  
 
 **NOTE:**
@@ -1321,8 +1302,7 @@ A virtual machine was stood up as a Jumpbox / Bastion host with the following co
 -   [VM Diagnostics extension](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-windows-extensions-diagnostics-template)
 
 -   [Bitlocker Encrypted Disk](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption)
-    using Azure Key Vault (respects Azure Government, PCI DSS, and HIPAA
-    requirements)
+    using Azure Key Vault (respects Azure Government, PCI DSS, HIPAA and other requirements)
 
 -   An [AutoShutDown Policy](https://azure.microsoft.com/en-us/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/)
     to reduce consumption of virtual machine resources when not in use.
@@ -1387,7 +1367,7 @@ Default deployment is intended to provide for a clean chit of security center re
 
 # THREAT MODEL
 
-Data Flow Diagram and sample threat model for Contoso clinic provided in the documents folder `./documents`
+Data Flow Diagram and sample threat model for Contoso webstore provided in the documents folder `./documents`
 
   ![](images/Threat_Model.png)
 
@@ -1431,7 +1411,7 @@ the solution.
 
 This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, please contact your Microsoft account representative or get in touch with the Avyan Consulting team. azurecompliance@avyanconsulting.com
 
-The current and stable version of the blueprint is avalible at [PCI Blueprint Marketplace Repo](https://azuremarketplace.microsoft.com/en-us/marketplace/apps)
+The current and stable version of the blueprint is avalible at [Blueprint Marketplace Repo](https://azuremarketplace.microsoft.com/en-us/marketplace/apps)
 The next version pre-release, fixes and updates are located at [Avyan Consulting Git Repo](https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/)
 
 
