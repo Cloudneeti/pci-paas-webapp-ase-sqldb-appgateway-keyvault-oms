@@ -1,5 +1,5 @@
-# Azure Webstore Blueprint 
-## Payment processing solution for PCI DSS
+# Azure Payment processing solution Blueprint 
+##  for PCI DSS enablement
 
 
 
@@ -306,7 +306,9 @@ create the correct file.
 5.  Convert the pfx file into a string Base64 text file. For example, in
     PowerShell you can use the following commands:
 ```powershell
-$fileContentBytes = get-content 'contosowebstore.com\_private\_key.pfx' -Encoding Byte[System.Convert]::ToBase64String(\$fileContentBytes) | Out-File 'pfx-bytes.txt'
+$bytes = [System.IO.File]::ReadAllBytes("c:\key.pfx");
+$b64 = [System.Convert]::ToBase64String($bytes);
+[System.Io.File]::WriteAllText("C:\key_.txt", $b64);
 ```
 
 **Preserve your SSL 64-bit string and password; you will use them when
