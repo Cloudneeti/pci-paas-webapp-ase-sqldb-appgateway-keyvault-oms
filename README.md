@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-# Azure BluePrint for Payment Handling Solution
-## PCI DSS Compliance focus
-=======
+
 # Azure PCI DSS or HIPAA Compliance Blueprint
 ## A Banking, Retail or Healthcare quickstart Compliant Solutions 
 >>>>>>> parent of 60377d7... HIPAA REMOVED FROM README --------
