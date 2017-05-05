@@ -520,13 +520,25 @@ New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"
 
 >**NOTE** - This demo currently ONLY runs correctly in the location **East**, **East US**
 
-2.  Create an Automation account following the instruction create a [runbooks
-    with an Azure Run As
-    account](https://docs.microsoft.com/en-us/azure/automation/automation-sec-configure-azure-runas-account).
+2.  Create an Automation account.
+	1. Click **+Add**. and type **Automation** in the search window.
+	2. Click **Automation** 
+	3. Click **Create**
+-   Name:`contosoautomation`
+-   Subscription: `Select your subscription`
+-	Resouce group, use exisiting: `Select your resource group'
+-   In this example:    `contosodemo`
+-	Location: `EAST US 2`
+- 	Create Azure Run As account `Yes`
+	4. Click **Create** 
+
+3. Select your resource group, **contosodemo**, click on **contosoautomation** and select **Runbooks**
 
 > **NOTE:** Do not proceed without verifying your Automation account was successful deployed
-by running the runbook examples in the previous step called
+by running the runbook examples 
 `azureautomationtutorialscript` Creation of a Service Principal has a **propensity to fail on occasion** troubleshooting this process is essential.
+
+Select **>Start** on the `azureautomationtutorialscript` and **Run** to verify it executed correctly. 
 
 3.  Record the information about your resource group, and Automation account:
 
@@ -786,7 +798,7 @@ Gateway IP address to be updated as a DNS record on the hosting site.
     command:
 
 ```powershell
-   Get-AzureRmPublicIpAddress \| where {\$\_.Name -eq "publicIp-AppGateway"} |select IpAddress
+   Get-AzureRmPublicIpAddress | where {$_.Name -eq "publicIp-AppGateway"} |select IpAddress
 ```
 
 
@@ -796,7 +808,7 @@ This command will return the IP address. For example:
 >` ---------`
 >` 52.168.0.1`
 
-1.  Log into your DNS hosting provider and update the A/AAAA and CNAME records
+1.  Log into your DNS hosting provider and update the A/AAAA record
     with the Application Gateway IP address.
 
 2.  Verify you can connect to your site by browsing to its domain, for example
