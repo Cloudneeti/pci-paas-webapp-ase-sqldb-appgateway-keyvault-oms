@@ -59,7 +59,7 @@
   },
   "variables": {
     "defaultSqlServerName": "[concat('sqlserver-', uniqueString(resourceGroup().id))]",
-    "defaultSqlDatabaseName": "ContosoClinicDB",
+    "defaultSqlDatabaseName": "ContosoPayments",
     "defaultAppServicePlanName": "[concat('contosoplan', uniqueString(resourceGroup().id))]",
     "defaultAppServicePlanSku": "Basic",
     "defaultAppServicePlanWorkerSize": "0"
