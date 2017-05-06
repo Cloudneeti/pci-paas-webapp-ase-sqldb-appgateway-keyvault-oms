@@ -51,7 +51,7 @@ Param(
 )
 
 
-$DatabaseName = "ContosoClinicDB"
+$DatabaseName = "ContosoPayments"
 $StorageName = "stgreleases"+$SQLServerName.Substring(10,5).ToLower()
 $StorageKeyType = "StorageAccessKey"
 $SQLContainerName = "pci-paas-sql-container"

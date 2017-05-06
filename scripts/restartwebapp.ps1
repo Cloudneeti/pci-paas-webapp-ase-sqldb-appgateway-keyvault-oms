@@ -5,7 +5,14 @@
         NA
 #>
 
+# Suspend the runbook if any errors, not just exceptions, are encountered
+$ErrorActionPreference = "Stop"
+
+# Get ResourceGroupName
+$ResourceGroupName = Get-AutomationVariable -Name 'metricresourceGroupName'
+
 $connectionName = "AzureRunAsConnection"
+
 try
 {
     # Get the connection "AzureRunAsConnection "
@@ -29,4 +36,4 @@ catch {
     }
 }
 
-Restart-AzureRmWebapp -Name webapp-pciwebapp -ResourceGroupName Contosoclinic
+Restart-AzureRmWebapp -Name webapp-pciwebapp -ResourceGroupName $ResourceGroupName
