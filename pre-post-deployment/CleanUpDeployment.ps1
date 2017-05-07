@@ -18,7 +18,7 @@ Connect-MsolService
 $ADApplicationId ='' # Provide Application ClientID if it's created or else don't provide
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
 $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
-$doctorUserName = "doctor_ChrisA@"+$azureADDomainName
+
 Write-Host ("Step 1:Remove AD Users" ) -ForegroundColor Red
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 if ($sqlADAdminObjectId -ne $null)  

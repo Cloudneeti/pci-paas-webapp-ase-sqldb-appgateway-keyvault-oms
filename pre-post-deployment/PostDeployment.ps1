@@ -1,5 +1,3 @@
-# Refer to the README.md (located here https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/) 
-#   and Deployment Guide (located in the documents folder of the same github repo
 #
 # This is a Post-Deployment script that is to be run after a successful ARM deployment 
 # Pre-Requisites to run this script
@@ -9,12 +7,10 @@
 # The script does the following things 
 #      1) Downloads and copies the SQL bacpac file to a new Azure storage account
 #      2) Updates SQL DB firewall to allow you (your clientIp) access to manage SQL DB AND Allowing the WebApp deployed on ASE (the ASE outbound virtual IP)
-#      3) Data Mask few DB columns (ensuring that only the SQL Admins be able to see the detailed info in the Database) everyone else sees them as masked .. e.g. SSN will show up as XXX-XX-4digitnumber
-#      4) Enable Always Encrypt for a few columns (e.g. Credit card)
+#      3) Data Mask few DB columns (ensuring that only the SQL Admins be able to see the detailed info in the Database) everyone else sees them as masked .. 
 #      5) Makes an AD User to the the SQL AD Admin [refer command Set-AzureRmSqlServerActiveDirectoryAdministrator]
 #      6) Ensures Diagnotics logs are sent to OMS Workspace (script assumes that there's only one WS in the resourcegroup created by the ARM template)
 #
-# Enjoy the sample.
 
 
 
@@ -123,13 +119,13 @@ Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account"
 ########################
 Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Gray
 
-# Start Dynamic Data Masking
+# Start Dynamic Data Masking ######################################### FOLLOWING TO BE REVISED FOR NEW BACKPACK
     Get-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
     Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -DataMaskingState Enabled
     Get-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
     New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "FirstName" -MaskingFunction Default
     New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "LastName" -MaskingFunction Default
-    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "SSN" -MaskingFunction SocialSecurityNumber 
+ 
 # End Dynamic Data Masking
 
 
@@ -233,7 +229,6 @@ foreach($resourceType in $resourceTypes)
 
 ########################
 
-Read-Host -Prompt "The script executed. Press enter to exit."
 
 
 

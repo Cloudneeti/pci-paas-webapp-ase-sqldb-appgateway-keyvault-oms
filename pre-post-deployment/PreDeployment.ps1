@@ -7,6 +7,7 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $subscriptionID, # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $suffix, #This is used to create a unique website name in your organization. This could be your company name or business unit name
 	[string] [Parameter(Mandatory=$true)] $sqlADAdminPassword # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
+	[string] [Parameter(Mandatory=$true)] $AzureADApplicationClientSecret #Provide a Azure Application Password for setup of the app client access.
 )
 
 ###
@@ -17,10 +18,10 @@ Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrat
 Connect-MsolService
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
 $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
-$doctorUserName = "doctor_ChrisA@"+$azureADDomainName
-#$sqlADAdminPassword = "!Password333!!!"
-$receptionistPassword = "!Password111!!!"
-$doctorPassword = "!Password222!!!"
+
+
+$receptionistPassword = "DfGed!Dfd@123"
+
 $cloudwiseAppServiceURL = "http://localcloudneeti6i"+$azureADDomainName
 Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
@@ -42,18 +43,12 @@ if ($receptionistUserObjectId -eq $null)
 }
 Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $receptionistPassword -ForceChangePassword $false
 
-$doctorUserObjectId = (Get-MsolUser -UserPrincipalName $doctorUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
-$doctoruserDetails = ""
-if ($doctorUserObjectId -eq $null)  
-{    
-    $doctoruserDetails = New-MsolUser -UserPrincipalName $doctorUserName -DisplayName "Chris Aston" -FirstName "Chris" -LastName "Aston"
-}
-Set-MsolUserPassword -userPrincipalName $doctorUserName -NewPassword $doctorPassword -ForceChangePassword $false
+
 Write-Host ("Created AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
 #------------------------------
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
 Set-Location ".\"
-$AzureADApplicationClientSecret =        "Password@123" 
+
 $suffix = $suffix.Replace(' ', '').Trim()
 $WebSiteName =         ("azurepcipaas" + $suffix)
 $displayName =         ($suffix + "Azure PCI PAAS Sample")
@@ -152,8 +147,7 @@ Write-Host -Prompt "End copy all the values from above here." -ForegroundColor Y
 
 Write-Host -Prompt "The following additional users have been created in domain. These users will be used for trying out various scenarios" -ForegroundColor Yellow
 Write-Host ($receptionistUserName +" user is created. password is "+$receptionistPassword ) -ForegroundColor Red
-Write-Host ($doctorUserName +" user is created. password is "+$doctorPassword ) -ForegroundColor Red
+
 
 Write-Host -Prompt "-- `nThe script completed execution. Ensure that you have copied all necessary inputs and Please return to the deployment guide to proceed with your installation. Do not run other scripts in this folder at this time." -ForegroundColor Yellow
 
-Read-Host -Prompt "Press any key to exit"

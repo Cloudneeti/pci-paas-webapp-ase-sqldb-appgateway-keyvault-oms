@@ -3,12 +3,7 @@
 use ContosoPayments
 Declare @domainName as varchar(50) = 'XXXX' -- Provide your domain name. This is the only change here
 
-Declare @doctorUserName as varchar(100) = 'doctor_ChrisA@'+@domainName
-exec ('CREATE USER [' + @doctorUserName+'] FROM EXTERNAL PROVIDER')
-exec ('GRANT CONNECT TO [' + @doctorUserName+']' )
-exec ('GRANT SELECT TO [' + @doctorUserName+']' )
-exec ('GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO [' + @doctorUserName+']' )
-exec ('GRANT VIEW ANY COLUMN Encryption KEY DEFINITION TO [' + @doctorUserName+']' )
+
 
 Declare @receptionistUserName as varchar(100) = 'receptionist_EdnaB@'+@domainName
 exec ('CREATE USER [' + @receptionistUserName+'] FROM EXTERNAL PROVIDER')
