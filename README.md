@@ -811,30 +811,23 @@ This command will return the IP address. For example:
 1.  Log into your DNS hosting provider and update the A/AAAA record
     with the Application Gateway IP address.
 
-	#### Enable Kudu Access
+	#### To Enable Kudu Access
 
-Remember that this Web App is living within a VNET that isn't publicly accessible, 
-so in order to be able to deploy stuff, access Kudu console and so on, you need to 
-create a Virtual Machine that is living within the same Virtual Network and use that 
-to access the Web App with its internal IP. 
+The Web App service is within a VNET that is not publicly accessible. To deploy new service capabilities such as a Kudu console, you require a Virtual Machine within the same Virtual Network that has access to the Web App. internal IP. 
 
-You would also need a Server with a DNS role to be able to resolve the Web App specific 
-domains (and other hostnames within your Virtual Network).You need to create A-records 
-pointing to the App Service Environment's Internal Load Balancer IP address for the 
-following hostnames (*, *.scm, ftp, publish). 
+You will also need to establish a DNS service that will resolve the Web App specific domains. This can be done by creating an **A-record** 
+that resolves to the App Service Environment's Internal Load Balancer **IP address**, and you will need to include Cnames for the following 
+> *, *.scm, ftp, publish 
 
-However, If you are deploying this solution in an isolated environment which does not have
-access to DNS server, You can create a Virtual Machine that is living within the same Virtual 
-Network and update its host file mapping App Service Environment's Internal Load Balancer
-IP address. For example: 
+If you are deploying this solution in an isolated environment which does not have access to DNS server, You can create a Virtual Machine that is hosted in the Virtual Network and update its host file mapping to include the App Service Environment's Internal Load Balancer
+**IP address**. For example: 
 
-10.10.0.73	www.contosowebstore.com	www.scm.contosowebstore.com	
+> 10.10.0.73	www.contosowebstore.com	www.scm.contosowebstore.com	
 
-2.  Verify you can connect to your site by browsing to its domain, for example
-    `http://www.contosowebstore.com`.
+Verify your connection for Kudu by browsing to your domain name, In our example we browse to: 
+-    `http://www.contosowebstore.com`.
 
-    1.  Note that your site will have limited services until the post-deployment
-        script is executed.
+    1.  Note that this verification will be limited till the  post-deployment process is completed.
 
 #### Post-deployment script
 
