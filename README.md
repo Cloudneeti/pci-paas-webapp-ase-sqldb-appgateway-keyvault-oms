@@ -822,7 +822,7 @@ that resolves to the App Service Environment's Internal Load Balancer **IP addre
 If you are deploying this solution in an isolated environment which does not have access to DNS server, You can create a Virtual Machine that is hosted in the Virtual Network and update its host file mapping to include the App Service Environment's Internal Load Balancer
 **IP address**. For example: 
 
-> 10.10.0.73	www.contosowebstore.com	www.scm.contosowebstore.com	
+> ` 10.10.0.73	www.contosowebstore.com	www.scm.contosowebstore.com`	
 
 Verify your connection for Kudu by browsing to your domain name, In our example we browse to: 
 -    `http://www.contosowebstore.com`.
