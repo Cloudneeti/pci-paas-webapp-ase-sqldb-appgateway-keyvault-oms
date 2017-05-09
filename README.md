@@ -811,6 +811,25 @@ This command will return the IP address. For example:
 1.  Log into your DNS hosting provider and update the A/AAAA record
     with the Application Gateway IP address.
 
+	#### Enable Kudu Access
+
+Remember that this Web App is living within a VNET that isn't publicly accessible, 
+so in order to be able to deploy stuff, access Kudu console and so on, you need to 
+create a Virtual Machine that is living within the same Virtual Network and use that 
+to access the Web App with its internal IP. 
+
+You would also need a Server with a DNS role to be able to resolve the Web App specific 
+domains (and other hostnames within your Virtual Network).You need to create A-records 
+pointing to the App Service Environment's Internal Load Balancer IP address for the 
+following hostnames (*, *.scm, ftp, publish). 
+
+However, If you are deploying this solution in an isolated environment which does not have
+access to DNS server, You can create a Virtual Machine that is living within the same Virtual 
+Network and update its host file mapping App Service Environment's Internal Load Balancer
+IP address. For example: 
+
+10.10.0.73	www.contosowebstore.com	www.scm.contosowebstore.com	
+
 2.  Verify you can connect to your site by browsing to its domain, for example
     `http://www.contosowebstore.com`.
 
@@ -885,7 +904,7 @@ and
 
         1.  Click **SQL Databases.**
 
-        2.  Select your database. For this example it will be `contosowebstoreDb`.
+        2.  Select your database. For this example it will be `ContosoPayments`.
 
         3.  The SQL server name will display in the **Server name** field.
     -   In our example:

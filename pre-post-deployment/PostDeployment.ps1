@@ -1,3 +1,5 @@
+# Refer to the README.md (located here https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/) 
+#   and Deployment Guide (located in the documents folder of the same github repo
 #
 # This is a Post-Deployment script that is to be run after a successful ARM deployment 
 # Pre-Requisites to run this script
@@ -8,9 +10,11 @@
 #      1) Downloads and copies the SQL bacpac file to a new Azure storage account
 #      2) Updates SQL DB firewall to allow you (your clientIp) access to manage SQL DB AND Allowing the WebApp deployed on ASE (the ASE outbound virtual IP)
 #      3) Data Mask few DB columns (ensuring that only the SQL Admins be able to see the detailed info in the Database) everyone else sees them as masked .. 
+#      4) Enable Always Encrypt for a few columns (e.g. Credit card)
 #      5) Makes an AD User to the the SQL AD Admin [refer command Set-AzureRmSqlServerActiveDirectoryAdministrator]
 #      6) Ensures Diagnotics logs are sent to OMS Workspace (script assumes that there's only one WS in the resourcegroup created by the ARM template)
 #
+# Enjoy the sample.
 
 
 
@@ -51,7 +55,7 @@ $DatabaseName = "ContosoPayments"
 $StorageName = "stgreleases"+$SQLServerName.Substring(10,5).ToLower()
 $StorageKeyType = "StorageAccessKey"
 $SQLContainerName = "pci-paas-sql-container"
-$SQLBackupName = "clinic.bacpac"
+$SQLBackupName = "ContosoPayments.bacpac"
 $StorageUri = "http://$StorageName.blob.core.windows.net/$SQLContainerName/$SQLBackupName"
 $cmkName = "CMK1" 
 $cekName = "CEK1" 
@@ -119,13 +123,13 @@ Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account"
 ########################
 Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Gray
 
-# Start Dynamic Data Masking ######################################### FOLLOWING TO BE REVISED FOR NEW BACKPACK
+# Start Dynamic Data Masking
     Get-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
     Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -DataMaskingState Enabled
     Get-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
-    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "FirstName" -MaskingFunction Default
-    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Patients" -ColumnName "LastName" -MaskingFunction Default
- 
+    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "FirstName" -MaskingFunction Default
+    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "LastName" -MaskingFunction Default
+    New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "Customer_Id" -MaskingFunction SocialSecurityNumber 
 # End Dynamic Data Masking
 
 
@@ -136,7 +140,7 @@ Write-Host ("`tStep 6: Update SQL Server for Azure Active Directory administrato
 Set-AzureRmSqlServerActiveDirectoryAdministrator -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DisplayName $SqlAdAdminUserName
             
 ########################
-Write-Host ("`tStep 7: Encrypt SQL DB columns SSN, Birthdate and Credit card Information" ) -ForegroundColor Gray
+Write-Host ("`tStep 7: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Gray
 
 # Start Encryption Columns
 Import-Module "SqlServer"
@@ -177,7 +181,7 @@ $database = $server.Databases[$databaseName]
     
     # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
     $ces = @()
-    $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Patients.CreditCard_Number" -EncryptionType "Deterministic" -EncryptionKey $cekName
+    $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Number" -EncryptionType "Deterministic" -EncryptionKey $cekName
     Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
     # End Encryption Columns
 
@@ -229,6 +233,7 @@ foreach($resourceType in $resourceTypes)
 
 ########################
 
+Read-Host -Prompt "The script executed. Press enter to exit."
 
 
 

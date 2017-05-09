@@ -138,7 +138,7 @@
         ],
         "backendAddressPools": [
           {
-            "name": "appGatewayBackendPool",
+            "name": "backendPool_ASE",
             "properties": {
               "BackendAddresses": [
                 {
@@ -199,7 +199,7 @@
                 "id": "[concat(variables('applicationGatewayId'), '/httpListeners/appGatewayHttpListener')]"
               },
               "backendAddressPool": {
-                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/appGatewayBackendPool')]"
+                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/backendPool_ASE')]"
               },
               "backendHttpSettings": {
                 "id": "[concat(variables('applicationGatewayId'), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"
@@ -214,7 +214,7 @@
                 "id": "[concat(variables('applicationGatewayId'), '/httpListeners/appGatewayHttpsListener')]"
               },
               "backendAddressPool": {
-                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/appGatewayBackendPool')]"
+                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/backendPool_ASE')]"
               },
               "backendHttpSettings": {
                 "id": "[concat(variables('applicationGatewayId'), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"

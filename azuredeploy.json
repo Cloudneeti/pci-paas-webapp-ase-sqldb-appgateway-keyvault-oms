@@ -108,7 +108,7 @@
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
     "storageAccountPreRelease": "stgpcipaasreleases",
     "webContainerName": "pci-paas-web-container",
-    "webPackageName": "ContosoClinic.zip",
+    "webPackageName": "ContosoWebStore.zip",
     "publicIpAddressName": "publicIp-AppGateway",
     "aseNsgGroupName": "nsg-ASE",
     "wafNsgGroupName": "nsg-WAF-Gateway",
@@ -358,6 +358,7 @@
           ],
           "apiVersion": "2015-07-01",
           "properties": {
+            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]",
             "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountDiagnostics'))]",
             "logs": [
               {
@@ -893,6 +894,20 @@
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 120,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowOutboundtoAzureDomain",
+            "properties": {
+              "description": "Allowing Outbound access on port 53 is required for communication with Azure DNS servers",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "53",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 130,
               "direction": "Outbound"
             }
           }

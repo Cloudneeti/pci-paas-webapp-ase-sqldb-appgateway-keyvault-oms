@@ -9,11 +9,11 @@ Declare @receptionistUserName as varchar(100) = 'receptionist_EdnaB@'+@domainNam
 exec ('CREATE USER [' + @receptionistUserName+'] FROM EXTERNAL PROVIDER')
 exec ('GRANT CONNECT TO [' + @receptionistUserName+']' )
 exec ('GRANT SELECT TO [' + @receptionistUserName+']' )
--- Receptionist would have privileges to update patient details
+-- Receptionist would have privileges to update Customers details
 exec ('GRANT UPDATE TO [' + @receptionistUserName+']' )
 exec ('GRANT VIEW ANY COLUMN MASTER KEY DEFINITION TO [' + @receptionistUserName+']' )
 exec ('GRANT VIEW ANY COLUMN Encryption KEY DEFINITION TO [' + @receptionistUserName+']' )
 
 EXECUTE AS USER = @receptionistUserName 
-SELECT * FROM patients;
+SELECT * FROM Customers;
 REVERT
