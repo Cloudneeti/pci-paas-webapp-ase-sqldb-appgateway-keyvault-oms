@@ -70,23 +70,27 @@
     "psModules": {
       "AzureRmProfile": {
         "Name": "AzureRm.Profile",
-        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.profile.1.0.9.nupkg"
+        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.profile.3.0.0.nupkg"
       },
       "AzureRmInsights": {
         "Name": "AzureRm.Insights",
-        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.insights.1.0.9.nupkg"
+        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.insights.3.0.0.nupkg"
       },
       "AzureRmSql": {
         "Name": "AzureRm.SQL",
-        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.sql.1.0.9.nupkg"
+        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.sql.3.0.0.nupkg"
       },
       "AzureRmResources": {
         "Name": "AzureRm.Resources",
-        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.resources.2.0.0.nupkg"
+        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.resources.4.0.0.nupkg"
       },
       "AzureRmAutomation": {
         "Name": "AzureRm.Automation",
-        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.automation.1.0.9.nupkg"
+        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.automation.3.0.0.nupkg"
+      },
+      "AzureRmWebsites": {
+        "Name": "AzureRm.Websites",
+        "URL": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.websites.3.0.0.nupkg"
       },
       "OMSIngestionAPI": {
         "Name": "OMSIngestionAPI",
@@ -183,8 +187,7 @@
           "location": "[parameters('automationRegion')]",
           "apiVersion": "[variables('aaApiVersion')]",
           "dependsOn": [
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'))]",
-            "[concat('Microsoft.Automation/automationAccounts/variables', 'metricresourceGroupName')]"
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'))]"
           ],
           "tags": {
             "layer": "management",
@@ -367,6 +370,20 @@
           "properties": {
             "contentLink": {
               "uri": "[variables('psModules').AzureRMSql.URL]"
+            }
+          }
+        },
+        {
+          "name": "[variables('psModules').AzureRmWebsites.Name]",
+          "type": "modules",
+          "apiVersion": "[variables('aaApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'))]",
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('automationAccountName'), '/modules/', variables('psModules').AzureRmProfile.Name)]"
+          ],
+          "properties": {
+            "contentLink": {
+              "uri": "[variables('psModules').AzureRmWebsites.URL]"
             }
           }
         },
