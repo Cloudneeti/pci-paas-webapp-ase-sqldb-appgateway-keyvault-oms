@@ -89,7 +89,7 @@ Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundCol
 $StorageAccountExists = Get-AzureRmStorageAccount -Name $StorageName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore
 if ($StorageAccountExists -eq $null)  
 {    
-    New-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $StorageName -Location $Location -Type "Standard_GRS"
+    New-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $StorageName -Location $Location -Type "Standard_GRS" -EnableEncryptionService "Blob"
 }
 
 # Set a default storage account.
