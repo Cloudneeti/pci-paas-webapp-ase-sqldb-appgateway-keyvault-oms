@@ -1317,7 +1317,8 @@ Service](https://azure.microsoft.com/en-us/services/app-service/?b=16.52), devel
 
 #### Virtual machine
 
-As the App Service Environment is secured and locked down, there needs to be a mechanism to allow for any DevOps releases/changes that might be necessary, such as the ability to monitor WebApp using Kudu.
+As the App Service Environment is secured and locked down, there needs to be a mechanism to allow for any DevOps releases/changes that might be necessary, such as the ability to monitor WebApp using Kudu. Virtual machine is secured behind NAT Load Balancer which allows you to connect
+VM on port other than tcp 3389. 
 
 A virtual machine was stood up as a Jumpbox / Bastion host with the following configurations:
 
@@ -1403,6 +1404,9 @@ Data Flow Diagram and sample threat model for Contoso webstore provided in the d
 > You require to create an AAD admin as identified in the document. This is required as a subscription admin does not automatically receive DS or AAD credentials. This is a security feature that enables RBAC and role separation in Azure.
 #### Why do I need the reboot AES runbook? 
 > Currently there is a limitation in how AES handles webapps. This reboot solution will be removed once the AES issues is resolved.
+#### How to configure runbook manually for restarting webapp ?
+> You need to first make sure module AzureRm.Websites 3.0.0 is imported within Azure Automation. Steps to import module is available at - (https://docs.microsoft.com/en-us/azure/automation/automation-runbook-gallery#modules-in-powershell-gallery). Once the module has
+been imported, You can create a runbook (https://docs.microsoft.com/en-us/azure/automation/automation-creating-importing-runbook) and add `Restart-AzureRmWebapp -Name [WEBAPP NAME] -ResourceGroupName [RESOURCE GROUP NAME]` command to restart webapp at specified interval.
 #### Why do I need to add my subscription administrator to the AAD Admin role?
 >Role based access control requires that a administrator grants themselfs administrative rights in AAD. Refer to this blog for a detailed explaination.
 > [Delegating Admin Rights in Microsoft Azure](https://www.petri.com/delegating-admin-rights-in-microsoft-azure)
