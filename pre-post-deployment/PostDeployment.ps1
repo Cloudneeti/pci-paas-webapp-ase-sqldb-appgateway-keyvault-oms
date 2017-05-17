@@ -16,9 +16,6 @@
 #
 # Enjoy the sample.
 
-
-
-
 <#
 # If you'd like to run this from w/i a powershell_ISE or visual studio code, you could try replacing and uncommenting this code block AND commenting out the parameters block.
 $SubscriptionId = <your sub id> # Provide your Azure subscription ID
@@ -108,10 +105,11 @@ $StorageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.R
 ########################
 Write-Host "SQL Server Updates" -foreground Yellow 
 Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Gray
-$clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
-Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress -ErrorAction Continue} Catch {}
-Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress -ErrorAction Continue} Catch {}
-Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIp" -StartIpAddress $clientIp -EndIpAddress $clientIp -ErrorAction Continue} Catch {}
+#$clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
+$unqiueid = Get-Random -Maximum 999
+Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule$unqiueid" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress -ErrorAction Continue} Catch {}
+Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule$unqiueid" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress -ErrorAction Continue} Catch {}
+#Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIp$unqiueid" -StartIpAddress $clientIp -EndIpAddress $clientIp -ErrorAction Continue} Catch {}
 
 ########################
 Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray
@@ -182,7 +180,11 @@ $database = $server.Databases[$databaseName]
     # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
     $ces = @()
     $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Number" -EncryptionType "Deterministic" -EncryptionKey $cekName
+	$ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Code" -EncryptionType "Deterministic" -EncryptionKey $cekName
+	$ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Expiration" -EncryptionType "Deterministic" -EncryptionKey $cekName
+
     Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
+
     # End Encryption Columns
 
 # End - Switching SQL commands context to the AD Application
