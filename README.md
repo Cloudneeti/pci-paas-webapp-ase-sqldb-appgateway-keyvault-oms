@@ -1,5 +1,5 @@
-# Azure Payment processing solution Blueprint 
-##  for PCI DSS enablement
+# Azure Blueprint - Payment processing solution  
+>  for PCI DSS enablement
 
 
 
