@@ -1,6 +1,8 @@
 # Azure Blueprint - Payment processing solution  
->  for PCI DSS enablement
 
+>  for PCI DSS enablement 
+
+###PUBLIC PREVIEW BETA 1
 
 
 
@@ -20,7 +22,7 @@ document for their internal, reference purposes.*
 network, or compute resource usage, and may increase a customer’s license or
 subscription costs.*  
 
-*© 2016 Microsoft/Avyan. All rights reserved.*
+*partnership between Microsoft/Avyan.*
 
 # ACKNOWLEDGEMENTS
 
