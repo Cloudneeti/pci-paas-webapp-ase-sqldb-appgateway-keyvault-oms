@@ -2,27 +2,19 @@
 
 >  for PCI DSS enablement 
 
-###PUBLIC PREVIEW BETA 1
+### PUBLIC PREVIEW BETA 1
 
 
 
 
 *Published May 2017*
 
-*This document is for informational purposes only. MICROSOFT/AVYAN MAKES NO
-WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, AS TO THE INFORMATION IN THIS
-DOCUMENT.*
-*This document is provided “as-is.” Information and views expressed in this
-document, including URL and other Internet website references, may change
-without notice. Customers reading this document bear the risk of using it.*  
-*This document does not provide customers with any legal rights to any
-intellectual property in any Microsoft product. Customers may copy and use this
-document for their internal, reference purposes.*  
-*NOTE: Certain recommendations in this paper may result in increased data,
-network, or compute resource usage, and may increase a customer’s license or
-subscription costs.*  
+*This document is for informational purposes only. MICROSOFT AND AVYAN MAKE NO WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, AS TO THE INFORMATION IN THIS DOCUMENT. This document is provided “as-is.” Information and views expressed in this document, including URL and other Internet website references, may change without notice. Customers reading this document bear the risk of using it.*
+*This document does not provide customers with any legal rights to any intellectual property in any Microsoft or Avyan product.* *Customers may copy and use this document for their internal, reference purposes.*
+*NOTE: Certain recommendations in this paper may result in increased data, network, or compute resource usage in Azure, and may increase a customer’s Azure license or subscription costs.*
+*The solution in this document is intended as a reference architecture pilot and should not be used as-is for production purposes.  Achieving PCI compliance requires that customers consult with their Qualified Security Assessor. *
 
-*partnership between Microsoft/Avyan.*
+*This solution was developed cooperativly by Microsoft and Avyan consulting.*
 
 # ACKNOWLEDGEMENTS
 
@@ -33,11 +25,17 @@ subscription costs.*
 
 ### Disclaimer 
 This solution is intended as a reference architecture pilot and should not be used as-is for production purposes.
-* Achieving PCI Compliance requires Customers to consult with their QSA.
-* Please contact  <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank"> azurecompliance@avyanconsulting.com </a> if you need further info or support on this QuickStart solution.
+- Achieving PCI Compliance requires Customers to consult with their QSA.
+- This reference architecture provides a template to help customers use Microsoft Azure in a PCI DSS-compliant manner. 
+- Customer is responsible for conducting appropriate security and compliance reviews of any solution built with this reference architecture, as requirements may vary based on the specifics of customer’s implementation and geography. 
+- PCI DSS requires that an accredited Qualified Security Assessor certify Customer’s solution.
+- All customer names, transactions records and any related data on this page are created for the purpose of the POC and are provided for illustration only and are fictitious.  No real association or connection is intended or should be inferred.
 
 
-### Contributors and Reviewers 
+
+* Microsoft would like to thank <a href="mailto:azurecompliance@avyanconsulting.com" target="_blank"> azurecompliance@avyanconsulting.com </a> for developing this solution.
+License <a href="https://opensource.org/licenses/MIT" target="_blank"> MIT </a>  
+
 
 
 
