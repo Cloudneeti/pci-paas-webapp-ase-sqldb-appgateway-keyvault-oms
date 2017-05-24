@@ -13,7 +13,7 @@
 *This document does not provide customers with any legal rights to any intellectual property in any Microsoft or Avyan product or solutions.* 
 *Customers may copy and use this document for their internal, reference purposes.*
 *NOTE: Certain recommendations in this paper may result in increased data, network, or compute resource usage in Azure, and may increase a customer’s Azure license or subscription costs.*
-*The solution in this document is intended as a reference architecture pilot and should not be used as-is for production purposes.  Achieving PCI compliance requires that customers consult with their Qualified Security Assessor.  *
+*The solution in this document is intended as a reference architecture pilot and should not be used as-is for production purposes.  Achieving PCI compliance requires that customers consult with their Qualified Security Assessor.*
 
 *This solution was developed cooperativly by Microsoft and Avyan consulting.*
 
@@ -1360,9 +1360,7 @@ Center](https://azure.microsoft.com/en-us/services/security-center/), you get a 
 [Microsoft Antimalware](https://docs.microsoft.com/en-us/azure/security/azure-security-antimalware)
 for Azure Cloud Services and Virtual Machines is real-time protection capability that helps identify and remove viruses, spyware, and other malicious software, with configurable alerts when known malicious or unwanted software attempts to install itself or run on your Azure systems.
 
-#### Optional Web Apps Vulnerability Assessment via Tinfoil
-For Azure Web Apps, [Tinfoil Security](https://azure.microsoft.com/en-us/blog/web-vulnerability-scanning-for-azure-app-service-powered-by-tinfoil-security/)
-is a security vulnerability scanning solution built into the Azure App Service management experience that provides web app scanning.
+
 
 ### Operations Management
 
