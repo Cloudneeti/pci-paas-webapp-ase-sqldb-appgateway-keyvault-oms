@@ -556,9 +556,15 @@ Select **>Start** on the `azureautomationtutorialscript` and **Run** to verify i
 
 4. In the PowerShell IDE, change directory to the local directory that contains the script and run the script `predeployment.ps1`.
 ```powershell
-.\predeployment.ps1 -azureADDomainName `pcidemo.onmicrosoft.com` -subscriptionID `27017c43-3ea4-467a-afa4-7d3d3d9D33232` -suffix contosowebstore -sqlADAdminPassword ***** -azureADApplicationClientSecret `QW#2wFRE12df` -customHostName `contoso.com` -enableSSL `$true` -certificatePath 
-`D:\certificate.pfx`
+.\predeployment.ps1 -azureADDomainName `pcidemo.onmicrosoft.com` -subscriptionID `27017c43-3ea4-467a-afa4-7d3d3d9D33232` -suffix `contosowebstore` -sqlADAdminPassword `PASSWORD` -azureADApplicationClientSecret `QW2wFRE12df` -customHostName `contoso.com` -enableSSL $true -certificatePath `D:\Certificate\Contoso.pfx`
 ```
+**NOTE**: customHostName, enableSSL & certificatePath are optional parameters. This parameters will help you provide necessary certificates and details what you will use during
+the template deployment. You will only provide those parameters based on your requirements as mentioned below -
+
+ -	**Use parameter customHostName** only when you have a custom domain but do not wish to install HTTPS endpoint. 
+ -	**Use parameter customHostName & enableSSL** when you have a custom domain and wish to install HTTPS endpoint using self-signed certificate. 
+ -	**Use parameter customHostName, enableSSL & certificatePath** when you have a custom domain and wish to install HTTPS endpoint using your own valid certificate. 
+ -	**Do not provide any of the three parameters** if you wish to install this solution in a default manner with pcipaas.com as your customHostName with HTTP endpoint only.
 
  Select **Run Once** to the script warning if you are prompted
 
