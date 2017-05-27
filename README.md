@@ -281,6 +281,10 @@ package](https://d.docs.live.net/7b2b5032e10686e1/Azure%20Compliance/PCI%20DSS%2
 Microsoft offers the ability to create a domain and request an SSL certificate
 from a Microsoft partner.
 
+However, This solution also allows you to create self-signed certificate for the custom domain for testing purpose. If you do not have valid SSL
+certificate, do not provide certificatePath while running pre-deployment script. Script will auto generate one self-signed certificate and
+also converts the certificate to Base64 string.
+
 Setting up a [custom domain with a DNS
 record](https://docs.microsoft.com/en-us/azure/app-service-web/custom-dns-web-site-buydomains-web-app)
 and a root domain can be configured in the [Azure
@@ -552,7 +556,8 @@ Select **>Start** on the `azureautomationtutorialscript` and **Run** to verify i
 
 4. In the PowerShell IDE, change directory to the local directory that contains the script and run the script `predeployment.ps1`.
 ```powershell
-.\predeployment.ps1
+.\predeployment.ps1 -azureADDomainName `pcidemo.onmicrosoft.com` -subscriptionID `27017c43-3ea4-467a-afa4-7d3d3d9D33232` -suffix contosowebstore -sqlADAdminPassword ***** -azureADApplicationClientSecret `QW#2wFRE12df` -customHostName `contoso.com` -enableSSL `$true` -certificatePath 
+`D:\certificate.pfx`
 ```
 
  Select **Run Once** to the script warning if you are prompted
@@ -586,6 +591,14 @@ proceed as illustrated in the following example for `contosowebstore.com`.
 |Azure AD Application Client Secret:| Value `QW#2wFRE12df` |
 |Azure AD Application Object ID:| In our example `73559c5c-e213-4f10-a88c-546c2`|
 |SQL AD Admin User Name:| Default Value, in our example `sqladmin\@pcidemo.onmicrosoft.com`|
+|App Gateway certData :| In our example `MIIDYTCCAkm..snip..snip..ADYa2itE=` |
+|App Gateway certPassword :| In our example `KkaxC4962` |
+|ASE ILB certData :| In our example `MIIDYTCCAkm..snip..snip..ADYa2itE=` |
+|ASE ILB Certificate asePfxBlobString :| In our example `MIIKMAIBA..snip..snip..nfcSIzQICB9A` |
+|ASE ILB pfxPassword :| In our example `JWChK5011` |
+|ASE ILB Certificate aseCertthumbPrint :| In our example `DC8EF6928CD9E025C8D2B0997462158F5A4863D1` |
+
+
 
 The following additional users have been created in domain.
 
@@ -1206,7 +1219,8 @@ following diagram:
 
 #### Application Gateway
 
--   [SSL Offload](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-ssl-portal)
+-   [End-to-End-SSL] (https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-end-to-end-ssl-powershell)
+-   [SSL Offload][DEPRECATED](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-ssl-portal)
 -   [Disable TLS v1.0 and v1.1](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-end-to-end-ssl-powershell)
 -   [Web application firewall](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-webapplicationfirewall-overview)(WAF mode)
 -   [Prevention mode](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-web-application-firewall-portal) with OWASP 3.0 ruleset
@@ -1340,6 +1354,7 @@ A virtual machine was stood up as a Jumpbox / Bastion host with the following co
 An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-intro) is a Premium service plan is used for compliance reasons. Use of this plan allowed for the following controls/configurations:
 
 -   Host inside a secured Virtual Network and Network security rules
+-   ASE configured with Self-signed ILB certificate for HTTPS communication
 -   [Internal Load Balancing mode](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-environment-with-internal-load-balancer) (mode 3)
 -   [Disable TLS 1.0](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings) – a deprecated TLS protocol from PCI DSS standpoint
 -   [Change TLS Cipher](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)

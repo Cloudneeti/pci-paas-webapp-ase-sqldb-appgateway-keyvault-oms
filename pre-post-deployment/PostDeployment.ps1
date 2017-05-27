@@ -105,11 +105,11 @@ $StorageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.R
 ########################
 Write-Host "SQL Server Updates" -foreground Yellow 
 Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Gray
-#$clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
+$clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
 $unqiueid = Get-Random -Maximum 999
 Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule$unqiueid" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress -ErrorAction Continue} Catch {}
 Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "AseOutboundRule$unqiueid" -StartIpAddress $ASEOutboundAddress -EndIpAddress $ASEOutboundAddress -ErrorAction Continue} Catch {}
-#Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIp$unqiueid" -StartIpAddress $clientIp -EndIpAddress $clientIp -ErrorAction Continue} Catch {}
+Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIp$unqiueid" -StartIpAddress $clientIp -EndIpAddress $clientIp -ErrorAction Continue} Catch {}
 
 ########################
 Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray

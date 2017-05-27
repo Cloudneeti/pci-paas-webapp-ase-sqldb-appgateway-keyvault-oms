@@ -6,9 +6,27 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $azureADDomainName, # Provide your Azure AD Domain Name
 	[string] [Parameter(Mandatory=$true)] $subscriptionID, # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $suffix, #This is used to create a unique website name in your organization. This could be your company name or business unit name
-	[string] [Parameter(Mandatory=$true)] $sqlADAdminPassword # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
-	[string] [Parameter(Mandatory=$true)] $AzureADApplicationClientSecret #Provide a Azure Application Password for setup of the app client access.
+	[string] [Parameter(Mandatory=$true)] $sqlADAdminPassword, # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
+	[string] [Parameter(Mandatory=$true)] $azureADApplicationClientSecret, #Provide a Azure Application Password for setup of the app client access.
+	[string] $customHostName = "pcipaas.com", # Provide CustomHostName which will be used for creatin ASE subdomain.
+	[bool]   $enableSSL = $false,
+	[string] $certificatePath
 )
+
+$ErrorActionPreference = 'Stop'
+
+function Generate-Password ()
+{
+    (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + (Get-Random -Maximum 9999)
+}
+
+function Convert-Certificate ($certPath)
+{
+$fileContentBytes = get-content "$certPath" -Encoding Byte
+[System.Convert]::ToBase64String($fileContentBytes)
+}
+
+$ScriptFolder = Split-Path -Parent $PSCommandPath
 
 ###
 #Imp: This script needs to be run by Global AD Administrator (aka Company Administrator)
@@ -18,7 +36,6 @@ Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrat
 Connect-MsolService
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
 $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
-
 
 $receptionistPassword = "DfGed!Dfd@123"
 
@@ -41,6 +58,7 @@ if ($receptionistUserObjectId -eq $null)
 {    
     $receptionistuserDetails = New-MsolUser -UserPrincipalName $receptionistUserName -DisplayName "Edna Benson" -FirstName "Edna" -LastName "Benson"
 }
+
 Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $receptionistPassword -ForceChangePassword $false
 
 
@@ -52,6 +70,7 @@ Set-Location ".\"
 $suffix = $suffix.Replace(' ', '').Trim()
 $WebSiteName =         ("azurepcipaas" + $suffix)
 $displayName =         ($suffix + "Azure PCI PAAS Sample")
+
 # To login to Azure Resource Manager
 	Try  
 	{  
@@ -63,6 +82,7 @@ $displayName =         ($suffix + "Azure PCI PAAS Sample")
 		Login-AzureRmAccount -SubscriptionId $subscriptionID
 	} 
 
+Start-Sleep -Seconds 10
 # Grant 'SQL AD Admin' access to the Azure subscription
 New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )
 
@@ -96,8 +116,46 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
     New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId.Guid -Scope $scopedSubs
     Write-Host ("`tStep 3.5: Reader Role assignment successful" ) -ForegroundColor Gray
 
+### 4. Create a Self-signed certificate for ASE ILB and Application Gateway.
 
-### 4. Print out the required project settings parameters
+### Generate App Gateway Front End SSL certificate string
+if($enableSSL){
+	if($certificatePath) {
+		$certData = Convert-Certificate -certPath $certificatePath
+		$certPassword = "Customer provided certificate."
+	}
+	Else{
+		$fileName = "appgwfrontendssl"
+		$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "www.$customHostName"
+		$certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
+		$pfxpass = Generate-Password
+		$password = ConvertTo-SecureString -String "$pfxpass" -Force -AsPlainText
+		Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\$fileName.pfx" -Password $password
+		$certData = Convert-Certificate -certPath "$ScriptFolder\$fileName.pfx"
+		$certPassword = $pfxpass
+	}
+}
+Else{
+	$certData = "null"
+	$certPassword = "null"
+}
+
+### Generate self-signed certificate for ASE ILB and convert into base64 string
+
+$fileName = "aseilbcertificate"
+$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "*.ase.$customHostName", "*.scm.ase.$customHostName"
+$certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
+$pfxpass = Generate-Password
+$password = ConvertTo-SecureString -String "$pfxpass" -Force -AsPlainText
+Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\$fileName.pfx" -Password $password
+Export-Certificate -Cert $certThumbprint -FilePath "$ScriptFolder\$fileName.cer"
+Start-Sleep -Seconds 3
+$aseCertData = Convert-Certificate -certPath "$ScriptFolder\$fileName.cer"
+$asePfxBlobString = Convert-Certificate -certPath "$ScriptFolder\$fileName.pfx"
+$asePfxPassword = $pfxpass
+$aseCertThumbprint = $certificate.Thumbprint
+
+### 5. Print out the required project settings parameters
 #############################################################################################
 $AzureADApplicationObjectID = (Get-AzureRmADServicePrincipal -ServicePrincipalName $azureAdApplication.ApplicationId).Id
 
@@ -105,10 +163,10 @@ Write-Host "TenantId: " -foreground Yellow -NoNewLine
 Write-Host $tenantID -foreground Red 
 Write-Host "SubscriptionID: " -foreground Yellow -NoNewLine
 Write-Host $sub.Subscription -foreground Red 
-
-
+Write-Host
+Write-Host
 Write-Host -Prompt "Start copy all the values from below here." -ForegroundColor Yellow
-
+Write-Host
 Write-Host ("Parameters to be used in the registration / configuration.") -foreground Yellow
 Write-Host "_artifactsLocationSasToken: " -foreground Yellow -NoNewline
 Write-Host "" -foreground Red 
@@ -130,7 +188,6 @@ Write-Host "Automation Account Name: " -foreground Yellow -NoNewLine
 Write-Host "Please see Deployment Guide for instructions" -foreground Red 
 Write-Host "Custom Host Name: " -foreground Yellow -NoNewLine
 Write-Host "Please see Deployment Guide for instructions" -foreground Red 
-
 Write-Host "Azure AD Application Client ID: " -foreground Yellow -NoNewLine
 Write-Host $azureAdApplication.ApplicationId -foreground Red 
 Write-Host "Azure AD Application Client Secret: " -foreground Yellow -NoNewLine
@@ -141,13 +198,24 @@ Write-Host "SQL AD Admin User Name: " -foreground Yellow -NoNewLine
 Write-Host $SQLADAdminName -foreground Red 
 Write-Host "SQL AD Admin User Password:" -foreground Green -NoNewLine
 Write-Host $SQLADAdminPassword -foreground Red 
-
+Write-Host "Application Gateway HTTPS certData string :" 
+Write-Host "$certData"
+Write-Host "Application Gateway HTTPS certPassword : $certPassword"
+Write-Host "Application Gateway Backend Authentication aseCertData String : "
+Write-Host "$aseCertData"
+Write-Host "ASE ILB Certificate string asePfxBlobString : "
+Write-Host "$asePfxBlobString"
+Write-Host "ASE ILB pfx Password :"
+Write-Host "$asePfxPassword"
+Write-host "ASE ILB Certificate Thumbprint aseCertthumbPrint :"
+Write-Host "$aseCertThumbprint"
+Write-Host
 Write-Host -Prompt "End copy all the values from above here." -ForegroundColor Yellow
-
-
+Write-Host
+Write-Host
 Write-Host -Prompt "The following additional users have been created in domain. These users will be used for trying out various scenarios" -ForegroundColor Yellow
 Write-Host ($receptionistUserName +" user is created. password is "+$receptionistPassword ) -ForegroundColor Red
-
-
+Write-Host
+Write-Host
 Write-Host -Prompt "-- `nThe script completed execution. Ensure that you have copied all necessary inputs and Please return to the deployment guide to proceed with your installation. Do not run other scripts in this folder at this time." -ForegroundColor Yellow
 

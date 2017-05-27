@@ -16,16 +16,49 @@
         "description": "Reserved for deploying using Visual Studio. Please keep it as an empty string"
       }
     },
+    "sslORnon-ssl": {
+      "type": "string",
+      "allowedValues": [
+        "ssl",
+        "non-ssl"
+      ]
+    },
     "certData": {
       "type": "securestring",
+      "defaultValue": "null",
       "metadata": {
         "description": "Base-64 encoded form of the .pfx file"
       }
     },
     "certPassword": {
       "type": "securestring",
+      "defaultValue": "null",
       "metadata": {
         "description": "Password for .pfx certificate"
+      }
+    },
+    "aseCertData": {
+      "type": "string",
+      "metadata": {
+        "description": "Base-64 encoded form of the .cer file"
+      }
+    },
+    "asePfxBlobString": {
+      "type": "string",
+      "metadata": {
+        "description": "Base-64 encoded form of the .pfx file"
+      }
+    },
+    "asePfxPassword": {
+      "type": "string",
+      "metadata": {
+        "description": "Password for .pfx certificate"
+      }
+    },
+    "aseCertThumbprint": {
+      "type": "string",
+      "metadata": {
+        "description": "Certificate Thumbprint"
       }
     },
     "bastionHostAdministratorUserName": {
@@ -121,7 +154,7 @@
     "bastionSubnetAddressPrefix": "10.0.2.0/24",
     "aseSubnetBaseAddress": "10.0.3",
     "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
-    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
+    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -451,7 +484,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('gatewayTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/appgateway/appgatewaydeploy-',parameters('sslORnon-ssl'),'.json',parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -478,6 +511,9 @@
           },
           "certPassword": {
             "value": "[parameters('certPassword')]"
+          },
+          "aseCertData": {
+            "value": "[parameters('aseCertData')]"
           },
           "wafSubnetName": {
             "value": "[variables('wafSubnetName')]"
@@ -578,6 +614,29 @@
           "newZoneName": { "value": "[variables('NewZoneName')]" },
           "aseVirtualIP": { "value": "[variables('aseBackendVirtualIp')]" },
           "tagValues": { "value": "[variables('tagValues')]" }
+        }
+      }
+    },
+    {
+      "name": "deploy-IlbAseCertificate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-WebAppAndPackage')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/aseilbcertdeploy.json', parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServiceEnvironmentName": { "value": "[variables('aseName')]" },
+          "existingAseLocation": { "value": "[variables('aseLocation')]" },
+          "pfxBlobString": { "value": "[parameters('asepfxBlobString')]" },
+          "password": { "value": "[parameters('asepfxPassword')]" },
+          "certificateThumbprint": { "value": "[parameters('asecertThumbprint')]" },
+          "certificateName": { "value": "[concat('*.ase.',parameters('customHostName'))]" }
         }
       }
     },
