@@ -281,9 +281,8 @@ package](https://d.docs.live.net/7b2b5032e10686e1/Azure%20Compliance/PCI%20DSS%2
 Microsoft offers the ability to create a domain and request an SSL certificate
 from a Microsoft partner.
 
->**IMPORTANT** This solution also allows you to create self-signed certificate for the custom domain for testing purpose ( **Self-signed certificates will not meet PCI DSS compliance requirements** ). If you do not have valid SSL
-certificate, the solution will create a self-signed certificated. 
->** To use a self signed certificate - leave certificatePath empty in the pre-deployment script. 
+>**IMPORTANT** This solution also allows you to create self-signed certificate for the custom domain for testing purpose (**Self-signed certificates will not meet PCI DSS compliance requirements**). If you do not have valid SSL certificate, the solution will create a self-signed certificated. 
+>**To use a self signed certificate - leave certificatePath empty in the pre-deployment script**. 
 >The Script will auto generate a self-signed certificate and convert it to a Base64 string.
 
 Setting up a [custom domain with a DNS
