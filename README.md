@@ -273,7 +273,7 @@ This section provides detailed information about items you will need during inst
     https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms (If you downloaded a .zip file, expand the content of the compressed file to
     a local directory.)
 
-#### Custom domain and SSL certificate
+#### Custom domain, SSL certificate (Third party, and Self-Signed)
 
 The installation requires a custom domain and SSL certificate. Microsoft
 recommends that a custom domain be purchased with [an SSL
@@ -281,9 +281,10 @@ package](https://d.docs.live.net/7b2b5032e10686e1/Azure%20Compliance/PCI%20DSS%2
 Microsoft offers the ability to create a domain and request an SSL certificate
 from a Microsoft partner.
 
-However, This solution also allows you to create self-signed certificate for the custom domain for testing purpose. If you do not have valid SSL
-certificate, do not provide certificatePath while running pre-deployment script. Script will auto generate one self-signed certificate and
-also converts the certificate to Base64 string.
+>**IMPORTANT** This solution also allows you to create self-signed certificate for the custom domain for testing purpose ( **Self-signed certificates will not meet PCI DSS compliance requirements** ). If you do not have valid SSL
+certificate, the solution will create a self-signed certificated. 
+>** To use a self signed certificate - leave certificatePath empty in the pre-deployment script. 
+>The Script will auto generate a self-signed certificate and convert it to a Base64 string.
 
 Setting up a [custom domain with a DNS
 record](https://docs.microsoft.com/en-us/azure/app-service-web/custom-dns-web-site-buydomains-web-app)
