@@ -1422,11 +1422,6 @@ Data Flow Diagram and sample threat model for Contoso webstore provided in the d
 
 #### I can't seem to be able to log in, or run the PowerShell scripts with my Subscription user? 
 > You require to create an AAD admin as identified in the document. This is required as a subscription admin does not automatically receive DS or AAD credentials. This is a security feature that enables RBAC and role separation in Azure.
-#### Why do I need the reboot AES runbook? 
-> Currently there is a limitation in how AES handles webapps. This reboot solution will be removed once the AES issues is resolved.
-#### How to configure runbook manually for restarting webapp ?
-> You need to first make sure module AzureRm.Websites 3.0.0 is imported within Azure Automation. Steps to import module is available at - (https://docs.microsoft.com/en-us/azure/automation/automation-runbook-gallery#modules-in-powershell-gallery). Once the module has
-been imported, You can create a runbook (https://docs.microsoft.com/en-us/azure/automation/automation-creating-importing-runbook) and add `Restart-AzureRmWebapp -Name [WEBAPP NAME] -ResourceGroupName [RESOURCE GROUP NAME]` command to restart webapp at specified interval.
 #### Why do I need to add my subscription administrator to the AAD Admin role?
 >Role based access control requires that a administrator grants themselfs administrative rights in AAD. Refer to this blog for a detailed explaination.
 > [Delegating Admin Rights in Microsoft Azure](https://www.petri.com/delegating-admin-rights-in-microsoft-azure)
