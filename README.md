@@ -764,7 +764,7 @@ The following example is used to illustrate the ARM information for `contosowebs
 
 >-   **\_artifactsLocation**: `https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master`
 >-   **\_artifactsLocationSasToken**: NULL
->-   **sslORnon-ssl**:[Choose either ssl or non-ssl]
+>-   **sslORnon_ssl**:[Choose either ssl or non-ssl]
 >-   **certData**: [The Contoso Base-64 SSL string]
 >-   **certPassword**: [Password you created for the SSL cert]
 >-   **aseCertData**:[The ASE ILB Certificate (.cer) Base-64 SSL string]

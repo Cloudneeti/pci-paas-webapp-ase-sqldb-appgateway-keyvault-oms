@@ -16,7 +16,7 @@
         "description": "Reserved for deploying using Visual Studio. Please keep it as an empty string"
       }
     },
-    "sslORnon-ssl": {
+    "sslORnon_ssl": {
       "type": "string",
       "allowedValues": [
         "ssl",
@@ -484,7 +484,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/appgateway/appgatewaydeploy-',parameters('sslORnon-ssl'),'.json',parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/appgateway/appgatewaydeploy-',parameters('sslORnon_ssl'),'.json',parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
