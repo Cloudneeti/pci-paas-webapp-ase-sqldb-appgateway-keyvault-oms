@@ -179,7 +179,6 @@ The following two service users are created to manage and administer the solutio
 |Item      |Example|
 |----------|------|
 |Username:| `EdnaB`|
-| Password:|``!Password111!!!``|
 | First name:| `Edna`|
 |Last name:| `Benson`|
 | User type: |`Member`|
@@ -594,14 +593,14 @@ proceed as illustrated in the following example for `contosowebstore.com`.
 |Automation Account Name:|**Automation account** In our example `contosowebstore-automation`|
 |Custom Host Name:|Your registered domain name. In our example `www.contosoclinc.com`|
 |Azure AD Application Client ID:| In our example `27017c43-3ea4-467a-afa4-7d3d3d9D`|
-|Azure AD Application Client Secret:| Value `QW#2wFRE12df` |
+|Azure AD Application Client Secret:| Value [PASSWORD] |
 |Azure AD Application Object ID:| In our example `73559c5c-e213-4f10-a88c-546c2`|
 |SQL AD Admin User Name:| Default Value, in our example `sqladmin\@pcidemo.onmicrosoft.com`|
-|App Gateway certData :| In our example `MIIDYTCCAkm..snip..snip..ADYa2itE=` |
-|App Gateway certPassword :| In our example `KkaxC4962` |
-|ASE ILB certData :| In our example `MIIDYTCCAkm..snip..snip..ADYa2itE=` |
-|ASE ILB Certificate asePfxBlobString :| In our example `MIIKMAIBA..snip..snip..nfcSIzQICB9A` |
-|ASE ILB pfxPassword :| In our example `JWChK5011` |
+|App Gateway certData :| In our example `MIIDYTCCAkm....ADYa2itE=` |
+|App Gateway certPassword :| In our example [PASSWORD] |
+|ASE ILB certData :| In our example `MIIDYTCCAkm....ADYa2itE=` |
+|ASE ILB Certificate asePfxBlobString :| In our example `MIIKMAIBA....nfcSIzQICB9A` |
+|ASE ILB pfxPassword :| In our example [PASSWORD] |
 |ASE ILB Certificate aseCertthumbPrint :| In our example `DC8EF6928CD9E025C8D2B0997462158F5A4863D1` |
 
 
@@ -611,9 +610,7 @@ The following additional users have been created in domain.
 |User Role| Example for `contosowebstore.com`|
 |--------------|-----------------------------|
 |Clerk|`Clerk_EdnaB@pcidemo.onmicrosoft.com`|
-|password|`!Password111!!!**`|
 |doctor|`doctor_ChrisA@pcidemo.onmicrosoft.com`|
-|password|`!Password222!!!`|
 
 
 
@@ -774,7 +771,7 @@ The following example is used to illustrate the ARM information for `contosowebs
 >-   **bastionHostAdministratorUserName**: `bastionadmin`
 >-   **bastionHostAdministratorPassword**: [Create a secure password]
 >-   **SqlAdministratorLoginUserName**: `sqladmin`
->-   **sqlAdministratorLoginPassword**: [Created password]
+>-   **sqlAdministratorLoginPassword**: [Create a secure password]
 >-   **sqlThreatDetectionAlertEmailAddress**: `admin@contosowebstore.com`
 >-   **automationAccountName**: `contosowebstore-Automation`
 >-   **customHostName**: `contosowebstore.com`
@@ -782,7 +779,7 @@ The following example is used to illustrate the ARM information for `contosowebs
 >-   **azureAdApplicationClientSecret**: `QW#2wFRE12df`
 >-   **azureAdApplicationObjectId**: `e3aa33bb-1cae-4afd-a8ba-9124b2a1838a`
 >-   **sqlAdAdminUserName**: `sqladmin@contosowebstore.onmicrosoft.com`
->-   **sqlAdAdminUserPassword**: [Created password]
+>-   **sqlAdAdminUserPassword**: [Create a secure password]
 
 
 ### Deployment Timeline
@@ -938,7 +935,7 @@ and
 
         sqlAdAdminUserName: `sqladmin`
 
-        sqlAdAdminUserPassword: `PASSWORD`
+        sqlAdAdminUserPassword: `your PASSWORD`
 
 7. Your **Key Vault name**, which you can retrieve using the [Azure
     Portal](https://portal.azure.com/). Complete the following steps:
@@ -957,7 +954,7 @@ and
 9.  Your **azureAdApplicationClientSecret** which was collected in the ARM
     deployment step.
 
-    -   In our example: `PASSWORD`
+    -   In our example: ` your PASSWORDPASSWORD`
 
 10. The SQL AD Admin User created in step
 
@@ -965,7 +962,7 @@ and
 
 11. The SQL AD Admin User password
 
-    -  In our example: `PASSWORD`
+    -  In our example: `your PASSWORD`
 
 ### Run post-deployment PowerShell script
 
@@ -1032,7 +1029,7 @@ Server Management Studio:
 
 -   Password: The password for your AD SQL user account. In this example:
 
-    `PASSWORD`
+    `your PASSWORD`
 
 -   Create a new query and run the following command to see the patient records
     secured
@@ -1444,7 +1441,7 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 #### Why do I need local admin rights to run the `./pre-post-deployment` script ?
 > PowerShell modules require elivated privileges to install service modules on your PC. This solution provides several scripts, and commands to verify that all the modules are installed, in the 'Client software requirements' section of the deployment guide.
 #### Why do Application gateway backend health status showing `unhealthy` ?
-> This deployment assumes that VIP address [ASE ILB >> Properties >> Virtual IP Address] assinged to ASE ILB would be 10.0.3.8 (observed behaviour). However, it might get changed to 10.0.3.9. So, if you find application gateway backend health as `un-healthy`, verify that ASE ILB VIP address and application backend pool targets are same. If they differ, please update application gateway backend pool targets with ASE ILB VIP. (https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal#add-servers-to-backend-pools)
+> This deployment assumes that VIP address [ASE ILB >> Properties >> Virtual IP Address] assinged to ASE ILB would be 10.0.3.8 (observed behaviour). However, it might get changed to 10.0.3.9. If  the application gateway backend health is listed as `un-healthy`, verify that ASE ILB VIP address and application backend pool targets are same. Update the application gateway backend pool targets with ASE ILB VIP. (https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal#add-servers-to-backend-pools)
 #### How do I set up the administrator properly to use this solution.
 > Review the 'Configure your global admin for the solution' section of the installation guide
 #### I get a script failed, error. User permission error. Insuficient permission error?
@@ -1459,9 +1456,9 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 
 # SUPPORT PROCESS
 
-This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, please contact your Microsoft account representative or get in touch with the Avyan Consulting team. azurecompliance@avyanconsulting.com
+This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, contact your Microsoft account representative.  Avyan Consulting team provided the development of this solution, any questions or concerns contact. azurecompliance@avyanconsulting.com **Developed under MIT licensing**
 
-The current and stable version of the blueprint is avalible at [Blueprint Marketplace Repo](https://azuremarketplace.microsoft.com/en-us/marketplace/apps)
+The current version of the blueprint is avalible in preview, and no stable build has been commited. Please check back frequently for updates for the official release of this solution.
 The next version pre-release, fixes and updates are located at [Avyan Consulting Git Repo](https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/)
 
 
