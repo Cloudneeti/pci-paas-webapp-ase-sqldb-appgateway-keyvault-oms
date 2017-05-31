@@ -111,7 +111,7 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 # USER SCENARIO
 
 
-> This scenario illustrates how a fictitious webstore clinic migrated their patient intake, and payment card processing to Azure. 
+> This scenario illustrates how a fictitious webstore moved their payment card processing to a pure cloud based payment processing using Azure services. 
 
 
 
@@ -169,7 +169,7 @@ The following two service users are created to manage and administer the solutio
 |User type:| `Administrator`|
 
 
-* sqladmin cannot credit card information. sqladmin can read SSN information. In addition, all actions are logged.
+* sqladmin cannot view unfiltered credit card information. In addition, all actions are logged.
 * sqladmin can manage SQL database.
 
 
@@ -183,14 +183,13 @@ The following two service users are created to manage and administer the solutio
 |Last name:| `Benson`|
 | User type: |`Member`|
 
-Edna Benson is the Clerk, and business manager. She is responsible to ensure that patient customer information is accurate, and billing is completed. Edna will use the **patient** data in the following manner:
+Edna Benson is the Clerk, and business manager. She is responsible to ensure that customer information is accurate, and billing is completed. Edna will use the **Customer** data in the following manner:
 
 
-* Edna can Create, read patient information, read date of birth (DOB)*
-* Edna will be able to modify patient information.
+* Edna can Create, read customer information *
+* Edna will be able to modify customer information.
 * Edna can overwrite (or replace) credit card number, expiration, and CVC verification information.
-* Edna can replace stored Social Security number (SSN)
-* Edna cannot read stored SSN or credit card information unmasked. In addition, all her actions are logged.
+
 
 
 
@@ -1031,11 +1030,11 @@ Server Management Studio:
 
     `your PASSWORD`
 
--   Create a new query and run the following command to see the patient records
+-   Create a new query and run the following command to see the customer records
     secured
 
 ```SQL
-    SELECT * FROM [dbo].[Patients]
+    SELECT * FROM [dbo].[customers]
 ```
 
 You will need to edit the `PostDeploymentSQL.sql` script under the
