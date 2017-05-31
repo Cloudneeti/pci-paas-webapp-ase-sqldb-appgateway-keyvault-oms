@@ -788,7 +788,7 @@ The following example is used to illustrate the ARM information for `contosowebs
 ### Deployment Timeline
 
 The following graphic displays the estimated time to deploy the solution
-components. The total time required is approximately 2.5 hours from when the
+components. The total time required is approximately 1.5 hours from when the
 **Purchase** button is clicked.
 
 ![](images/ARM_template_deployment_timeline.png)
@@ -1454,7 +1454,7 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 #### The ARM template fails to deploy 'xxxxxxxx' service
 > Currently this solution requires that you deploy in US EAST. Limitation to service avalibility in all regions may prevent the solution from deploying storage accounts, or the AES. This solution was tested with the following resource group `New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"`
 #### The deployment of my services is taking a long time (over two hours), is that normal?
-> The total deployment of the services is estimated to take approximately 2.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
+> The total deployment of the services is estimated to take approximately 1.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
 
 # SUPPORT PROCESS
