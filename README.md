@@ -764,8 +764,13 @@ The following example is used to illustrate the ARM information for `contosowebs
 
 >-   **\_artifactsLocation**: `https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master`
 >-   **\_artifactsLocationSasToken**: NULL
+>-   **sslORnon-ssl**:[Choose either ssl or non-ssl]
 >-   **certData**: [The Contoso Base-64 SSL string]
 >-   **certPassword**: [Password you created for the SSL cert]
+>-   **aseCertData**:[The ASE ILB Certificate (.cer) Base-64 SSL string]
+>-   **asePfxBlobString**:[The ASE ILB Certificate (.pfx) Base-64 SSL string]
+>-   **asePfxPassword**:[Password for ASE ILB .pfx certificate]
+>-   **aseCertThumbprint**:[Certificate Thumbprintor ASE ILB .pfx certificate]
 >-   **bastionHostAdministratorUserName**: `bastionadmin`
 >-   **bastionHostAdministratorPassword**: [Create a secure password]
 >-   **SqlAdministratorLoginUserName**: `sqladmin`
@@ -1364,7 +1369,7 @@ An [App Service Environment](https://docs.microsoft.com/en-us/azure/app-service-
 -   [Internal Load Balancing mode](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-environment-with-internal-load-balancer) (mode 3)
 -   [Disable TLS 1.0](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings) – a deprecated TLS protocol from PCI DSS standpoint
 -   [Change TLS Cipher](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-custom-settings)
--   [Control inbound traffic N/W    ports](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-control-inbound-traffic)  
+-   [Control inbound traffic N/W    ports](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-control-inbound-traffic) 
 -   [WAF – Restrict Data](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-web-application-firewall)
 -   [Allow SQL DB traffic](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-app-service-environment-network-architecture-overview)
 
@@ -1438,14 +1443,14 @@ recommends that a custom domain be purchased with [an SSL package](https://d.doc
 Microsoft offers the ability to create a domain and request an SSL certificate from a Microsoft partner.
 #### Why do I need local admin rights to run the `./pre-post-deployment` script ?
 > PowerShell modules require elivated privileges to install service modules on your PC. This solution provides several scripts, and commands to verify that all the modules are installed, in the 'Client software requirements' section of the deployment guide.
-
+#### Why do Application gateway backend health status showing `unhealthy` ?
+> This deployment assumes that VIP address [ASE ILB >> Properties >> Virtual IP Address] assinged to ASE ILB would be 10.0.3.8 (observed behaviour). However, it might get changed to 10.0.3.9. So, if you find application gateway backend health as `un-healthy`, verify that ASE ILB VIP address and application backend pool targets are same. If they differ, please update application gateway backend pool targets with ASE ILB VIP. (https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal#add-servers-to-backend-pools)
 #### How do I set up the administrator properly to use this solution.
 > Review the 'Configure your global admin for the solution' section of the installation guide
 #### I get a script failed, error. User permission error. Insuficient permission error?
 > Review 'LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS' section of the installation guide
 #### The ARM template fails to run because of my password complexity?
-> **NOTE**: Strong passwords **(Minimum 15 characters, with Upper and Lower case letters, at least 1 number and 1 special character)** are recommended throughout
-the solution.
+> **NOTE**: Strong passwords **(Minimum 15 characters, with Upper and Lower case letters, at least 1 number and 1 special character)** are recommended throughout the solution.
 #### The ARM template fails to deploy 'xxxxxxxx' service
 > Currently this solution requires that you deploy in US EAST. Limitation to service avalibility in all regions may prevent the solution from deploying storage accounts, or the AES. This solution was tested with the following resource group `New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"`
 #### The deployment of my services is taking a long time (over two hours), is that normal?
