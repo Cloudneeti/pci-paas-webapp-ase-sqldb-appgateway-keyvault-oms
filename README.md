@@ -15,9 +15,9 @@
 *NOTE: Certain recommendations in this paper may result in increased data, network, or compute resource usage in Azure, and may increase a customer’s Azure license or subscription costs.*
 *The solution in this document is intended as a reference architecture pilot and should not be used as-is for production purposes.  Achieving PCI compliance requires that customers consult with their Qualified Security Assessor.*
 
-*This solution was developed cooperativly by Microsoft and Avyan consulting.*
+*This solution was developed cooperatively by Microsoft and Avyan consulting.*
 
-# ACKNOWLEDGEMENTS
+# ACKNOWLEDGMENTS
 
 ### Authors of the document 
 
@@ -43,7 +43,7 @@ License <a href="https://opensource.org/licenses/MIT" target="_blank"> MIT </a>
 
 # TABLE OF CONTENTS 
 <!-- TOC -->
-- [ACKNOWLEDGEMENTS](#acknowledgements)
+- [ACKNOWLEDGMENTS](#acknowledgments)
 - [TABLE OF CONTENTS](#table-of-contents)
 - [SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO](#solution-description-objective-and-scenario)
 - [USER SCENARIO](#user-scenario)
@@ -54,8 +54,10 @@ License <a href="https://opensource.org/licenses/MIT" target="_blank"> MIT </a>
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [FAQ AND FIXES](#faq-and-fixes)
 - [THREAT MODEL](#threat-model)
+- [AZURE MARKETPLACE - 3RD PARTY GUIDANCE](#azure-marketplace-3rd-party-guidance)
 - [SUPPORT PROCESS](#support-process)
 <!-- /TOC -->
+
 
 
 # SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO
@@ -1447,11 +1449,23 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 > Review 'LOGGING INTO POWERSHELL WITH CORRECT CREDENTIALS' section of the installation guide
 #### The ARM template fails to run because of my password complexity?
 > **NOTE**: Strong passwords **(Minimum 15 characters, with Upper and Lower case letters, at least 1 number and 1 special character)** are recommended throughout the solution.
-#### The ARM template fails to deploy 'xxxxxxxx' service
+#### The ARM template fails to deploy `xxxxxxxx` service
 > Currently this solution requires that you deploy in US EAST. Limitation to service avalibility in all regions may prevent the solution from deploying storage accounts, or the AES. This solution was tested with the following resource group `New-AzureRmResourceGroup -Name [RESOURCE GROUP NAME] -Location "East US"`
 #### The deployment of my services is taking a long time (over two hours), is that normal?
 > The total deployment of the services is estimated to take approximately 1.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
+
+# AZURE MARKETPLACE - 3RD PARTY GUIDANCE
+The following Azure Marketplace products are recommendations to help you achieve and manage continuous compliance  
+
+| Security Layer                           	| Azure Marketplace Product(s)                                                                                                                                         	|
+|------------------------------------------	|----------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| Continuous Compliance Monitoring         	| [CloudNeeti - Continuous Governance of Azure Assets](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/cloudneeti.cloudneeti_enterpise?tab=Overview)     	|
+| For Network Security and Management      	| [Azure Marketplace - Network Security](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/networking?page=1)                                     	|
+| or extending Identity Security           	| [Azure Marketplace - Security + Identity](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/security-identity?page=1)                           	|
+| For extending Monitoring and Diagnostics 	| [Monitoring + Diagnostics](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/monitoring-management?page=1&subcategories=monitoring-diagnostics) 	|
+
+ 
 
 # SUPPORT PROCESS
 
