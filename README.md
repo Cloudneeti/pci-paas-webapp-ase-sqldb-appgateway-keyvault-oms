@@ -54,7 +54,7 @@ License <a href="https://opensource.org/licenses/MIT" target="_blank"> MIT </a>
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
 - [FAQ AND FIXES](#faq-and-fixes)
 - [THREAT MODEL](#threat-model)
-- [AZURE MARKETPLACE - 3RD PARTY GUIDANCE](#azure-marketplace-3rd-party-guidance)
+- [AZURE MARKETPLACE - 3RD PARTY GUIDANCE](#azure-marketplace---3rd-party-guidance)
 - [SUPPORT PROCESS](#support-process)
 <!-- /TOC -->
 
@@ -1461,9 +1461,9 @@ The following Azure Marketplace products are recommendations to help you achieve
 | Security Layer                           	| Azure Marketplace Product(s)                                                                                                                                         	|
 |------------------------------------------	|----------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
 | Continuous Compliance Monitoring         	| [CloudNeeti - Continuous Governance of Azure Assets](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/cloudneeti.cloudneeti_enterpise?tab=Overview)     	|
-| For Network Security and Management      	| [Azure Marketplace - Network Security](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/networking?page=1)                                     	|
-| or extending Identity Security           	| [Azure Marketplace - Security + Identity](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/security-identity?page=1)                           	|
-| For extending Monitoring and Diagnostics 	| [Monitoring + Diagnostics](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/monitoring-management?page=1&subcategories=monitoring-diagnostics) 	|
+| Network Security and Management      	| [Azure Marketplace: Network Security](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/networking?page=1)                                     	|
+| Extending Identity Security           	| [Azure Marketplace: Security + Identity](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/security-identity?page=1)                           	|
+| Extending Monitoring and Diagnostics 	| [Azure Marketplace: Monitoring + Diagnostics](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/monitoring-management?page=1&subcategories=monitoring-diagnostics) 	|
 
  
 
