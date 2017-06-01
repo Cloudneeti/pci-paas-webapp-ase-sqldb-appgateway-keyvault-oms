@@ -14,13 +14,18 @@ Param(
 )
 
 $ErrorActionPreference = 'Stop'
-#Depends on Azure AD Preview Module
-if (-not (Get-Module -Name AzureADPreview)) 
-{
-    Write-Host "Installing ADPreview Module"
-  #  Install-Module AzureADPreview -AllowClobber
-    Import-Module AzureADPreview
-}
+
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
+############################################################
+# Install Azure Active Directory Powershell Modules
+############################################################
+    if (-not (Get-Module -ListAvailable AzureAD)) 
+    { 
+        Install-Module AzureAD -Force -AllowClobber;
+        Write-Host "Installed AzureAD Module"
+    }
+
 
 Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Gray
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
@@ -37,6 +42,10 @@ $newUserPasswordProfile.forceChangePasswordNextLogin = $false
     try
     {
         $adAdmin = Get-AzureADUser -ObjectId $globalADAdminName -ErrorAction SilentlyContinue
+		if ($adAdmin){
+			Write-Host "`tUpdating $globalADAdminName with new password - $globalADAdminPassword" -ForegroundColor Yellow
+			Set-AzureADUser -ObjectId $adAdmin.ObjectID -PasswordProfile $newUserPasswordProfile
+		}
     }
     catch
     {
@@ -45,26 +54,41 @@ $newUserPasswordProfile.forceChangePasswordNextLogin = $false
         $adAdmin = New-AzureADUser -DisplayName "Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "admin" -UserPrincipalName $globalADAdminName
     }
 
-
 #Get the Compay AD Admin ObjectID
     $companyAdminObjectId = Get-AzureADDirectoryRole | Where {$_."DisplayName" -eq "Company Administrator"} | Select ObjectId
 
 #make the new user the company admin aka Global AD administrator
     try
     {
-        Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId -ErrorAction SilentlyContinue
-        Write-Host "`tSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
-        
-    } catch {}
-
+        if((Get-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId).UserPrincipalName -contains $globalADAdminName){
+			Write-Host "$globalADAdminName is already granted with Global Admin Permission"
+		}
+		Else{
+			Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId -ErrorAction SilentlyContinue
+			Write-Host "`tSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
+        }
+    } catch {$Error[0].Exception}
+Write-Host ("Step 5: Assinging Owner permission on a Subscription" ) -ForegroundColor Gray
 # Assinging Owner permission on a Subscription
     try
     {
-        New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId"
-        Write-Host "`tSuccessfully granted Owner permissions to the Admin user $globalADAdminName on Subscription $SubscriptionId" -ForegroundColor Gray
-    } catch {}
+		Write-Host "`tLogin to Azure Subscription with Global Admin to assign owner permission to $globalADAdminName" -ForegroundColor Gray
+		if (Login-AzureRmAccount -SubscriptionId $SubscriptionId)
+		{Write-Host "`tLogin was successful" -ForegroundColor Gray}
+		if((Get-AzureRmRoleAssignment -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId").SignInName -contains "$globalADAdminName"){
+			Write-Host "`tOwner permissions already granted to the Admin user $globalADAdminName" -ForegroundColor Gray
+		}
+		Else{
+			Write-Host "`tAssigning Subscription Owner permission to $globalADAdminName" -ForegroundColor Gray
+			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId" 
+			Write-Host "`tSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
+		}
 
-Write-Host ("Global AD Admin User created Successfully. Details are" ) -ForegroundColor Gray
+    } catch {
+		$Error[0].Exception
+	}
+
+Write-Host ("`n`nGlobal AD Admin User created Successfully. Details are" ) -ForegroundColor Gray
 Write-Host ("`tUser Name: $globalADAdminName") -ForegroundColor Red -NoNewline
 Write-Host ("`tPassword: " + $newUserPasswordProfile.password) -ForegroundColor Red
 
