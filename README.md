@@ -1454,6 +1454,9 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 #### The deployment of my services is taking a long time (over two hours), is that normal?
 > The total deployment of the services is estimated to take approximately 1.5 hours from when the you select **Purchase** on the ARM template. ASE takes 2 hours to provision.
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
+#### How do I use this solution in my production deployment, environment?
+This solution including the scripts, template, and documentation are designed to help you build a pilot or demo site. Utilizing this solution does not provide a customer ready to run solution, it only illustrates the components required to build for a secure and compliant end to end solution. For instance, Custom Host Names, SSL Certificates, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions, Key vault rotation policies, usage of existing AD Admins and RBAC roles, usage of existing AD Applications and Service Principals will require customization and change to meet your custom production ready solution.
+
 
 # AZURE MARKETPLACE - 3RD PARTY GUIDANCE
 The following Azure Marketplace products are recommendations to help you achieve and manage continuous compliance  
@@ -1478,6 +1481,3 @@ The next version pre-release, fixes and updates are located at [Avyan Consulting
   ![](images/deploy.png)
   
   
-> ### Disclaimer  
-> These template are only for pilots or tryouts. There are many things that will need to retrofitted for your application and production purposes.   
-> **e.g**. Configurations for Custom Host Names, SSL Certs, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions, Key vault rotation policies, usage of existing AD Admins and RBAC roles, usage of existing AD Applications and ServicePrincipals and many more.
