@@ -9,9 +9,11 @@
 Param(
 	[string] [Parameter(Mandatory=$true)] $azureADDomainName, # Provide your Azure AD Domain Name
     [string] [Parameter(Mandatory=$true)] $tenantId, # Provide your Azure AD Tenant ID
+	[string] [Parameter(Mandatory=$true)] $SubscriptionId, # Provide your Azure Subscrition ID
     [string] [Parameter(Mandatory=$true)] $globalADAdminPassword # Provide an AD Admin Password for the user admin@$azureADDomainName that complies to your AD's password policy. 
 )
 
+$ErrorActionPreference = 'Stop'
 #Depends on Azure AD Preview Module
 if (-not (Get-Module -Name AzureADPreview)) 
 {
@@ -23,8 +25,6 @@ if (-not (Get-Module -Name AzureADPreview))
 Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Gray
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Gray
-
-
 Write-Host ("Step 3: Create Global Admin User Id" ) -ForegroundColor Gray
 $globalADAdminName = "admin@"+$azureADDomainName
 Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Gray
@@ -55,6 +55,13 @@ $newUserPasswordProfile.forceChangePasswordNextLogin = $false
         Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId -ErrorAction SilentlyContinue
         Write-Host "`tSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
         
+    } catch {}
+
+# Assinging Owner permission on a Subscription
+    try
+    {
+        New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId"
+        Write-Host "`tSuccessfully granted Owner permissions to the Admin user $globalADAdminName on Subscription $SubscriptionId" -ForegroundColor Gray
     } catch {}
 
 Write-Host ("Global AD Admin User created Successfully. Details are" ) -ForegroundColor Gray
