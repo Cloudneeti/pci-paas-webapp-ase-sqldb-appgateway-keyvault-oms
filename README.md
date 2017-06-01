@@ -1476,3 +1476,8 @@ The next version pre-release, fixes and updates are located at [Avyan Consulting
 
 
   ![](images/deploy.png)
+  
+  
+> ### Disclaimer  
+> These template are only for pilots or tryouts. There are many things that will need to retrofitted for your application and production purposes.   
+> **e.g**. Configurations for Custom Host Names, SSL Certs, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions, Key vault rotation policies, usage of existing AD Admins and RBAC roles, usage of existing AD Applications and ServicePrincipals and many more.
