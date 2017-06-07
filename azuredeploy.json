@@ -222,7 +222,7 @@
           "ApplicationObjectId": {
             "value": "[parameters('azureAdApplicationObjectId')]"
           },
-          "ApplicationClientId": {
+          "applicationClientId": {
             "value": "[parameters('azureAdApplicationClientId')]"
           },          
           "storageAccountName": {

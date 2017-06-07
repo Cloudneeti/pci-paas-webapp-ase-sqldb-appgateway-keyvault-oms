@@ -62,7 +62,7 @@
     "applicationObjectId": {
       "type": "string"
     },
-    "ApplicationClientId": {
+    "applicationClientId": {
       "type": "string"
     },    
     "retentionPolicy": {
@@ -74,11 +74,7 @@
     }
   },
   "variables": {
-    "apiVersion": "2016-01-01",
-    "appKeysPermissions": [ "all" ],
-    "appSecretPermissions": [ "all" ],
-    "userKeysPermissions": [ "all" ],
-    "userSecretPermissions": [ "all" ]
+    "apiVersion": "2016-01-01"
   },
   "resources": [
     {
@@ -134,13 +130,45 @@
           {
             "tenantId": "[subscription().TenantId]",
             "objectId": "[parameters('applicationObjectId')]",
-            "applicationId": "[parameters('ApplicationClientId')]",
+            "applicationId": "[parameters('applicationClientId')]",
             "permissions": {
               "keys": [
-                "[variables('appKeysPermissions')]"
+                "encrypt",
+                "decrypt",
+                "wrapKey",
+                "unwrapKey",
+                "sign",
+                "verify",
+                "get",
+                "list",
+                "create",
+                "update",
+                "import",
+                "delete",
+                "backup",
+                "restore"
               ],
               "secrets": [
-                "[variables('appSecretPermissions')]"
+                "get",
+                "list",
+                "set",
+                "delete"
+              ],
+              "certificates": [
+                "get",
+                "list",
+                "delete",
+                "create",
+                "import",
+                "update",
+                "managecontacts",
+                "getissuers",
+                "listissuers",
+                "setissuers",
+                "deleteissuers",
+                "manageissuers",
+                "recover",
+                "purge"
               ]
             }
           }
