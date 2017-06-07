@@ -196,7 +196,7 @@
       "layer": "dummy",
       "environment": "Pilot",
       "projectname": "PCI PaaS Reference Architecture",
-      "dataprofile": "PHI(Protected Health Information)",
+      "dataprofile": "PCI-CCTD (Credit Card Transaction Data)",
       "department": "IT - Avyan Consulting",
       "businessUnit": "Cloud - IT COE"
     }
