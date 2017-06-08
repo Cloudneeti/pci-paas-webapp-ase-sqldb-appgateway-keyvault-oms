@@ -3,14 +3,6 @@
  [Parameter(Mandatory=$true)]
  [String] $ResourceGroup,
 
- <# <Provide your Azure AD Global Admin UserName>
- [string] [Parameter(Mandatory=$true)] 
- $GlobalAdminUserName,
-
- # <Provide your Azure AD Global Admin Password>
- [string] [Parameter(Mandatory=$true)] 
- $GlobalAdminPassword,
- #>
  [Parameter(Mandatory=$true)]
  [String] $AutomationAccountName,
 
@@ -108,14 +100,10 @@
     Write-Error -Message "Please install the latest Azure PowerShell and retry. Relevant doc url : https://docs.microsoft.com/powershell/azureps-cmdlets-docs/ "
     return
  }
-<#
- $secpasswd = ConvertTo-SecureString “$GlobalAdminPassword” -AsPlainText -Force
- $mycreds = New-Object System.Management.Automation.PSCredential (“$GlobalAdminUserName”, $secpasswd)
- Connect-MsolService -Credential $mycreds
- $Login = Login-AzureRmAccount -SubscriptionId $SubscriptionID -Environment $EnvironmentName -Credential $mycreds
- #Login-AzureRmAccount -EnvironmentName $EnvironmentName
+
+ Login-AzureRmAccount -EnvironmentName $EnvironmentName
  $Subscription = Select-AzureRmSubscription -SubscriptionId $SubscriptionId
-#>
+
  # Create a Run As account by using a service principal
  $CertifcateAssetName = "AzureRunAsCertificate"
  $ConnectionAssetName = "AzureRunAsConnection"
