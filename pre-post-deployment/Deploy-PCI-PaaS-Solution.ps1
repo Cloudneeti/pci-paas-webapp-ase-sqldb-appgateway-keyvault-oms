@@ -35,7 +35,7 @@ param
 	[string] [Parameter(Mandatory=$true)] 
 	$globalAdminUserName,
 	# <Provide your Azure AD Global Admin Password>
-	[securestring] [Parameter(Mandatory=$true)] 
+	[string] [Parameter(Mandatory=$true)] 
     $globalAdminPassword,
     # <Provide Supported Location/Region for Automation Account >
     [string] [Parameter(Mandatory=$true)] 
@@ -55,6 +55,9 @@ param
 	# <Provide Certificate path to use your own certificate on application gateway.>
     [string]
 	$certificatePath,
+	# <Enter password for the certificate provided.>
+    [string]
+	$certificatePassword,    
 	# <Provide Email address for SQL Threat Detection Alerts.>
     [string]
     $sqlTDAlertEmailAddress = "internet@mail.com"
@@ -102,8 +105,8 @@ Begin
     ###  Login to Azure 
 
     Write-Host "`nLogging into Azure Powershell.."
-    #$secpasswd = ConvertTo-SecureString $GlobalAdminPassword -AsPlainText -Force
-    $mycreds = New-Object System.Management.Automation.PSCredential ($GlobalAdminUserName, $globalAdminPassword)
+    $secpasswd = ConvertTo-SecureString $GlobalAdminPassword -AsPlainText -Force
+    $mycreds = New-Object System.Management.Automation.PSCredential ($GlobalAdminUserName, $secpasswd)
     Connect-MsolService -Credential $mycreds
     $Login = Login-AzureRmAccount -SubscriptionId $SubscriptionID -Credential $mycreds
     Save-AzureRmContext -Path $PWD\Scripts\auth.json -Force
@@ -158,7 +161,7 @@ Process
     if($enableSSL){
         $sslORnon_ssl = "ssl"
 	    if($CertificatePath) {
-            .\Scripts\PreDeployment.ps1 -azureADDomainName $AzureADDomainName -subscriptionID $subscriptionID -suffix $suffix -sqlADAdminPassword $commonPassword -AzureADApplicationClientSecret $commonPassword -customHostName $CustomDomain -enableSSL $true -certificatePath $CertificatePath
+            .\Scripts\PreDeployment.ps1 -azureADDomainName $AzureADDomainName -subscriptionID $subscriptionID -suffix $suffix -sqlADAdminPassword $commonPassword -AzureADApplicationClientSecret $commonPassword -customHostName $CustomDomain -enableSSL $true -certificatePath $CertificatePath -certificatePassword $certificatePassword
 	    }
 	    Else{
             Write-Output ""
