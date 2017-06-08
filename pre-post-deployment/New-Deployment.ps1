@@ -85,7 +85,7 @@
 	    Set-ExecutionPolicy RemoteSigned;
         cd $PSScriptRoot
         Write "Connecting to Azure.. "
-        Import-AzureRmContext -Path "$pwd\Scripts\auth.json" -ErrorAction Stop
+        Import-AzureRmContext -Path "$pwd\auth.json" -ErrorAction Stop
         <#
         $mycreds = Get-Credential
         $Login = Login-AzureRmAccount -SubscriptionId $SubscriptionID -Credential $mycreds

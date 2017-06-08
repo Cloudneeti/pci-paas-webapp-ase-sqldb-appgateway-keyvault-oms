@@ -35,6 +35,5 @@
     
 	If (Get-Module -ListAvailable -Name SqlServer) 
 	{Get-Module -ListAvailable -Name SqlServer | Import-Module -Force }
-	Else{
-		Throw "SQL Powershell Modules not available. Please follow deployment guide for missing modules and installation steps."
+	Else{ Install-Module -Name SqlServer -AllowClobber; Write "Installed SqlServer Module. Please follow deployment guide for missing modules and installation steps."
 	}	
