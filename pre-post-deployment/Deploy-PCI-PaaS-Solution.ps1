@@ -13,11 +13,20 @@ that are used to deploy a PCI-Compliant-PaaS-Solution reference architecture
 and enable One-Click Deployment.
 .DESCRIPTION
 This script helps you deploy entire Azure Blueprint - Payment processing solution
-for PCI DSS enablement by executing this single deployment script.
+for PCI DSS enablement by executing this single deployment script.You need download 
+Deploy-PCI-PaaS-Solution.ps1 to a folder and then follow example to execute the script.
 .EXAMPLE
-<!<SnippetExample>!>
+& "C:\Users\khan_\Desktop\Deployment\Deploy-PCI-PaaS-Solution.ps1" -resourceGroupName deploy6 
+-location eastus -globalAdminUserName admin1@avyanconsulting.com -globalAdminPassword 123jgrlijg37r3!
+ -automationAccLocation eastus2 -subscriptionID 8e082b0c-f760-4a7e-bd98-e1be24f50cd2 -suffix 
+ azurepcisamples -customDomain azurepcisamples.com -enableSSL $true -sqlTDAlertEmailAddress "abc@xyz.com"
 .EXAMPLE
-<!<SnippetAnotherExample>!>
+& "C:\Users\khan_\Desktop\Deployment\Deploy-PCI-PaaS-Solution.ps1" -resourceGroupName deploy6 
+-location eastus -globalAdminUserName admin1@avyanconsulting.com -globalAdminPassword 123jgrlijg37r3! 
+-automationAccLocation eastus2 -subscriptionID 8e082b0c-f760-4a7e-bd98-e1be24f50cd2 -suffix azurepcisamples 
+-customDomain azurepcisamples.com -enableSSL $true -certificatePath **Your Certificate path** 
+-certificatePassword **Your certificate password** -sqlTDAlertEmailAddress abc@xyz.com
+
 .EXAMPLE
 <!<SnippetAnotherExample>!>
 #>
