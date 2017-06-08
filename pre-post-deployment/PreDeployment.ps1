@@ -11,6 +11,7 @@ Param(
 	[string] $customHostName, # Provide CustomHostName which will be used for creating ASE subdomain.
 	[bool]   $enableSSL, # Provide boolean input to enable or disable SSL on application gateway 
 	[string] $certificatePath, # Provide Certificate path if you want to provide your own Application gateway certificate.
+	[string] $certificatePassword # Enter password for the certificate provided.
 )
 
 $ErrorActionPreference = 'Stop'
