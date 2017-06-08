@@ -1,56 +1,39 @@
-Set-ExecutionPolicy RemoteSigned;
+	$ErrorActionPreference = 'Stop'
+	Set-ExecutionPolicy RemoteSigned;
+	Write "Installing Modules if not already installed.."
 
-############################################################
-# Install Azure Resource Manager Powershell Modules
-############################################################
-    if (-not (Get-Module -Name AzureRM)) 
-    { 
-        Install-Module AzureRM -AllowClobber;
-        Write-Host "Installed AzureRM Module"
-    }
+	############################################################
+	# Install Azure Resource Manager Powershell Modules
+	############################################################
+	If (Get-Module -ListAvailable -Name AzureRM*) 
+	{Get-Module -ListAvailable -Name AzureRM* | Import-Module -NoClobber -Force }
+	Else{Install-Module AzureRM -AllowClobber; Write-Host "Installed AzureRM Module"}
 
-############################################################
-# Install Azure Active Directory Powershell Modules
-############################################################
-    if (-not (Get-Module -Name AzureAD)) 
-    { 
-        Install-Module AzureAD -AllowClobber;
-        Write-Host "Installed AzureAD Module"
-    }
+	############################################################
+	# Install Azure Active Directory Powershell Modules
+	############################################################
 
-    if (-not (Get-Module -Name AzureADPreview)) 
-    {
-        Install-Module AzureADPreview -AllowClobber
-        Import-Module AzureADPreview
-        Write-Host "Installed ADPreview Module"
-    }
+	If (Get-Module -ListAvailable -Name AzureAD) 
+	{Get-Module -ListAvailable -Name AzureAD | Import-Module -NoClobber -Force }
+	Else{Install-Module AzureAD -AllowClobber; Write-Host "Installed AzureAD Module"}	
+	############################################################
+	# Install Auditing and OMS Powershell Modules
+	############################################################
+	# 
 
-############################################################
-# Install Auditing and OMS Powershell Modules
-############################################################
-# 
-    if (-not (Get-Module -Name Enable-AzureRMDiagnostics)) 
-    {
-        Install-Script -Name Enable-AzureRMDiagnostics -Force;
-        Install-Module -Name Enable-AzureRMDiagnostics
-        Write-Host "Installed Enable-AzureRMDiagnostics Module"
-    }
-    if (-not (Get-Module -Name AzureDiagnosticsAndLogAnalytics)) 
-    {
-        Install-Script -Name AzureDiagnosticsAndLogAnalytics -Force;
-        Install-Module -Name AzureDiagnosticsAndLogAnalytics
-        Write-Host "Installed AzureDiagnosticsAndLogAnalytics Module"
-    }
+	If (!(Get-InstalledScript -Name Enable-AzureRMDiagnostics)) 
+	{Install-Script -Name Enable-AzureRMDiagnostics -Force}
 
+	If (Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics) 
+	{Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics | Import-Module -Force }
+	Else{Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber; Write-Host "Installed AzureDiagnosticsAndLogAnalytics Module"}
 
-############################################################
-# Install SQL Server Powershell Modules
-############################################################
-# Test Import SQL Server Modules. If this fails, please follow deployment guide for installing SQL Server Client components
+	############################################################
+	# Install SQL Server Powershell Modules
+	############################################################
+	# Test Import SQL Server Modules. If this fails, please follow deployment guide for installing SQL Server Client components
     
-    if (-not (Get-Module -Name SqlServer)) 
-    {
-        Write-Host "SQL Powershell Modules not available. Please follow deployment guide for installing SQL Server Client components and powershell modules will get installed along with it."
-    }
-   
-Read-Host "Check if there were any errors. Please follow deployment guide for missing modules and installation steps"
+	If (Get-Module -ListAvailable -Name SqlServer) 
+	{Get-Module -ListAvailable -Name SqlServer | Import-Module -Force }
+	Else{ Install-Module -Name SqlServer -AllowClobber; Write "Installed SqlServer Module. Please follow deployment guide for missing modules and installation steps."
+	}	

@@ -3,6 +3,14 @@
  [Parameter(Mandatory=$true)]
  [String] $ResourceGroup,
 
+ <# <Provide your Azure AD Global Admin UserName>
+ [string] [Parameter(Mandatory=$true)] 
+ $GlobalAdminUserName,
+
+ # <Provide your Azure AD Global Admin Password>
+ [string] [Parameter(Mandatory=$true)] 
+ $GlobalAdminPassword,
+ #>
  [Parameter(Mandatory=$true)]
  [String] $AutomationAccountName,
 
@@ -91,8 +99,8 @@
  New-AzureRmAutomationConnection -ResourceGroupName $ResourceGroup -AutomationAccountName $automationAccountName -Name $connectionAssetName -ConnectionTypeName $connectionTypeName -ConnectionFieldValues $connectionFieldValues
  }
 
- Import-Module AzureRM.Profile
- Import-Module AzureRM.Resources
+ Import-Module AzureRM.Profile ##$$BUG$$ ## Wont this fail if this is not run as admin on local box?. Not a good security practice, fail if not loaded... 
+ Import-Module AzureRM.Resources ##$$BUG$$ ## Wont this fail if this is not run as admin on local box?. Not a good security practice, fail if not loaded... 
 
  $AzureRMProfileVersion= (Get-Module AzureRM.Profile).Version
  if (!(($AzureRMProfileVersion.Major -ge 2 -and $AzureRMProfileVersion.Minor -ge 1) -or ($AzureRMProfileVersion.Major -gt 2)))
@@ -100,10 +108,14 @@
     Write-Error -Message "Please install the latest Azure PowerShell and retry. Relevant doc url : https://docs.microsoft.com/powershell/azureps-cmdlets-docs/ "
     return
  }
-
- Login-AzureRmAccount -EnvironmentName $EnvironmentName
+<# ##$$BUG$$ ## What is this? remove if dummy code.
+ $secpasswd = ConvertTo-SecureString “$GlobalAdminPassword” -AsPlainText -Force
+ $mycreds = New-Object System.Management.Automation.PSCredential (“$GlobalAdminUserName”, $secpasswd)
+ Connect-MsolService -Credential $mycreds
+ $Login = Login-AzureRmAccount -SubscriptionId $SubscriptionID -Environment $EnvironmentName -Credential $mycreds
+ #Login-AzureRmAccount -EnvironmentName $EnvironmentName
  $Subscription = Select-AzureRmSubscription -SubscriptionId $SubscriptionId
-
+#>
  # Create a Run As account by using a service principal
  $CertifcateAssetName = "AzureRunAsCertificate"
  $ConnectionAssetName = "AzureRunAsConnection"
@@ -148,7 +160,7 @@
       if ($EnterpriseCertPathForClassicRunAsAccount -and $EnterpriseCertPlainPasswordForClassicRunAsAccount ) {
       $PfxCertPathForClassicRunAsAccount = $EnterpriseCertPathForClassicRunAsAccount
       $PfxCertPlainPasswordForClassicRunAsAccount = $EnterpriseCertPlainPasswordForClassicRunAsAccount
-      $UploadMessage = $UploadMessage.Replace("#CERT#", $PfxCertPathForClassicRunAsAccount)
+      $UploadMessage = $UploadMessage.Replace("#CERT#", $PfxCertPathForClassicRunAsAccount) ##$$BUG$$ ## is this correct?
  } else {
       $ClassicRunAsAccountCertificateName = $AutomationAccountName+$ClassicRunAsAccountCertifcateAssetName
       $PfxCertPathForClassicRunAsAccount = Join-Path $env:TEMP ($ClassicRunAsAccountCertificateName + ".pfx")
