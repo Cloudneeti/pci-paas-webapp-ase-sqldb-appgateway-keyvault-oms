@@ -1,50 +1,48 @@
-# Refer to the README.md (located here https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/) 
-#   and Deployment Guide (located in the documents folder of the same github repo
+# Refer to the README.md document for deployment 
 #
-# This is a Post-Deployment script that is to be run after a successful ARM deployment 
+# This is a Post-Deployment script that is to be run after a successful Azure Resource Manager Template deployment 
 # Pre-Requisites to run this script
-#      1) Global Azure AD admin credentials that has at least contributor access to the Azure Subscription
-#      2) Should have successfully deployed pre-Deployment script and Azure ARM deployment
+#      1) Global Azure AD admin credentials that has contributor access to the Azure Subscription
+#      2) Successfully deployed pre-Deployment script and Azure Azure Resource Manager Template deployment
 #
-# The script does the following things 
-#      1) Downloads and copies the SQL bacpac file to a new Azure storage account
-#      2) Updates SQL DB firewall to allow you (your clientIp) access to manage SQL DB AND Allowing the WebApp deployed on ASE (the ASE outbound virtual IP)
-#      3) Data Mask few DB columns (ensuring that only the SQL Admins be able to see the detailed info in the Database) everyone else sees them as masked .. 
-#      4) Enable Always Encrypt for a few columns (e.g. Credit card)
-#      5) Makes an AD User to the the SQL AD Admin [refer command Set-AzureRmSqlServerActiveDirectoryAdministrator]
-#      6) Ensures Diagnotics logs are sent to OMS Workspace (script assumes that there's only one WS in the resourcegroup created by the ARM template)
+# This script will:
+#      1) Downloads and copy the SQL bacpac file to a new Azure storage account
+#      2) Updates SQL DB firewall to allow you (your clientIp) access to manage SQL DB and Allow the WebApp to be deployed using ASE 
+#      3) Enable Always Encrypt in SQL (e.g. Credit card)
+#      4) Set up the correct roles for the SQL AD Admin [refer command Set-AzureRmSqlServerActiveDirectoryAdministrator]
+#      6) Enable logs are sent to OMS Workspace (script assumes that there's only one WS in the resourcegroup created by the Azure Resource Manager Template)
 #
-# Enjoy the sample.
+
 
 <#
-# If you'd like to run this from w/i a powershell_ISE or visual studio code, you could try replacing and uncommenting this code block AND commenting out the parameters block.
+# for advanced use, you can uncomment this code block AND commenting out the parameters block.
 $SubscriptionId = <your sub id> # Provide your Azure subscription ID
-$ResourceGroupName = '001-azurepcisamples-avyan' # Provide Resource Group Name Created through ARM template
-$ClientIPAddress = <your client IP address>  # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
+$ResourceGroupName = '001-azurepcisamples' # Provide Resource Group Name Created through Azure Resource Manager Template  template
+$ClientIPAddress = <your client IP address>  # Eg: 168.1.1.1 Provide Client IP address (get by running ipconfig in cmd prompt)
 $ASEOutboundAddress = <virtual outbound IP address of the ASE> # Provide ASE Outbound address we will get it in ASE properties in Azure portal
-$SQLServerName = <your sql server name> # Provide Sql Server name (not required full name) Created through ARM template
-$SQLServerAdministratorLoginPassword = <your sqlserver admin password> # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" 
-$KeyVaultName = <your keyvault name> # Provide Key Vault Name Created through ARM template
-$AzureAdApplicationClientId = <your app id> # AD Application ClientID - the same one you used in the ARM template
-$AzureAdApplicationClientSecret = <your password> # AD Application ClientID - the same one you used in the ARM template
-$SqlAdAdminUserName = <your sqladadmin user principal name> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserName
-$SqlAdAdminUserPassword = <your password> # Provide SQL AD Administrator Name same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
+$SQLServerName = <your sql server name> # Provide Sql Server name (not required full name) Created through Azure Resource Manager Template  
+$SQLServerAdministratorLoginPassword = <your sqlserver admin password> # Provide admin password of sql server used for Azure Resource Manager Template parameter "sqlAdministratorLoginPassword" 
+$KeyVaultName = <your keyvault name> # Provide Key Vault Name Created through Azure Resource Manager Template  
+$AzureAdApplicationClientId = <your app id> # AD Application ClientID - the same one you used in the Azure Resource Manager Template  
+$AzureAdApplicationClientSecret = <your password> # AD Application ClientID - the same one you used in the Azure Resource Manager Template  
+$SqlAdAdminUserName = <your sqladadmin user principal name> # Provide SQL AD Administrator Name as used for Azure Resource Manager Template  Deployment for parameter sqlAdAdminUserName
+$SqlAdAdminUserPassword = <your password> # Provide SQL AD Administrator Name as used for Azure Resource Manager Template Deployment for parameter sqlAdAdminUserPassword provided for use consistency
 #>
 
 
 Param(
 	[string] [Parameter(Mandatory=$true)] $SubscriptionId , # Provide your Azure subscription ID
-    [string] [Parameter(Mandatory=$true)] $ResourceGroupName , # Provide Resource Group Name Created through ARM template
+    [string] [Parameter(Mandatory=$true)] $ResourceGroupName , # Provide Resource Group Name Created through Azure Resource Manager Template  
 	[string] [Parameter(Mandatory=$true)] $ClientIPAddress , # Eg: 168.62.48.129 Provide Client IP address (get by running ipconfig in cmd prompt)
 	[string] [Parameter(Mandatory=$true)] $ASEOutboundAddress , # Provide ASE Outbound address, we will get it in ASE properties in Azure portal
-	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $SQLServerAdministratorLoginUserName, # Provide admin user name of sql server used for ARM template parameter "sqlAdministratorLoginUserName" 
-	[string] [Parameter(Mandatory=$true)] $SQLServerAdministratorLoginPassword, # Provide admin password of sql server used for ARM template parameter "sqlAdministratorLoginPassword" 
-	[string] [Parameter(Mandatory=$true)] $KeyVaultName , # Provide Key Vault Name Created through ARM template
-	[string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientId , # AD Application ClientID - the same one you used in the ARM template
-    [string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientSecret, # AD Application ClientID - the same one you used in the ARM template
-	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserName, # Provide SQL AD Administrator Name, same we used for ARM Deployment for parameter sqlAdAdminUserName
-	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserPassword # Provide SQL AD Administrator Name, same we used for ARM Deployment for parameter sqlAdAdminUserPassword, available for consistency purposes only.
+	[string] [Parameter(Mandatory=$true)] $SQLServerName , # Provide Sql Server name (not required full name) Created through Azure Resource Manager Template  template
+	[string] [Parameter(Mandatory=$true)] $SQLServerAdministratorLoginUserName, # Provide admin user name of sql server used for Azure Resource Manager Template  template parameter "sqlAdministratorLoginUserName" 
+	[string] [Parameter(Mandatory=$true)] $SQLServerAdministratorLoginPassword, # Provide admin password of sql server used for Azure Resource Manager Template  template parameter "sqlAdministratorLoginPassword" 
+	[string] [Parameter(Mandatory=$true)] $KeyVaultName , # Provide Key Vault Name Created through Azure Resource Manager Template  
+	[string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientId , # AD Application ClientID - the same one you used in the Azure Resource Manager Template  template
+    [string] [Parameter(Mandatory=$true)] $AzureAdApplicationClientSecret, # AD Application ClientID - the same one you used in the Azure Resource Manager Template  template
+	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserName, # Provide SQL AD Administrator Name, same we used for Azure Resource Manager Template  Deployment for parameter sqlAdAdminUserName
+	[string] [Parameter(Mandatory=$true)] $SqlAdAdminUserPassword # Provide SQL AD Administrator Name, same we used for Azure Resource Manager Template  Deployment for parameter sqlAdAdminUserPassword provided for use consistency
 )
 
 
@@ -62,7 +60,7 @@ $SQLBackupToUpload = (".\"+$SQLBackupName)
 # Check if there is already a login session in Azure Powershell, if not, sign in to Azure  
 
 Write-Host "Azure Subscription Login " -foreground Yellow 
-Write-Host ("Step 1: Please use Contributor/Owner access to Login to Azure Subscription Id = " + $subscriptionId) -ForegroundColor Gray
+Write-Host ("Step 1: Please use Contributor/Owner access to Login to Azure Subscription Id = " + $subscriptionId) -ForegroundColor Yellow
 
 Try  
 {  
@@ -81,7 +79,7 @@ $downloadbacpacPath = "https://stgpcipaasreleases.blob.core.windows.net/pci-paas
 Invoke-WebRequest $downloadbacpacPath -OutFile $SQLBackupToUpload
 
 
-Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundColor Gray
+Write-Host ("Step 2: Creating storage account for SQL Artifacts") -ForegroundColor Yellow
 # Create a new storage account.
 $StorageAccountExists = Get-AzureRmStorageAccount -Name $StorageName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore
 if ($StorageAccountExists -eq $null)  
@@ -104,7 +102,7 @@ $StorageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.R
 
 ########################
 Write-Host "SQL Server Updates" -foreground Yellow 
-Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Gray
+Write-Host ("`tStep 3: Update SQL firewall with your ClientIp = " + $ClientIPAddress + " and ASE's virtual-ip = " + $ASEOutboundAddress ) -ForegroundColor Yellow
 $clientIp =  Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip  
 $unqiueid = Get-Random -Maximum 999
 Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIpRule$unqiueid" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress -ErrorAction Continue} Catch {}
@@ -112,14 +110,14 @@ Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -Se
 Try { New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -FirewallRuleName "ClientIp$unqiueid" -StartIpAddress $clientIp -EndIpAddress $clientIp -ErrorAction Continue} Catch {}
 
 ########################
-Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Gray
+Write-Host ("`tStep 4: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Yellow
 
     $importRequest = New-AzureRmSqlDatabaseImport -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName -StorageKeytype $StorageKeyType -StorageKey $StorageKey -StorageUri $StorageUri -AdministratorLogin $credential.UserName -AdministratorLoginPassword $credential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
     Get-AzureRmSqlDatabaseImportExportStatus -OperationStatusLink $importRequest.OperationStatusLink
     Start-Sleep -s 100
 
 ########################
-Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Gray
+Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Yellow
 
 # Start Dynamic Data Masking
     Get-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DatabaseName $DatabaseName
@@ -132,13 +130,13 @@ Write-Host ("`tStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundCol
 
 
 
-Write-Host ("`tStep 6: Update SQL Server for Azure Active Directory administrator =" + $SqlAdAdminUserName ) -ForegroundColor Gray
+Write-Host ("`tStep 6: Update SQL Server for Azure Active Directory administrator =" + $SqlAdAdminUserName ) -ForegroundColor Yellow
 
 # Create an Azure Active Directory administrator for SQL
 Set-AzureRmSqlServerActiveDirectoryAdministrator -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DisplayName $SqlAdAdminUserName
             
 ########################
-Write-Host ("`tStep 7: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Gray
+Write-Host ("`tStep 7: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Yellow
 
 # Start Encryption Columns
 Import-Module "SqlServer"
@@ -153,7 +151,7 @@ $database = $server.Databases[$databaseName]
 
 
 #policy for the UserPrincipal
-    Write-Host ("`tGiving Key Vault access permissions to the users and serviceprincipals ..") -ForegroundColor Gray
+    Write-Host ("`tGiving Key Vault access permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
 
         Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $ResourceGroupName -PermissionsToKeys all  -PermissionsToSecrets all
 
@@ -161,7 +159,7 @@ $database = $server.Databases[$databaseName]
 
         Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
 
-    Write-Host ("`tGranted permissions to the users and serviceprincipals ..") -ForegroundColor Gray
+    Write-Host ("`tGranted permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
 
 
 # Creating Master key settings
@@ -192,14 +190,14 @@ $database = $server.Databases[$databaseName]
 ########################
 Write-Host "OMS Updates..." -foreground Yellow 
 
-Write-Host ("`tStep 8: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Gray
+Write-Host ("`tStep 8: OMS -- Update all services for Logging" ) -ForegroundColor Yellow
 
 # Start OMS Diagnostics
 $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $ResourceGroupName
 
 $resourceTypes = @( "Microsoft.Network/applicationGateways",
                     "Microsoft.Network/NetworkSecurityGroups",
-                    "Microsoft.Web/serverFarms",
+                    "Microsoft.Web/serverFAzure Resource Manager Template s",
                     "Microsoft.Sql/servers/databases",
                     "Microsoft.Compute/virtualMachines",
                     "Microsoft.Web/sites",
@@ -222,11 +220,11 @@ foreach($resourceType in $resourceTypes)
 $workspace = Find-AzureRmResource -ResourceType "Microsoft.OperationalInsights/workspaces" -ResourceNameContains $omsWS.Name
 
 ########################
-Write-Host ("`tStep 8.1: OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Gray
+Write-Host ("`tStep 8.1: OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Yellow
 
 foreach($resourceType in $resourceTypes)
 {
-    Write-Host ("Add-AzureDiagnosticsToLogAnalytics to " + $resourceType) -ForegroundColor Gray
+    Write-Host ("Add-AzureDiagnosticsToLogAnalytics to " + $resourceType) -ForegroundColor Yellow
     $resource = Find-AzureRmResource -ResourceType $resourceType 
     Add-AzureDiagnosticsToLogAnalytics $resource $workspace -ErrorAction SilentlyContinue
 }

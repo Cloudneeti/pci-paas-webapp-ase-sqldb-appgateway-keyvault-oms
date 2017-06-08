@@ -27,12 +27,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
     }
 
 
-Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Gray
+Write-Host ("Step 1: Set Script Execution Policy as RemoteSigned" ) -ForegroundColor Yellow
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Gray
-Write-Host ("Step 3: Create Global Admin User Id" ) -ForegroundColor Gray
+Write-Host ("Step 2: Install AzureADPreview Module" ) -ForegroundColor Yellow
+Write-Host ("Step 3: Create Global Admin User Id" ) -ForegroundColor Yellow
 $globalADAdminName = "admin@"+$azureADDomainName
-Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Gray
+Write-Host ("Step 4: Connect to Azure AD" ) -ForegroundColor Yellow
 Connect-AzureAD -TenantId $tenantId
 $newUserPasswordProfile = "" | Select-Object password, forceChangePasswordNextLogin
 $newUserPasswordProfile.password = $globalADAdminPassword
@@ -49,7 +49,7 @@ $newUserPasswordProfile.forceChangePasswordNextLogin = $false
     }
     catch
     {
-        Write-Host "`tAdmin user not $globalADAdminName found. attempting create..." -ForegroundColor Gray
+        Write-Host "`tAdmin user not $globalADAdminName found. attempting create..." -ForegroundColor Yellow
         #Create New User
         $adAdmin = New-AzureADUser -DisplayName "Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "admin" -UserPrincipalName $globalADAdminName
     }
@@ -65,30 +65,30 @@ $newUserPasswordProfile.forceChangePasswordNextLogin = $false
 		}
 		Else{
 			Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId -ErrorAction SilentlyContinue
-			Write-Host "`tSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
+			Write-Host "`tSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
         }
     } catch {$Error[0].Exception}
-Write-Host ("Step 5: Assinging Owner permission on a Subscription" ) -ForegroundColor Gray
+Write-Host ("Step 5: Assinging Owner permission on a Subscription" ) -ForegroundColor Yellow
 # Assinging Owner permission on a Subscription
     try
     {
-		Write-Host "`tLogin to Azure Subscription with Global Admin to assign owner permission to $globalADAdminName" -ForegroundColor Gray
+		Write-Host "`tLogin to Azure Subscription with Global Admin to assign owner permission to $globalADAdminName" -ForegroundColor Yellow
 		if (Login-AzureRmAccount -SubscriptionId $SubscriptionId)
-		{Write-Host "`tLogin was successful" -ForegroundColor Gray}
+		{Write-Host "`tLogin was successful" -ForegroundColor Yellow}
 		if((Get-AzureRmRoleAssignment -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId").SignInName -contains "$globalADAdminName"){
-			Write-Host "`tOwner permissions already granted to the Admin user $globalADAdminName" -ForegroundColor Gray
+			Write-Host "`tOwner permissions already granted to the Admin user $globalADAdminName" -ForegroundColor Yellow
 		}
 		Else{
-			Write-Host "`tAssigning Subscription Owner permission to $globalADAdminName" -ForegroundColor Gray
+			Write-Host "`tAssigning Subscription Owner permission to $globalADAdminName" -ForegroundColor Yellow
 			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId" 
-			Write-Host "`tSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Gray
+			Write-Host "`tSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
 		}
 
     } catch {
 		$Error[0].Exception
 	}
 
-Write-Host ("`n`nGlobal AD Admin User created Successfully. Details are" ) -ForegroundColor Gray
+Write-Host ("`n`nGlobal AD Admin User created Successfully. Details are" ) -ForegroundColor Yellow
 Write-Host ("`tUser Name: $globalADAdminName") -ForegroundColor Red -NoNewline
 Write-Host ("`tPassword: " + $newUserPasswordProfile.password) -ForegroundColor Red
 
