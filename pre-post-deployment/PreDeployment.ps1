@@ -10,7 +10,7 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $azureADApplicationClientSecret, #Provide a Azure Application Password for setup of the app client access.
 	[string] $customHostName, # Provide CustomHostName which will be used for creating ASE subdomain.
 	[bool]   $enableSSL, # Provide boolean input to enable or disable SSL on application gateway 
-	[string] $certificatePath # Provide Certificate path if you want to provide your own Application gateway certificate.
+	[string] $certificatePath, # Provide Certificate path if you want to provide your own Application gateway certificate.
 )
 
 $ErrorActionPreference = 'Stop'
@@ -112,8 +112,8 @@ Write-Host ("`nStep 3: Create Azure Active Directory apps in default directory")
 ### Generate App Gateway Front End SSL certificate string
 if($enableSSL){
 	if($certificatePath) {
-		$certData = Convert-Certificate -certPath $certificatePath
-		$certPassword = "Customer provided certificate."
+		$Global:certData = Convert-Certificate -certPath $certificatePath
+		$Global:certPassword = "$certificatePassword"
 	}
 	Else{
 		$fileName = "appgwfrontendssl"
