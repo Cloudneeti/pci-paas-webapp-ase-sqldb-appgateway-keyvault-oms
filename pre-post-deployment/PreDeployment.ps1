@@ -17,7 +17,7 @@ $ErrorActionPreference = 'Stop'
 
 function Generate-Password ()
 {
-    (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + (Get-Random -Maximum 9999)
+    (-join ((65..90) + (97..122) | Get-Random -Count 15 | % {[char]$_})) + (Get-Random -Maximum 9999)
 }
 
 function Convert-Certificate ($certPath)
