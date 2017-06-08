@@ -68,7 +68,7 @@ if ($receptionistUserObjectId -eq $null)
 Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $receptionistPassword -ForceChangePassword $false
 
 
-Write-Host ("`nCreated AD Users for SQL AD Admin, and Receptinist user" ) -ForegroundColor Yellow
+Write-Host ("`nCreated AD Users for SQL AD Admin, and Receptionist user" ) -ForegroundColor Yellow
 #------------------------------
 Write-Host ("`nStep 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor yellow
 Set-Location ".\"
