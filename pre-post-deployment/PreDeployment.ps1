@@ -31,7 +31,7 @@ $ScriptFolder = Split-Path -Parent $PSCommandPath
 ###
 #Imp: This script needs to be run by Global AD Administrator (aka Company Administrator)
 ###
-Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Gray
+Write-Host ("Pre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" ) -ForegroundColor Yellow
 #Connect to the Azure AD
 Connect-MsolService
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
@@ -43,7 +43,7 @@ $receptionistPassword = Generate-Password
 $bastionPassword = Generate-Password
 
 $cloudwiseAppServiceURL = "http://localcloudneeti6i"+$azureADDomainName
-Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
+Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Yellow
 $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
 $sqlADAdminDetails = ""
 if ($sqlADAdminObjectId -eq $null)  
@@ -65,9 +65,9 @@ if ($receptionistUserObjectId -eq $null)
 Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $receptionistPassword -ForceChangePassword $false
 
 
-Write-Host ("Created AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
+Write-Host ("Created AD Users for SQL AD Admin, and Receptinist user" ) -ForegroundColor Yellow
 #------------------------------
-Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor Gray
+Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor yellow
 Set-Location ".\"
 
 $suffix = $suffix.Replace(' ', '').Trim()
@@ -94,7 +94,7 @@ New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Cont
 $sub = Get-AzureRmSubscription -SubscriptionId $subscriptionID | Select-AzureRmSubscription 
 
 ### 2. Create Azure Active Directory apps in default directory
-Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -ForegroundColor Gray
+Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -ForegroundColor Yellow
     $u = (Get-AzureRmContext).Account
     $u1 = ($u -split '@')[0]
     $u2 = ($u -split '@')[1]
@@ -106,18 +106,18 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
     $replyURLs = @( $cloudwiseAppServiceURL, "http://*.azurewebsites.net","http://localhost:62080", "http://localhost:3026/")
     # Create Active Directory Application
     $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $AzureADApplicationClientSecret # -ReplyUrls $replyURLs
-    Write-Host ("`tStep 3.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Gray
+    Write-Host ("`tStep 3.1: Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Yellow
 
 ### 3. Create a service principal for the AD Application and add a Reader role to the principal
 
-    Write-Host ("`tStep 3.2: Attempting to create Service Principal") -ForegroundColor Gray
+    Write-Host ("`tStep 3.2: Attempting to create Service Principal") -ForegroundColor Yellow
     $principal = New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication.ApplicationId
     Start-Sleep -s 30 # Wait till the ServicePrincipal is completely created. Usually takes 20+secs. Needed as Role assignment needs a fully deployed servicePrincipal
-    Write-Host ("`tStep 3.3: Service Principal creation successful - " + $principal.DisplayName) -ForegroundColor Gray
+    Write-Host ("`tStep 3.3: Service Principal creation successful - " + $principal.DisplayName) -ForegroundColor Yellow
     $scopedSubs = ("/subscriptions/" + $sub.Subscription)
-    Write-Host ("`tStep 3.4: Attempting Reader Role assignment" ) -ForegroundColor Gray
+    Write-Host ("`tStep 3.4: Attempting Reader Role assignment" ) -ForegroundColor Yellow
     New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId.Guid -Scope $scopedSubs
-    Write-Host ("`tStep 3.5: Reader Role assignment successful" ) -ForegroundColor Gray
+    Write-Host ("`tStep 3.5: Reader Role assignment successful" ) -ForegroundColor Yellow
 
 ### 4. Create a Self-signed certificate for ASE ILB and Application Gateway.
 
