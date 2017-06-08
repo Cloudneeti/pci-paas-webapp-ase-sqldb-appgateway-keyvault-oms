@@ -200,16 +200,6 @@ $Global:database = $server.Databases[$databaseName]
     }
     # End Encryption Columns
 
-    ### creating user within SQL Server and Granting them with appropriate access.
-    $connectionString = "Server=tcp:" + $SQLServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $DatabaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + $SqlAdAdminUserName + "`"" + ";Password=`"" + $SqlAdAdminUserPassword + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication=Active Directory Integrated;Connection Timeout=30;"
-    $connection = New-Object -TypeName System.Data.SqlClient.SqlConnection($connectionString)
-    $query = [IO.File]::ReadAllText("$PWD\Scripts\PostDeploymentSQL.sql")
-    $query = $query -replace "XXXX","$AzureADDomainName"
-    $command = New-Object -TypeName System.Data.SqlClient.SqlCommand($query, $connection)
-    $connection.Open()
-    $command.ExecuteNonQuery()
-    $connection.Close()
-
 # End - Switching SQL commands context to the AD Application
 
 ########################
