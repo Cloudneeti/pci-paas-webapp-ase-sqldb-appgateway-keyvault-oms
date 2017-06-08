@@ -6,7 +6,7 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $azureADDomainName, # Provide your Azure AD Domain Name
 	[string] [Parameter(Mandatory=$true)] $subscriptionID, # Provide your Azure subscription ID
 	[string] [Parameter(Mandatory=$true)] $suffix, #This is used to create a unique website name in your organization. This could be your company name or business unit name
-	[string] [Parameter(Mandatory=$true)] $sqlADAdminPassword, # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
+	# [string] [Parameter(Mandatory=$true)] , # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
 	[string] [Parameter(Mandatory=$true)] $azureADApplicationClientSecret, #Provide a Azure Application Password for setup of the app client access.
 	[string] $customHostName = "pcipaas.com", # Provide CustomHostName which will be used for creating ASE subdomain.
 	[bool]   $enableSSL = $false, # Provide boolean input to enable or disable SSL on application gateway 
@@ -37,7 +37,10 @@ Connect-MsolService
 $SQLADAdminName = "sqladmin@"+$azureADDomainName
 $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
 
-$receptionistPassword = "DfGed!Dfd@123"
+#Generate bunch of strong passwords
+$sqlADAdminPassword = Generate-Password
+$receptionistPassword = Generate-Password
+$bastionPassword = Generate-Password
 
 $cloudwiseAppServiceURL = "http://localcloudneeti6i"+$azureADDomainName
 Write-Host ("Step 1:Create AD Users for SQL AD Admin, Receptinist and Doctor to test various scenarios" ) -ForegroundColor Gray
@@ -165,29 +168,28 @@ Write-Host "SubscriptionID: " -foreground Yellow -NoNewLine
 Write-Host $sub.Subscription -foreground Red 
 Write-Host
 Write-Host
-Write-Host -Prompt "Start copy all the values from below here." -ForegroundColor Yellow
+Write-Host -Prompt "Use the following information to start Azure Resource Manager Template deloyment" -ForegroundColor Yellow
 Write-Host
-Write-Host ("Parameters to be used in the registration / configuration.") -foreground Yellow
 Write-Host "_artifactsLocationSasToken: " -foreground Yellow -NoNewline
-Write-Host "" -foreground Red 
+Write-Host "Advanced use" -foreground Red 
 Write-Host "Cert Data: " -foreground Yellow -NoNewLine
-Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+Write-Host "Refer to deployment Guide for correct use" -foreground Red 
 Write-Host "Cert Password: " -foreground Yellow -NoNewLine
-Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+Write-Host "cert [PASSWORD]" -foreground Red 
 Write-Host "Bastion Host Administrator User Name: " -foreground Yellow -NoNewLine
-Write-Host "Default Value is 'bastionadmin'.If needs change please do so in the next step" -foreground Red 
+Write-Host "Default Value 'bastionadmin' " -foreground Red 
 Write-Host "Bastion Host Administrator Password: " -foreground Yellow -NoNewLine
-Write-Host "Please Provide Host Administrator Password" -foreground Red 
+Write-Host $bastionPassword -foreground Red 
 Write-Host "SQL Administrator Login User Name: " -foreground Yellow -NoNewLine
-Write-Host "Default Value is 'sqladmin'.If needs change please do so in the next step" -foreground Red 
+Write-Host "Default Value 'sqladmin' " -foreground Red 
 Write-Host "SQL Administrator Login Password: " -foreground Yellow -NoNewLine
-Write-Host "Please Provide SQL Administrator Login Password" -foreground Red 
+Write-Host $sqlADAdminPassword -foreground Red 
 Write-Host "SQL Threat Detection Alert Email Address: " -foreground Yellow -NoNewLine
-Write-Host "Please Provide Email Address to get SQL Threat Detection Alerts" -foreground Red 
-Write-Host "Automation Account Name: " -foreground Yellow -NoNewLine
-Write-Host "Please see Deployment Guide for instructions" -foreground Red 
-Write-Host "Custom Host Name: " -foreground Yellow -NoNewLine
-Write-Host "Please see Deployment Guide for instructions" -foreground Red 
+Write-Host "Email Address that will receive  SQL alerts" -foreground Red 
+Write-Host "Azue Automation Account Name: " -foreground Yellow -NoNewLine
+Write-Host "Provide your automation account name. Configuration provided in deployment guide" -foreground Red #### PULL THIS INFORMATION AND PROVIDE IT using 
+Write-Host "Custom Domain Name: " -foreground Yellow -NoNewLine
+Write-Host "Please see Deployment Guide for details" -foreground Red 
 Write-Host "Azure AD Application Client ID: " -foreground Yellow -NoNewLine
 Write-Host $azureAdApplication.ApplicationId -foreground Red 
 Write-Host "Azure AD Application Client Secret: " -foreground Yellow -NoNewLine
@@ -196,26 +198,25 @@ Write-Host "Azure AD Application Object ID: " -foreground Yellow -NoNewLine
 Write-Host $AzureADApplicationObjectID -foreground Red 
 Write-Host "SQL AD Admin User Name: " -foreground Yellow -NoNewLine
 Write-Host $SQLADAdminName -foreground Red 
-Write-Host "SQL AD Admin User Password:" -foreground Green -NoNewLine
+Write-Host "SQL AD Admin User Password:" -foreground Yellow -NoNewLine
 Write-Host $SQLADAdminPassword -foreground Red 
-Write-Host "Application Gateway HTTPS certData string :" 
-Write-Host "$certData"
-Write-Host "Application Gateway HTTPS certPassword : $certPassword"
-Write-Host "Application Gateway Backend Authentication aseCertData String : "
-Write-Host "$aseCertData"
-Write-Host "ASE ILB Certificate string asePfxBlobString : "
-Write-Host "$asePfxBlobString"
-Write-Host "ASE ILB pfx Password :"
-Write-Host "$asePfxPassword"
-Write-host "ASE ILB Certificate Thumbprint aseCertthumbPrint :"
-Write-Host "$aseCertThumbprint"
+Write-Host "Application Gateway HTTPS certData string :" -foreground Yellow -NoNewLine
+Write-Host "$certData" -foreground Red 
+Write-Host "Application Gateway HTTPS certPassword :" -foreground Yellow -NoNewLine
+Write-Host $certPassword -foreground Red 
+Write-Host "Application Gateway Backend Authentication aseCertData String : " -foreground Yellow -NoNewLine
+Write-Host $aseCertData -foreground Red 
+Write-Host "ASE ILB Certificate string asePfxBlobString : " -foreground Yellow -NoNewLine
+Write-Host "$asePfxBlobString" -foreground Red 
+Write-Host "ASE ILB pfx Password :" -foreground Yellow -NoNewLine
+Write-Host "$asePfxPassword" -foreground Red 
+Write-host "ASE ILB Certificate Thumbprint aseCertthumbPrint :" -foreground Yellow -NoNewLine
+Write-Host "$aseCertThumbprint" -foreground Red 
 Write-Host
-Write-Host -Prompt "End copy all the values from above here." -ForegroundColor Yellow
+
+Write-Host -Prompt "The following additional users have been created in domain. These users will be used for trying out various scenarios" -Foreground Yellow
+Write-Host ($receptionistUserName +" user is created. password is "+$receptionistPassword ) -Foreground Yellow
 Write-Host
 Write-Host
-Write-Host -Prompt "The following additional users have been created in domain. These users will be used for trying out various scenarios" -ForegroundColor Yellow
-Write-Host ($receptionistUserName +" user is created. password is "+$receptionistPassword ) -ForegroundColor Red
-Write-Host
-Write-Host
-Write-Host -Prompt "-- `nThe script completed execution. Ensure that you have copied all necessary inputs and Please return to the deployment guide to proceed with your installation. Do not run other scripts in this folder at this time." -ForegroundColor Yellow
+Write-Host -Prompt "-- `nThe script complete." -ForegroundColor Yellow
 
