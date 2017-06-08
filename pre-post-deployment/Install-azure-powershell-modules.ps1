@@ -48,16 +48,9 @@ Set-ExecutionPolicy RemoteSigned;
 ############################################################
 # Test Import SQL Server Modules. If this fails, please follow deployment guide for installing SQL Server Client components
     
-<<<<<<< HEAD
-	If (Get-Module -ListAvailable -Name SqlServer) 
-	{Get-Module -ListAvailable -Name SqlServer | Import-Module -Force }
-	Else{ Install-Module -Name SqlServer -AllowClobber; Write "Installed SqlServer Module. Please follow deployment guide for missing modules and installation steps."
-	}	
-=======
     if (-not (Get-Module -Name SqlServer)) 
     {
         Write-Host "SQL Powershell Modules not available. Please follow deployment guide for installing SQL Server Client components and powershell modules will get installed along with it."
     }
    
 Read-Host "Check if there were any errors. Please follow deployment guide for missing modules and installation steps"
->>>>>>> parent of 121cd46... Updating code for 1-click deployment

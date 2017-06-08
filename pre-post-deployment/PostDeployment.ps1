@@ -181,13 +181,10 @@ $database = $server.Databases[$databaseName]
 	$ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Code" -EncryptionType "Deterministic" -EncryptionKey $cekName
 	$ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Expiration" -EncryptionType "Deterministic" -EncryptionKey $cekName
 
-<<<<<<< HEAD
-=======
     Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
 
     # End Encryption Columns
 
->>>>>>> parent of 121cd46... Updating code for 1-click deployment
 # End - Switching SQL commands context to the AD Application
 
 ########################

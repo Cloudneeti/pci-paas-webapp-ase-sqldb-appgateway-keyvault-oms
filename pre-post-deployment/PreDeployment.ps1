@@ -8,16 +8,9 @@ Param(
 	[string] [Parameter(Mandatory=$true)] $suffix, #This is used to create a unique website name in your organization. This could be your company name or business unit name
 	# [string] [Parameter(Mandatory=$true)] , # Provide an SQL AD Admin Password for the user sqladmin@$azureADDomainName that complies to your AD's password policy. 
 	[string] [Parameter(Mandatory=$true)] $azureADApplicationClientSecret, #Provide a Azure Application Password for setup of the app client access.
-<<<<<<< HEAD
-	[string] $customHostName, # Provide CustomHostName which will be used for creating ASE subdomain.
-	[bool]   $enableSSL, # Provide boolean input to enable or disable SSL on application gateway 
-	[string] $certificatePath, # Provide Certificate path if you want to provide your own Application gateway certificate.
-	[string] $certificatePassword # Enter password for the certificate provided.
-=======
 	[string] $customHostName = "pcipaas.com", # Provide CustomHostName which will be used for creating ASE subdomain.
 	[bool]   $enableSSL = $false, # Provide boolean input to enable or disable SSL on application gateway 
 	[string] $certificatePath # Provide Certificate path if you want to provide your own Application gateway certificate.
->>>>>>> parent of 121cd46... Updating code for 1-click deployment
 )
 
 $ErrorActionPreference = 'Stop'
@@ -72,11 +65,7 @@ if ($receptionistUserObjectId -eq $null)
 Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $receptionistPassword -ForceChangePassword $false
 
 
-<<<<<<< HEAD
-Write-Host ("`nCreated AD Users for SQL AD Admin, and Receptionist user" ) -ForegroundColor Yellow
-=======
 Write-Host ("Created AD Users for SQL AD Admin, and Receptinist user" ) -ForegroundColor Yellow
->>>>>>> parent of 121cd46... Updating code for 1-click deployment
 #------------------------------
 Write-Host ("Step 2: Login to Azure AD and Azure. Please provide Global Administrator Credentials that has Owner/Contributor rights on the Azure Subscription ") -ForegroundColor yellow
 Set-Location ".\"
@@ -135,8 +124,8 @@ Write-Host ("Step 3: Create Azure Active Directory apps in default directory") -
 ### Generate App Gateway Front End SSL certificate string
 if($enableSSL){
 	if($certificatePath) {
-		$Global:certData = Convert-Certificate -certPath $certificatePath
-		$Global:certPassword = "$certificatePassword"
+		$certData = Convert-Certificate -certPath $certificatePath
+		$certPassword = "Customer provided certificate."
 	}
 	Else{
 		$fileName = "appgwfrontendssl"
