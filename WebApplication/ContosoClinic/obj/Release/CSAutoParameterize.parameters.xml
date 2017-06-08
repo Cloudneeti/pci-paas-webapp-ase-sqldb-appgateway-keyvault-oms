@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="DefaultConnection-Web.config Connection String" description="DefaultConnection Connection String used in web.config by the application to access the database." defaultValue="Data Source=tcp:sqlserver-fbikvpe4mjhgu.database.windows.net,1433;Initial Catalog=ContosoPayments;User Id=sqladmin@pcidemoxoutlook560.onmicrosoft.com;Password=h6^UPWPLE$;Authentication=Active Directory Password;Column Encryption Setting=Enabled;Encrypt=True; TrustServerCertificate=False;Connection Timeout=300;" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\ARM\ Sample\\ContosoClinic\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
+  </parameter>
+</parameters>
