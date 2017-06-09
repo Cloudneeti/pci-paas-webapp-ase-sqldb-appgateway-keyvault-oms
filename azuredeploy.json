@@ -644,36 +644,6 @@
       }
     },
     {
-      "name": "deploy-BastionVM",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-02-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]",
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('vmBastionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminUsername": { "value": "[parameters('bastionHostAdministratorUserName')]" },
-          "adminPassword": { "value": "[parameters('bastionHostAdministratorPassword')]" },
-          "dnsLabelPrefix": { "value": "[concat('pcisamples',uniqueString(resourceGroup().id))]" },
-          "virtualNetworkName": { "value": "[variables('virtualNetworkName')]" },
-          "subnetName": { "value": "[variables('bastionSubnetName')]" },
-          "networkSecurityGroupName": { "value": "[variables('bastionNsgGroupName')]" },
-          "diagnosticsStorageAccountName": { "value": "[variables('storageAccountDiagnostics')]" },
-          "omsWorkspaceName": { "value": "[variables('omsWorkspaceName')]" },
-          "aadClientID": { "value": "[parameters('azureAdApplicationClientId')]" },
-          "aadClientSecret": { "value": "[parameters('azureAdApplicationClientSecret')]" },
-          "keyVaultName": { "value": "[variables('keyVaultName')]" },
-          "tagValues": { "value": "[variables('tagValues')]" }
-        }
-      }
-    },
-    {
       "name": "deploy-SQLServerSQLDb",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-02-01",
