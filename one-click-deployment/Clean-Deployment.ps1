@@ -1,30 +1,23 @@
 <#
 .Synopsis
-   Script to remove Azure PCI solution from the subscription post deployment.
+   Clean-up resources deployed within subscription during deployment.
 .DESCRIPTION
-   This script removes all the resources that were deployed by the solution. This
-    script will also remove Azure AD user accounts that were created during the
+   This script removes all the resources that were deployed by the solution. This script will also remove Azure AD user accounts that were created during the
     deployment.
-   Important: This script needs to be run by Global AD Administrator (aka Company 
-   Administrator)
-.EXAMPLE
-   Example of how to use this cmdlet
-.EXAMPLE
-   Another example of how to use this cmdlet
-.INPUTS
-   Inputs to this cmdlet (if any)
-.OUTPUTS
-   Output from this cmdlet (if any)
-.NOTES
-   General notes
-.COMPONENT
-   The component this cmdlet belongs to
-.ROLE
-   The role this cmdlet belongs to
-.FUNCTIONALITY
-   The functionality that best describes this cmdlet
+   Important: This script needs to be run by Global AD Administrator (aka Company Administrator)
+.EXAMPLE 1
+    # Deletes Users, ResourceGroup & Azure AD Application created during the deployment.
+   .\Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -resourceGroupName demorg -globalAdminUserName  `
+   admin@contoso.com -globalAdminPassword ********* -azureADApplicationID xxxx-xxxx-xxxx-xxxx
+.EXAMPLE 2
+    # Deletes Users from Azure AD created during the deployment.
+   \Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -globalAdminUserName admin@contoso.com`
+    -globalAdminPassword *********
+.EXAMPLE 3
+    # Deletes Users from Azure AD & ResourceGroup created during the deployment.
+   \Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -resourceGroupName demorg -globalAdminUserName `
+    admin@contoso.com -globalAdminPassword *********    
 #>
-[CmdletBinding()]
 param (
     # Provide Azure AD Domain name for the subscription
     [Parameter(Mandatory=$true)]
@@ -39,8 +32,6 @@ param (
     $subscriptionID,
 
     # Provide ResourceGroup Name
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
     [String]
     $resourceGroupName,
 
@@ -57,21 +48,18 @@ param (
     $globalAdminPassword,
 
 	# Provide Azure AD Application ID
-	[Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
     [String]
     $azureADApplicationID    
 
 )
 Begin
 {
-    # Constructing variables
+    # variables
     $sqlADAdminName = "sqladmin@"+$azureADDomainName
     $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
 }
 Process {
-    Write-Host "`nPre-Requisite: This script needs to be run by Global AD Administrator (aka Company `
-    Administrator)" -ForegroundColor Yellow
+    Write-Host "`nPre-Requisite: This script needs to be run by Global AD Administrator (aka Company Administrator)" -ForegroundColor Yellow
 
     # Login to Azure AD & Subscription
     $psCred = New-Object System.Management.Automation.PSCredential ($globalAdminUserName, $globalAdminPassword)
@@ -109,29 +97,33 @@ Process {
     Write-Host "`nRemoved users successfully." -ForegroundColor Yellow
 
     # Removing Azure Resource Group
-    Write-Host ("`nStep 2:Remove Azure Resource Group" ) -ForegroundColor Yellow
-    try {
-        Remove-AzureRmResourceGroup -Name $resourceGroupName -Force
-        Write-Host -ForegroundColor Yellow "$resourceGroupName has been deleted."
-    }
-    catch [System.Exception] {
-        Write-Host -ForegroundColor Red $_.Exception.GetBaseException()
+    if ($resourceGroupName){
+        Write-Host ("`nStep 2:Remove Azure Resource Group" ) -ForegroundColor Yellow
+        try {
+            Remove-AzureRmResourceGroup -Name $resourceGroupName -Force
+            Write-Host -ForegroundColor Yellow "$resourceGroupName has been deleted."
+        }
+        catch [System.Exception] {
+            Write-Host -ForegroundColor Red $_.Exception.GetBaseException()
+        }
     }
 
     # Removing Azure AD Application, if exist
-    Write-Host ("`nStep 3:Remove Azure Application Id" ) -ForegroundColor Yellow
-    try {
-        $ADObjectId = (Get-AzureADApplication).AppId -eq $ADApplicationId
-        if ($ADObjectId -ne $null)  
-        {
-            Remove-AzureADApplication -ObjectId $ADObjectId
-            Write-Host -ForegroundColor Yellow "Application with ID - $azureADApplicationID has been deleted."
+    if ($azureADApplicationID) {
+        Write-Host ("`nStep 3:Remove Azure Application Id" ) -ForegroundColor Yellow
+        try {
+            $ADObjectId = (Get-AzureADApplication).AppId -eq $ADApplicationId
+            if ($ADObjectId -ne $null)  
+            {
+                Remove-AzureADApplication -ObjectId $ADObjectId
+                Write-Host -ForegroundColor Yellow "Application with ID - $azureADApplicationID has been deleted."
+            }
+            else {
+                Write-Host -ForegroundColor Red "Application with ID - $azureADApplicationID could not be found."
+            }
         }
-        else {
-            Write-Host -ForegroundColor Red "Application with ID - $azureADApplicationID could not be found."
-        }
-    }
-    catch {
-        Write-Host -ForegroundColor Red $_.Exception.GetBaseException()
+        catch {
+            Write-Host -ForegroundColor Red $_.Exception.GetBaseException()
+        }        
     }
 }
