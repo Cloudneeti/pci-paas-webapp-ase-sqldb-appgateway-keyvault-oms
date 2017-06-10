@@ -99,13 +99,13 @@ Begin
 		$webclient.DownloadFile($url,$filepath)
 	}
 
-	function Generate-Password () ##$$BUG$$ ###########FUNCTION COMMENT provide details what is happening
+	function New-RandomPassword () ##$$BUG$$ ###########FUNCTION COMMENT provide details what is happening
 	{
 		(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + ` ##$$BUG$$ ################## no 11 to 15 it has to be 15 all times - eg you need min here (Get-Random -Minimum 10 -Maximum 99)
-        (Get-Random -Maximum 99) + `
+        ((10..99) | Get-Random -Count 1) + `
         ('@','%','!','^' | Get-Random -Count 1) +`
         (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + `
-        (Get-Random -Maximum 99)`
+        ((10..99) | Get-Random -Count 1)
 	}
 
 	function Convert-Certificate ($certPath) ##$$BUG$$ ###########FUNCTION COMMENT provide details what is happening
@@ -143,7 +143,7 @@ Begin
 	$DeploymentName = "PCI-Deploy-"+ ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')
     $_artifactsLocation = "https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master" ##$$BUG$$ Must make this a variable in top of script https://raw.githubusercontent.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/master
     $_artifactsLocationSasToken = "null"
-    $commonPassword = Generate-Password
+    $commonPassword = New-RandomPassword
 }
 Process
 {

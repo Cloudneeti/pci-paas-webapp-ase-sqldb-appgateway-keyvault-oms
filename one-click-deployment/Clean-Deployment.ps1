@@ -1,22 +1,22 @@
 <#
 .Synopsis
-   Clean-up resources deployed within subscription during deployment.
+    Clean-up resources deployed within subscription during deployment.
 .DESCRIPTION
-   This script removes all the resources that were deployed by the solution. This script will also remove Azure AD user accounts that were created during the
-    deployment.
-   Important: This script needs to be run by Global AD Administrator (aka Company Administrator)
+    This script removes all the resources that were deployed by the solution. This script will also remove Azure AD user accounts that were created during the
+        deployment.
+    Important: This script needs to be run by Global AD Administrator (aka Company Administrator)
 .EXAMPLE 1
     # Deletes Users, ResourceGroup & Azure AD Application created during the deployment.
-   .\Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -resourceGroupName demorg -globalAdminUserName  `
-   admin@contoso.com -globalAdminPassword ********* -azureADApplicationID xxxx-xxxx-xxxx-xxxx
+    .\Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -resourceGroupName demorg -globalAdminUserName  `
+        admin@contoso.com -globalAdminPassword ********* -azureADApplicationID xxxx-xxxx-xxxx-xxxx
 .EXAMPLE 2
     # Deletes Users from Azure AD created during the deployment.
-   \Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -globalAdminUserName admin@contoso.com`
-    -globalAdminPassword *********
+    .\Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -globalAdminUserName admin@contoso.com`
+        -globalAdminPassword *********
 .EXAMPLE 3
     # Deletes Users from Azure AD & ResourceGroup created during the deployment.
-   \Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -resourceGroupName demorg -globalAdminUserName `
-    admin@contoso.com -globalAdminPassword *********    
+    .\Clean-Deployment.ps1 -azureADDomainName domain@contoso.com -subscriptionID xxxx-xxxx-xxx-xxxx -resourceGroupName demorg -globalAdminUserName `
+        admin@contoso.com -globalAdminPassword *********    
 #>
 param (
     # Provide Azure AD Domain name for the subscription
@@ -54,7 +54,7 @@ param (
 )
 Begin
 {
-    # variables
+    # constructing variables
     $sqlADAdminName = "sqladmin@"+$azureADDomainName
     $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
 }
@@ -84,12 +84,13 @@ Process {
 
     # Removing users from AD, if exist.
     Write-Host ("`nStep 1:Remove AD Users" ) -ForegroundColor Yellow
-    $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+    
+    $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $SQLADAdminName -ErrorAction SilentlyContinue).ObjectID
     if ($sqlADAdminObjectId -ne $null)  
     {    
         Remove-MsolUser -UserPrincipalName $SQLADAdminName -Force
     }
-    $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue -ErrorVariable errorVariable).ObjectID
+    $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue).ObjectID
     if ($receptionistUserObjectId -ne $null)  
     {    
         Remove-MsolUser -UserPrincipalName $receptionistUserName -Force
