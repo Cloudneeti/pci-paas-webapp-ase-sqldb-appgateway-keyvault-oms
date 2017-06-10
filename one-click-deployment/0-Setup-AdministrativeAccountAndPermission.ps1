@@ -11,6 +11,7 @@
     This script auto generates Global Admin UserPrincipal Name as 'admin+(2 length random number between 10-99)@azureADDomainName' and 15 length strong password for Global `
         Admin account and will print output at the completion of script. Please save the output for future reference purpose.
         For example - Username - admin45@contoso.com ; Password - ECUbZ30@IrSiG53
+    By default, 
     
     Important Note: This script requires you to run powershell in an elevated mode i.e Run As Administrator. Otherwise you might see issues while executing the script.
 
@@ -24,16 +25,35 @@
 #>
 [CmdletBinding()]
 Param(
+    # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subsciption.
+    [Parameter(Position=0, 
+        Mandatory=$True, 
+        ValueFromPipeline=$True)] 
+    [string]$userName, 
+
     # Provide registered Azure AD Domain Name for Global Administrator Account.
+    [Parameter(Position=1, 
+        Mandatory=$True, 
+        ValueFromPipeline=$True)] 
+    [securestring]$password,
+
+    # Provide registered Azure AD Domain Name for Global Administrator Account.
+    [Parameter(Position=2,
+        ParameterSetName='ConfigureGlobalADAdmin')]
     [string]$azureADDomainName,
 	
     # Provide Directory / Tenant ID of an Azure Active Directory.
+    [Parameter(Position=3,
+        ParameterSetName='ConfigureGlobalADAdmin')]
     [string]$tenantId,
 
     # Provide Subscription ID on which you want to grant Global Administrator account with an Owner permission.
+    [Parameter(Position=4)]
     [string]$subscriptionId,
 
     # Use this switch to create Global Adiministrator account.
+    [Parameter(Position=5,
+        ParameterSetName='ConfigureGlobalADAdmin')]
     [ValidateScript({
         if(
             (Get-Variable azureADDomainName) -and 
@@ -42,7 +62,15 @@ Param(
         ){$true}
         Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using this configureGlobalAdmin switch"}
     })] 
-    [switch]$configureGlobalAdmin
+    [switch]$configureGlobalAdmin,
+
+    # Use this switch to change password policy to 60 days on your tenant.
+    [Parameter(Position=6)] 
+    [ValidateScript({
+        if(Get-Variable subscriptionId) {$true}
+        Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using this configureGlobalAdmin switch"}
+    })] 
+    [switch]$setPasswordPolicy
 )
 Begin{
     
@@ -192,8 +220,8 @@ End
     if($configureGlobalAdmin){
         Write-Host -ForegroundColor Green "`n######################################################################`n"
         Write-Host -ForegroundColor Yellow "Kindly save the below information for future reference purpose:"
-        $outputTable.Add('GlobalAdminUserName',$globalADAdminUserName)
-        $outputTable.Add('GlobalAdminPassword',$globalADAdminPassword)
+        $outputTable.Add('globalADAdminUserName',$globalADAdminUserName)
+        $outputTable.Add('globalADAdminPassword',$globalADAdminPassword)
         $outputTable | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
         Write-Host -ForegroundColor Green "`n######################################################################`n"
     }
