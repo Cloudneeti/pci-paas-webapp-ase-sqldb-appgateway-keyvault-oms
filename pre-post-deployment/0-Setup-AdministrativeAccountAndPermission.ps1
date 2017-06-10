@@ -65,64 +65,64 @@ Begin{
 Process
 {
     # Importing / Installing Powershell Modules
-    Write-Host -ForegroundColor Yellow "`nTrying to import modules"
+    Write-Host -ForegroundColor Green "`nStep-1: Importing / Installing Powershell Modules"
     try {
         # Azure Resource Manager Powershell Modules
-        Write-Host -ForegroundColor Yellow "`nChecking if AzureRM module already exist."
+        Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
         If (Get-Module -ListAvailable -Name AzureRM) 
         {   
-            Write-Host -ForegroundColor Yellow "`nModule has been found. Trying to import module."
+            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
             Import-Module -Name AzureRM -NoClobber -Force 
-            if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`nAzureRM Module imported successfully."}
+            if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
         }
         Else
         {
             # Installing Azure AD Module
             Install-Module AzureRM -AllowClobber; 
             if(Get-Module AzureRM | Out-Null){
-                Write-Host -ForegroundColor Yellow "`nAzureRM Module successfully installed and imported in to the session"
+                Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed and imported in to the session"
             }
         }
 
         # Azure Active Directory Powershell Modules
-        Write-Host -ForegroundColor Yellow "`nChecking if AzureAD module already exist."
+        Write-Host -ForegroundColor Yellow "`t* Checking if AzureAD module already exist."
         If (Get-Module -ListAvailable -Name AzureAD) 
         {   
-            Write-Host -ForegroundColor Yellow "`nModule has been found. Trying to import module."
+            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
             Import-Module -Name AzureAD -NoClobber -Force
-            if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`nAzureAD Module imported successfully."}             
+            if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`t* AzureAD Module imported successfully."}             
         }
         Else
         { 
             # Installing AzureAD Module
             Install-Module AzureAD -AllowClobber;
             if(Get-Module AzureAD | Out-Null){
-                Write-Host -ForegroundColor Yellow "`nAzureAD Module successfully installed and imported in to the session"
+                Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed and imported in to the session"
             }
         }
 
         # Auditing and OMS Powershell Modules & Script
-        Write-Host -ForegroundColor Yellow "`nChecking if Enable-AzureRMDiagnostics script is installed."
+        Write-Host -ForegroundColor Yellow "`t* Checking if Enable-AzureRMDiagnostics script is installed."
         If (!(Get-InstalledScript -Name Enable-AzureRMDiagnostics)) 
         {
-            Write-Host "`nEnable-AzureRMDiagnostics script could not be found. Installing the script."
+            Write-Host "`t* Enable-AzureRMDiagnostics script could not be found. Installing the script."
             Install-Script -Name Enable-AzureRMDiagnostics -Force
             if(Get-InstalledScript -Name Enable-AzureRMDiagnostics | Out-Null){
-                Write-Host "`nScript installed successfully"
+                Write-Host "`t* Script installed successfully"
             }
         }
-        Write-Host -ForegroundColor Yellow "`nChecking if AzureDiagnosticsAndLogAnalytics module is already exist."
+        Write-Host -ForegroundColor Yellow "`t* Checking if AzureDiagnosticsAndLogAnalytics module is already exist."
         If (Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics) 
         {
-            Write-Host -ForegroundColor Yellow "`nModule has been found. Trying to import module."
+            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
             Import-Module AzureDiagnosticsAndLogAnalytics -NoClobber -Force 
-            if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`nAzureDiagnosticsAndLogAnalytics Module imported successfully."}            
+            if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}            
         }
         Else{
             # Installing AzureDiagnosticsAndLogAnalytics Module
             Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber
             if (Get-Module -Name AzureDiagnosticsAndLogAnalytics | Out-Null ) {
-                Write-Host -ForegroundColor Yellow "`nAzureDiagnosticsAndLogAnalytics Module successfully installed and imported in to the session"
+                Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed and imported in to the session"
             }
         }
     }
@@ -133,18 +133,19 @@ Process
     if ($configureGlobalAdmin)
     {   
         # Creating Global Administrator Account & Making it Company Administrator in Azure Active Directory
+        Write-Host -ForegroundColor Green "`nStep-2: Creating Azure AD Global Admin with UserName - $globalADAdminUserName."
         try {
-            Write-Host -ForegroundColor Yellow "`nConnecting to Azure Active Directory."
+            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory."
             Connect-AzureAD -TenantId $tenantId
             if(Get-AzureADDomain -Name $azureADDomainName | Out-Null){
-                Write-Host -ForegroundColor Yellow "`nSuccessfully connected to Azure Active Directory."
+                Write-Host -ForegroundColor Yellow "`t* Successfully connected to Azure Active Directory."
             }
 
             # Creating Azure Global Admin Account
-            Write-Host -ForegroundColor Yellow "`nCreating Azure AD Global Admin with UserName - $globalADAdminUserName."
             $adAdmin = New-AzureADUser -DisplayName "Global Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "PCIAdmin" -UserPrincipalName $globalADAdminUserName
+            Start-Sleep -Seconds 10
             if (Get-AzureADUser -ObjectId "$globalADAdminUserName"| Out-Null){
-                Write-Host -ForegroundColor Yellow "Azure AD Global Admin - $globalADAdminUserName created successfully."
+                Write-Host -ForegroundColor Yellow "`t* Azure AD Global Admin - $globalADAdminUserName created successfully."
             }
 
             #Get the Compay AD Admin ObjectID
@@ -152,23 +153,24 @@ Process
 
             #Make the new user the company admin aka Global AD administrator
             Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId
-            Write-Host "`nSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
+            Write-Host "`t* Successfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
         }
         catch {
             Throw $_
         }
 
         # Assigning Owner permission to Global Administrator Account on a Subscription
+        Write-Host -ForegroundColor Green "`nStep-3: Configuring subscription - $subscriptionId with Global Administrator account."        
         try {
             # Login to Azure Subscription
-            Write-Host -ForegroundColor Yellow "`nConfiguring subscription - $subscriptionId with Global Administrator account."
+            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId."
             if (Login-AzureRmAccount -subscriptionId $subscriptionId| Out-Null){
-                Write-Host "`tLogin was successful" -ForegroundColor Yellow
+                Write-Host "`t* Connection was successful" -ForegroundColor Yellow
             }
             # Assigning Owner Permission
-			Write-Host "`nAssigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
+			Write-Host "`t* Assigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
 			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$subscriptionId" 
-			Write-Host "`nSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
+			Write-Host "`t* Successfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
         }
         catch {
             Throw $_
@@ -179,7 +181,7 @@ End
 {
     if($configureGlobalAdmin){
         Write-Host -ForegroundColor Green "`n######################################################################`n"
-        Write-Host -ForegroundColor Yellow "`nKindly save the below information for future reference purpose:"
+        Write-Host -ForegroundColor Yellow "Kindly save the below information for future reference purpose:"
         $outputTable.Add('GlobalAdminUserName',$globalADAdminUserName)
         $outputTable.Add('GlobalAdminPassword',$globalADAdminPassword)
         $outputTable | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
