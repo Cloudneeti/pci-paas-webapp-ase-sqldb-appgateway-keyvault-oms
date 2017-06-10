@@ -5,13 +5,16 @@
    This script will import or installs (if not available) various powershell modules that requires to run this deployment. It also creates Global Administrator account`
     and assigns Owner permission on a given subscription.
 .EXAMPLE
-   Example of how to use this cmdlet
+    Execute script without parameters to only Import / Install modules.
+    .\0-Setup-AdministrativeAccountAndPermission.ps1
 .EXAMPLE
-   Another example of how to use this cmdlet
+        Execute below command to Import / Install modules and also create Azure AD Global Admin Account with Subscription Owner access
+    .\0-Setup-AdministrativeAccountAndPermission.ps1 -azureADDomainName contoso.com -tenantId xxxxxx-9c8f-4e1e-941b-xxxxxx -subscriptionID xxxxx-f760-4a7e-bd98-xxxxxxxx `
+        -configureGlobalAdmin
 #>
 [CmdletBinding()]
 Param(
-    # Provide registered Azure AD Domain name for Global Administrator account.
+    # Provide registered Azure AD Domain Name for Global Administrator Account.
     [string]$azureADDomainName,
 	
     # Provide Directory / Tenant ID of an Azure Active Directory.
@@ -32,6 +35,9 @@ Param(
     [switch]$configureGlobalAdmin
 )
 Begin{
+    
+    $ErrorActionPreference = 'stop'
+
     # Functions
 	function New-RandomPassword () 
 	{
@@ -67,6 +73,7 @@ Process
         {   
             Write-Host -ForegroundColor Yellow "`nModule has been found. Trying to import module."
             Import-Module -Name AzureRM -NoClobber -Force 
+            if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`nAzureRM Module imported successfully."}
         }
         Else
         {
@@ -82,7 +89,8 @@ Process
         If (Get-Module -ListAvailable -Name AzureAD) 
         {   
             Write-Host -ForegroundColor Yellow "`nModule has been found. Trying to import module."
-            Import-Module -Name AzureAD -NoClobber -Force 
+            Import-Module -Name AzureAD -NoClobber -Force
+            if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`nAzureAD Module imported successfully."}             
         }
         Else
         { 
@@ -108,6 +116,7 @@ Process
         {
             Write-Host -ForegroundColor Yellow "`nModule has been found. Trying to import module."
             Import-Module AzureDiagnosticsAndLogAnalytics -NoClobber -Force 
+            if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`nAzureDiagnosticsAndLogAnalytics Module imported successfully."}            
         }
         Else{
             # Installing AzureDiagnosticsAndLogAnalytics Module
@@ -118,25 +127,22 @@ Process
         }
     }
     catch {
+        Throw $_
     }
     
     if ($configureGlobalAdmin)
     {   
-        # Gets the user credentials, and then stores them in the $Credential variable.
-        $Credential = Get-Credential
-        
         # Creating Global Administrator Account & Making it Company Administrator in Azure Active Directory
         try {
-            
             Write-Host -ForegroundColor Yellow "`nConnecting to Azure Active Directory."
-            Connect-AzureAD -TenantId $tenantId -Credential $Credential
+            Connect-AzureAD -TenantId $tenantId
             if(Get-AzureADDomain -Name $azureADDomainName | Out-Null){
                 Write-Host -ForegroundColor Yellow "`nSuccessfully connected to Azure Active Directory."
             }
 
             # Creating Azure Global Admin Account
             Write-Host -ForegroundColor Yellow "`nCreating Azure AD Global Admin with UserName - $globalADAdminUserName."
-            $adAdmin = New-AzureADUser -DisplayName "Gloabl Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "PCIAdmin" -UserPrincipalName $globalADAdminUserName
+            $adAdmin = New-AzureADUser -DisplayName "Global Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true -MailNickName "PCIAdmin" -UserPrincipalName $globalADAdminUserName
             if (Get-AzureADUser -ObjectId "$globalADAdminUserName"| Out-Null){
                 Write-Host -ForegroundColor Yellow "Azure AD Global Admin - $globalADAdminUserName created successfully."
             }
@@ -149,32 +155,35 @@ Process
             Write-Host "`nSuccessfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
         }
         catch {
-
+            Throw $_
         }
 
         # Assigning Owner permission to Global Administrator Account on a Subscription
         try {
             # Login to Azure Subscription
             Write-Host -ForegroundColor Yellow "`nConfiguring subscription - $subscriptionID with Global Administrator account."
-            if (Login-AzureRmAccount -SubscriptionId $subscriptionID -Credential $Credential | Out-Null){
+            if (Login-AzureRmAccount -SubscriptionId $subscriptionID| Out-Null){
                 Write-Host "`tLogin was successful" -ForegroundColor Yellow
             }
             # Assigning Owner Permission
 			Write-Host "`nAssigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
 			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId" 
-			Write-Host "`tSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
+			Write-Host "`nSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
         }
         catch {
+            Throw $_
         }
     }
 }
 End
 {
     if($configureGlobalAdmin){
-        Write-Host -ForegroundColor DarkGray "`nKindly save the below information for future reference purpose:"
+        Write-Host -ForegroundColor Green "`n######################################################################`n"
+        Write-Host -ForegroundColor Yellow "`nKindly save the below information for future reference purpose:"
         $outputTable.Add('GlobalAdminUserName',$globalADAdminUserName)
         $outputTable.Add('GlobalAdminPassword',$globalADAdminPassword)
         $outputTable | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
+        Write-Host -ForegroundColor Green "`n######################################################################`n"
     }
 
 }
