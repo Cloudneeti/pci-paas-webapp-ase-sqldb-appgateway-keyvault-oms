@@ -9,7 +9,7 @@
     .\0-Setup-AdministrativeAccountAndPermission.ps1
 .EXAMPLE
         Execute below command to Import / Install modules and also create Azure AD Global Admin Account with Subscription Owner access
-    .\0-Setup-AdministrativeAccountAndPermission.ps1 -azureADDomainName contoso.com -tenantId xxxxxx-9c8f-4e1e-941b-xxxxxx -subscriptionID xxxxx-f760-4a7e-bd98-xxxxxxxx `
+    .\0-Setup-AdministrativeAccountAndPermission.ps1 -azureADDomainName contoso.com -tenantId xxxxxx-9c8f-4e1e-941b-xxxxxx -subscriptionId xxxxx-f760-4a7e-bd98-xxxxxxxx `
         -configureGlobalAdmin
 #>
 [CmdletBinding()]
@@ -21,16 +21,16 @@ Param(
     [string]$tenantId,
 
     # Provide Subscription ID on which you want to grant Global Administrator account with an Owner permission.
-    [string]$subscriptionID,
+    [string]$subscriptionId,
 
     # Use this switch to create Global Adiministrator account.
     [ValidateScript({
         if(
             (Get-Variable azureADDomainName) -and 
             (Get-Variable tenantId) -and
-            (Get-Variable subscriptionID)
+            (Get-Variable subscriptionId)
         ){$true}
-        Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionID before using this configureGlobalAdmin switch"}
+        Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using this configureGlobalAdmin switch"}
     })] 
     [switch]$configureGlobalAdmin
 )
@@ -161,13 +161,13 @@ Process
         # Assigning Owner permission to Global Administrator Account on a Subscription
         try {
             # Login to Azure Subscription
-            Write-Host -ForegroundColor Yellow "`nConfiguring subscription - $subscriptionID with Global Administrator account."
-            if (Login-AzureRmAccount -SubscriptionId $subscriptionID| Out-Null){
+            Write-Host -ForegroundColor Yellow "`nConfiguring subscription - $subscriptionId with Global Administrator account."
+            if (Login-AzureRmAccount -subscriptionId $subscriptionId| Out-Null){
                 Write-Host "`tLogin was successful" -ForegroundColor Yellow
             }
             # Assigning Owner Permission
 			Write-Host "`nAssigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
-			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$SubscriptionId" 
+			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$subscriptionId" 
 			Write-Host "`nSuccessfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
         }
         catch {
