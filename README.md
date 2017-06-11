@@ -52,7 +52,8 @@ License <a href="https://opensource.org/licenses/MIT" target="_blank"> MIT </a>
 - [POST DEPLOYMENT USER EXPERIENCE SETUP](#post-deployment-user-experience-setup)
 - [LOGGING AND MONITORING](#logging-and-monitoring)
 - [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
-- [FAQ AND FIXES](#FAQ.md)
+- [FAQ AND FIXES]<a href="FAQ.md"> 
+- [FAQ AND FIXES2](#./FAQ.md)
 - [THREAT MODEL](#threat-model)
 - [AZURE MARKETPLACE - 3RD PARTY GUIDANCE](#azure-marketplace---3rd-party-guidance)
 - [SUPPORT PROCESS](#support-process)
