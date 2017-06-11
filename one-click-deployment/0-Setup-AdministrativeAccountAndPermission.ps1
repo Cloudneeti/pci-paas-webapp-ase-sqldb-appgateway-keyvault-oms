@@ -11,7 +11,7 @@
     This script auto generates Global Admin UserPrincipal Name as 'admin+(2 length random number between 10-99)@azureADDomainName' and 15 length strong password for Global `
         Admin account and will print output at the completion of script. Please save the output for future reference purpose.
         For example - Username - admin45@contoso.com ; Password - ECUbZ30@IrSiG53
-    By default, 
+    Modules that will be Insatlled - * AzureRM   * AzureAD    * AzureDiagnosticsAndLogAnalytics   * SqlServer   * Enable-AzureRMDiagnostics (Script) 
     
     Important Note: This script requires you to run powershell in an elevated mode i.e Run As Administrator. Otherwise you might see issues while executing the script.
 
@@ -26,57 +26,40 @@
 [CmdletBinding()]
 Param(
     # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subsciption.
-    [Parameter(Position=0, 
-        Mandatory=$True, 
-        ValueFromPipeline=$True)] 
+    [Parameter(Mandatory=$True)] 
     [string]$userName, 
 
-    # Provide registered Azure AD Domain Name for Global Administrator Account.
-    [Parameter(Position=1, 
-        Mandatory=$True, 
-        ValueFromPipeline=$True)] 
-    [securestring]$password,
+    # Provide password for Azure AD UserName.
+    [Parameter(Mandatory=$True)] 
+    [string]$password,
 
     # Provide registered Azure AD Domain Name for Global Administrator Account.
-    [Parameter(Position=2,
-        ParameterSetName='ConfigureGlobalADAdmin')]
     [string]$azureADDomainName,
 	
     # Provide Directory / Tenant ID of an Azure Active Directory.
-    [Parameter(Position=3,
-        ParameterSetName='ConfigureGlobalADAdmin')]
     [string]$tenantId,
 
     # Provide Subscription ID on which you want to grant Global Administrator account with an Owner permission.
-    [Parameter(Position=4)]
     [string]$subscriptionId,
 
     # Use this switch to create Global Adiministrator account.
-    [Parameter(Position=5,
-        ParameterSetName='ConfigureGlobalADAdmin')]
     [ValidateScript({
         if(
             (Get-Variable azureADDomainName) -and 
             (Get-Variable tenantId) -and
             (Get-Variable subscriptionId)
         ){$true}
-        Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using this configureGlobalAdmin switch"}
+        Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using configureGlobalAdmin switch"}
     })] 
-    [switch]$configureGlobalAdmin,
-
-    # Use this switch to change password policy to 60 days on your tenant.
-    [Parameter(Position=6)] 
-    [ValidateScript({
-        if(Get-Variable subscriptionId) {$true}
-        Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using this configureGlobalAdmin switch"}
-    })] 
-    [switch]$setPasswordPolicy
+    [switch]$configureGlobalAdmin
 )
 Begin{
     
     $ErrorActionPreference = 'stop'
 
     # Functions
+
+    # Function to create a strong 15 length Strong & Random password for Azure AD Gobal Admin Account.
 	function New-RandomPassword () 
 	{
 		# This function generates a strong 15 length random password using Capital & Small Aplhabets,Numbers and Special characters.
@@ -88,7 +71,7 @@ Begin{
 	}
     
     # Azure AD username
-    $globalADAdminUserName = "admin"+(Get-Random -Maximum 99) +"@"+$azureADDomainName
+    $globalADAdminUserName = "admin"+(Get-Random -Maximum 99) +"@"+$azureADDomainName # e.g. admin45@contoso.com
 
     # Azure AD Global Admin Password & Profile
     $globalADAdminPassword = New-RandomPassword
@@ -99,6 +82,33 @@ Begin{
     # Hashtable for output table
     $outputTable = New-Object -TypeName Hashtable
 
+    # Login to Azure Subscrition & Azure AD 
+    if($configureGlobalAdmin){
+       try {
+            # Creating a login credential to login to Azure AD
+            $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
+            $psCred = New-Object System.Management.Automation.PSCredential ($userName, $secpasswd)
+
+            # Login to Azure Subscription
+            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId."
+            if (Login-AzureRmAccount -subscriptionId $subscriptionId -Credential $psCred){
+                Write-Host "`t* Connection was successful" -ForegroundColor Yellow
+            }
+
+            Start-Sleep -Seconds 10
+            
+            # Connecting to Azure
+            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory."
+            Connect-AzureAD -TenantId $tenantId -Credential $psCred
+            if(Get-AzureADDomain -Name $azureADDomainName){
+                Write-Host -ForegroundColor Yellow "`t* Successfully connected to Azure Active Directory."
+            }
+       }
+       catch {
+           Throw $_
+       }
+
+    }
 }
 Process
 {
@@ -139,7 +149,10 @@ Process
             }
         }
 
-        # Auditing and OMS Powershell Modules & Script
+        <# This script takes a SubscriptionID, ResourceType, ResourceGroup and a workspace ID as parameters, analyzes the subscription or
+            specific ResourceGroup defined for the resources specified in $Resources, and enables those resources for diagnostic metrics
+            also enabling the workspace ID for the OMS workspace to receive these metrics.#>
+            
         Write-Host -ForegroundColor Yellow "`t* Checking if Enable-AzureRMDiagnostics script is installed."
         If (!(Get-InstalledScript -Name Enable-AzureRMDiagnostics)) 
         {
@@ -149,6 +162,8 @@ Process
                 Write-Host "`t* Script installed successfully"
             }
         }
+
+        #Enable Log Analytics to collect logs from Azure Diagnostics
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureDiagnosticsAndLogAnalytics module is already exist."
         If (Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics) 
         {
@@ -163,21 +178,34 @@ Process
                 Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed and imported in to the session"
             }
         }
+
+        # This module allows SQL Server administrators and developers to automate server administration
+        Write-Host -ForegroundColor Yellow "`t* Checking if SqlServer module already exist."
+        If (Get-Module -ListAvailable -Name SqlServer) 
+        {   
+            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
+            Import-Module -Name SqlServer -NoClobber -Force
+            if(Get-Module -Name SqlServer) {Write-Host -ForegroundColor Yellow "`t* SqlServer Module imported successfully."}             
+        }
+        Else
+        { 
+            # Installing AzureAD Module
+            Install-Module SqlServer -AllowClobber;
+            if(Get-Module SqlServer | Out-Null){
+                Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed and imported in to the session"
+            }
+        }
     }
     catch {
         Throw $_
     }
-    
+
+    # Creating and Configuring Azure Global AD Admin account.
     if ($configureGlobalAdmin)
     {   
         # Creating Global Administrator Account & Making it Company Administrator in Azure Active Directory
         Write-Host -ForegroundColor Green "`nStep-2: Creating Azure AD Global Admin with UserName - $globalADAdminUserName."
         try {
-            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory."
-            Connect-AzureAD -TenantId $tenantId
-            if(Get-AzureADDomain -Name $azureADDomainName | Out-Null){
-                Write-Host -ForegroundColor Yellow "`t* Successfully connected to Azure Active Directory."
-            }
             # Creating Azure Global Admin Account
             $adAdmin = New-AzureADUser -DisplayName "Global Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true `
             -MailNickName "PCIAdmin" -UserPrincipalName $globalADAdminUserName
@@ -185,7 +213,6 @@ Process
             if (Get-AzureADUser -ObjectId "$globalADAdminUserName"| Out-Null){
                 Write-Host -ForegroundColor Yellow "`t* Azure AD Global Admin - $globalADAdminUserName created successfully."
             }
-
             #Get the Compay AD Admin ObjectID
             $companyAdminObjectId = Get-AzureADDirectoryRole | Where-Object {$_."DisplayName" -eq "Company Administrator"} | Select-Object ObjectId
 
@@ -200,11 +227,6 @@ Process
         # Assigning Owner permission to Global Administrator Account on a Subscription
         Write-Host -ForegroundColor Green "`nStep-3: Configuring subscription - $subscriptionId with Global Administrator account."        
         try {
-            # Login to Azure Subscription
-            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId."
-            if (Login-AzureRmAccount -subscriptionId $subscriptionId| Out-Null){
-                Write-Host "`t* Connection was successful" -ForegroundColor Yellow
-            }
             # Assigning Owner Permission
 			Write-Host "`t* Assigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
 			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$subscriptionId" 
@@ -225,10 +247,4 @@ End
         $outputTable | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
         Write-Host -ForegroundColor Green "`n######################################################################`n"
     }
-
 }
-
-
-############### Improvements
-# Add a switch to enable password policy at domain level.
-#FIX PASSWORD NEVER EXPIRES & STRONG PASSWORD
