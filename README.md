@@ -87,7 +87,7 @@ This solution illustrates the management of credit card data including card numb
 -   **Solution blueprint**. The blueprint provides an understanding of how Contoso webstore (a fictitious organization) achieved its compliant state. Included in the solution package is a completed PCI – DSS responsibility matrix for Contoso webstore.
 -   **Reference architecture**. The reference architecture provides the design that was used for the Contoso webstore solution.
 -   **Azure Resource Manager (ARM) templates**. In this deployment, JavaScript Object Notation (.JSON) files provide Microsoft Azure the ability to automatically deploy the components of the reference architecture after the configuration parameters are provided during setup.
--   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
+-   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](http://www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
     -   Module installation script that will install required PowerShell modules for
     the installation. This script will require local administrator rights.
     -   Global administrator setup script establishes the needed admin user to
@@ -118,26 +118,19 @@ For deployment details refer to section DEPLOYMENT GUIDE below
 
 
 
-A small webstore called, Contoso webstore is ready to move their payment system to the cloud. They have selected Microsoft Azure to host the
- process for purchasing and to allow a  clerk to collect credit card payments from their customer.
+A ~~small~~ medium to large eCommerce webstore called, Contoso webstore is ready to move their payment system to the cloud. They have selected Microsoft Azure to host the ~~process for purchasing~~ application infrastructure and to allow a  clerk to collect credit card payments from their customer.
 
-The administrator is looking for a solution can be quickly deployable to achieve his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
+An IT Manager / Cloud Architect ~~administrator~~ is looking for a solution that can be quickly deployws to achieve his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
 
 -   Collect, store, and retrieve payment card data while complying with
     stringent Payment Card Industry, Data Security Standards (PCI DSS)
     requirements
 
-Because this is a POC that installs the required elements to operate a service,
-it is not a customer ready-to-go solution. It requires careful understanding of
-all the regulations and laws that your organization must abide by.
+Because this is a POC that installs the required elements to operate a service, it is not a customer ready-to-go solution. It requires careful understanding of all the regulations and laws that your organization must abide by.
 
-*You will be responsible for conducting appropriate security and compliance reviews of any
-solution built with the architecture used by this POC, as requirements may vary
-based on the specifics of your implementation and geography. PCI DSS requires
-that you work directly with an accredited Qualified Security Assessor to certify
-your production ready solution.*
+*You will be responsible for conducting appropriate security and compliance reviews of any solution built with the architecture used by this POC, as requirements may vary based on the specifics of your implementation and geography. PCI DSS requires that you work directly with an accredited Qualified Security Assessor to certify your production ready solution.*
 
-### The contosowebstore POC
+### The ContosoWebstore POC
 
 The POC solution is designed with the following fictitious employees of `contosowebstore.com`:
 
@@ -193,12 +186,7 @@ Edna Benson is the Clerk, and business manager. She is responsible to ensure tha
 * Edna can overwrite (or replace) credit card number, expiration, and CVC verification information.
 
 
-
-
-
 In the `Contoso webstore` Demo User Application, you will be logged in to is configured to use **Edna** and able to test the capabilities of the deployed environment.
-
-
 
 
 ### contosowebstore Azure pricing sample calculation
@@ -310,11 +298,11 @@ create the correct file.
 
 5.  Convert the pfx file into a string Base64 text file. For example, in
     PowerShell you can use the following commands:
-```powershell
-$bytes = [System.IO.File]::ReadAllBytes("c:\key.pfx");
-$b64 = [System.Convert]::ToBase64String($bytes);
-[System.Io.File]::WriteAllText("C:\key_.txt", $b64);
-```
+    ```powershell
+    $bytes = [System.IO.File]::ReadAllBytes("c:\key.pfx");
+    $b64 = [System.Convert]::ToBase64String($bytes);
+    [System.Io.File]::WriteAllText("C:\key_.txt", $b64);
+    ```
 
 **Preserve your SSL 64-bit string and password; you will use them when
 installing the ARM template.**
@@ -345,9 +333,9 @@ computer throughout the installation of this solution.
     v5.x or greater. For example, in PowerShell you can use the following
     commands:
 
-```powershell
+    ```powershell
     $PSVersionTable.psversion
-```
+    ```
 
 3.  The Powershell modules referenced in the following PowerShell script, which
     must be installed with local Administrative permissions. To do so,
@@ -357,9 +345,9 @@ computer throughout the installation of this solution.
     -   Run the following installation script located in the
         `./pre-post-deployment` folder of this solution, and accept (or select
         Yes to user commands)
-```powershell
-   ./Install-azure-powershell-modules.ps1
-```
+    ```powershell
+    ./Install-azure-powershell-modules.ps1
+    ```
 
 
 
@@ -368,25 +356,25 @@ for assistance:
 
 
  To test [AzureRM](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/) run the following commands in PowerShell:
-```powershell
-$cred = Get-Credential  
-Login-AzureRmAccount -Credential $cred
-```
+    ```powershell
+    $cred = Get-Credential  
+    Login-AzureRmAccount -Credential $cred
+    ```
 
 To test [Azure AD](https://technet.microsoft.com/en-us/library/dn975125.aspx) run the following commands in PowerShell:  
-```powershell
-$cred = Get-Credential  
-Login-AzureAD -Credential $cred
-```
+    ```powershell
+    $cred = Get-Credential  
+    Login-AzureAD -Credential $cred
+    ```
 
  Review the following documentation to test [Enable AzureRM Diagnostics](https://www.powershellgallery.com/packages/Enable-AzureRMDiagnostics/1.3/DisplayScript)                      
 
  Review the following documentation to test [Azure Diagnostics and LogAnalytics](https://www.powershellgallery.com/packages/AzureDiagnosticsAndLogAnalytics/0.1)                    
 
  To test [SQL Server PowerShell](https://msdn.microsoft.com/en-us/library/hh231683.aspx?f=255&MSPPError=-2147217396#Installing#SQL#Server#PowerShell#Support) run the following commands in PowerShell:
-```powershell
- $Credential = Get-Credential   Connect-AzureAD -Credential $Credential   Get-Module -ListAvailable -Name Sqlps;
-```
+    ```powershell
+     $Credential = Get-Credential   Connect-AzureAD -Credential $Credential   Get-Module -ListAvailable -Name Sqlps;
+    ```
 
 ### Configure your global admin for the solution
 
@@ -470,27 +458,27 @@ Logging in to the powershell administrative
     AD](https://docs.microsoft.com/en-us/powershell/module/azuread/connect-azuread?view=azureadps-2.0)
     service running the following command, with your admin user such as
     admin\@pcidemo.onmicrosoft.com
-```powershell
-    Connect-AzureAD
-```
+    ```powershell
+        Connect-AzureAD
+    ```
 3.  [Connect to your Azure Active
     directory](https://docs.microsoft.com/en-us/powershell/module/msonline/connect-msolservice?view=azureadps-1.0)
     running the following command, with your admin user such as
     admin\@pcidemo.onmicrosoft.com
-```powershell
-    Connect-MsolService
-```
+    ```powershell
+        Connect-MsolService
+    ```
 4.  [Connect to your Azure
     Resource](https://msdn.microsoft.com/en-us/library/mt125356.aspx) manager
     running the following commands, with your admin user such as
     admin\@pcidemo.onmicrosoft.com
-```powershell
-    login-azurermaccount
-```
+    ```powershell
+    Login-AzureRmAccount
+    ```
 5.  Retrieve your subscription information running the following commands
-```powershell
-Get-AzureRmSubscription
-```
+    ```powershell
+    Get-AzureRmSubscription
+    ```
 1.  Record the highlighted information as illustrated in the following example.
 
 TenantId : `21d644f0-12av-4043-b0bb-f5acfde12256`
