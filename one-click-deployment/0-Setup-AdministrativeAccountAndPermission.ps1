@@ -51,7 +51,10 @@ Param(
         ){$true}
         Else {Throw "Please make sure you have provided azureADDomainName, tenantId, subscriptionId before using configureGlobalAdmin switch"}
     })] 
-    [switch]$configureGlobalAdmin
+    [switch]$configureGlobalAdmin,
+
+    # Use this switch to Install Modules, if does not exist.
+    [switch]$installModules
 )
 Begin{
     
@@ -82,6 +85,7 @@ Begin{
     # Hashtable for output table
     $outputTable = New-Object -TypeName Hashtable
 
+    Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription"
     # Login to Azure Subscrition & Azure AD 
     if($configureGlobalAdmin){
        try {
@@ -113,7 +117,7 @@ Begin{
 Process
 {
     # Importing / Installing Powershell Modules
-    Write-Host -ForegroundColor Green "`nStep-1: Importing / Installing Powershell Modules"
+    Write-Host -ForegroundColor Green "`nStep 2: Importing / Installing Powershell Modules"
     try {
         # Azure Resource Manager Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
@@ -125,10 +129,14 @@ Process
         }
         Else
         {
-            # Installing Azure AD Module
-            Install-Module AzureRM -AllowClobber; 
-            if(Get-Module AzureRM | Out-Null){
-                Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed and imported in to the session"
+            if (installModules) {
+                # Installing Azure AD Module
+                Install-Module AzureRM -AllowClobber; 
+                if(Get-Module AzureRM | Out-Null){
+                    Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed and imported in to the session"
+                }                
+            }else {
+                Write-Host -ForegroundColor Red "`t* AzureRM module does not exist. Please run script with -installModules switch to install modules."
             }
         }
 
@@ -142,10 +150,14 @@ Process
         }
         Else
         { 
-            # Installing AzureAD Module
-            Install-Module AzureAD -AllowClobber;
-            if(Get-Module AzureAD | Out-Null){
-                Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed and imported in to the session"
+            if (installModules) {
+                # Installing AzureAD Module
+                Install-Module AzureAD -AllowClobber;
+                if(Get-Module AzureAD | Out-Null){
+                    Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed and imported in to the session"
+                }                
+            }else {
+                Write-Host -ForegroundColor Red "`t* AzureAD module does not exist. Please run script with -installModules switch to install modules."
             }
         }
 
@@ -154,13 +166,18 @@ Process
             also enabling the workspace ID for the OMS workspace to receive these metrics.#>
             
         Write-Host -ForegroundColor Yellow "`t* Checking if Enable-AzureRMDiagnostics script is installed."
-        If (!(Get-InstalledScript -Name Enable-AzureRMDiagnostics)) 
-        {
-            Write-Host "`t* Enable-AzureRMDiagnostics script could not be found. Installing the script."
-            Install-Script -Name Enable-AzureRMDiagnostics -Force
-            if(Get-InstalledScript -Name Enable-AzureRMDiagnostics | Out-Null){
-                Write-Host "`t* Script installed successfully"
-            }
+        If (Get-InstalledScript -Name Enable-AzureRMDiagnostics) 
+        {   
+            Write-Host -ForegroundColor Yellow "`t* Enable-AzureRMDiagnostics script is already installed."
+        }else {
+            if (installModules) {
+                Install-Script -Name Enable-AzureRMDiagnostics -Force
+                if(Get-InstalledScript -Name Enable-AzureRMDiagnostics | Out-Null){
+                    Write-Host "`t* Script installed successfully"
+                }
+            }else {
+                Write-Host -ForegroundColor Red "`t* Enable-AzureRMDiagnostics script does not exist. Please run script with -installModules switch to install modules."
+            }            
         }
 
         #Enable Log Analytics to collect logs from Azure Diagnostics
@@ -172,11 +189,13 @@ Process
             if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}            
         }
         Else{
-            # Installing AzureDiagnosticsAndLogAnalytics Module
-            Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber
-            if (Get-Module -Name AzureDiagnosticsAndLogAnalytics | Out-Null ) {
-                Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed and imported in to the session"
-            }
+            if (installModules) {
+                # Installing AzureDiagnosticsAndLogAnalytics Module
+                Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber
+                if (Get-Module -Name AzureDiagnosticsAndLogAnalytics | Out-Null ) {
+                    Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed and imported in to the session"
+                }
+            }            
         }
 
         # This module allows SQL Server administrators and developers to automate server administration
@@ -189,11 +208,15 @@ Process
         }
         Else
         { 
-            # Installing AzureAD Module
-            Install-Module SqlServer -AllowClobber;
-            if(Get-Module SqlServer | Out-Null){
-                Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed and imported in to the session"
-            }
+            if (installModules) {
+                # Installing SqlServer Module
+                Install-Module SqlServer -AllowClobber;
+                if(Get-Module SqlServer | Out-Null){
+                    Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed and imported in to the session"
+                }
+            }else {
+                Write-Host -ForegroundColor Red "`t* SqlServer Module does not exist. Please run script with -installModules switch to install modules."
+            }             
         }
     }
     catch {
@@ -204,7 +227,7 @@ Process
     if ($configureGlobalAdmin)
     {   
         # Creating Global Administrator Account & Making it Company Administrator in Azure Active Directory
-        Write-Host -ForegroundColor Green "`nStep-2: Creating Azure AD Global Admin with UserName - $globalADAdminUserName."
+        Write-Host -ForegroundColor Green "`nStep 3: Creating Azure AD Global Admin - $globalADAdminUserName"
         try {
             # Creating Azure Global Admin Account
             $adAdmin = New-AzureADUser -DisplayName "Global Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true `
@@ -218,19 +241,19 @@ Process
 
             #Make the new user the company admin aka Global AD administrator
             Add-AzureADDirectoryRoleMember -ObjectId $companyAdminObjectId.ObjectId -RefObjectId $adAdmin.ObjectId
-            Write-Host "`t* Successfully granted Global AD permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
+            Write-Host "`t* Successfully granted Global AD permissions to $globalADAdminUserName" -ForegroundColor Yellow
         }
         catch {
             Throw $_
         }
 
         # Assigning Owner permission to Global Administrator Account on a Subscription
-        Write-Host -ForegroundColor Green "`nStep-3: Configuring subscription - $subscriptionId with Global Administrator account."        
+        Write-Host -ForegroundColor Green "`nStep 4: Configuring subscription - $subscriptionId"        
         try {
             # Assigning Owner Permission
 			Write-Host "`t* Assigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
 			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$subscriptionId" 
-			Write-Host "`t* Successfully granted Owner permissions to the Admin user $globalADAdminName" -ForegroundColor Yellow
+			Write-Host "`t* Successfully granted Owner permissions to $globalADAdminUserName" -ForegroundColor Yellow
         }
         catch {
             Throw $_
