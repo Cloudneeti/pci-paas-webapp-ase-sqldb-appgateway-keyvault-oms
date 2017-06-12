@@ -33,10 +33,74 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
 #### How do I use this solution in my production deployment, environment?
 > This solution including the scripts, template, and documentation are designed to help you build a pilot or demo site. Utilizing this solution does not provide a customer ready to run solution, it only illustrates the components required to build for a secure and compliant end to end solution. For instance, Custom Host Names, SSL Certificates, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions, Key vault rotation policies, usage of existing AD Admins and RBAC roles, usage of existing AD Applications and Service Principals will require customization and change to meet your custom production ready solution.
+#### How do I create a custom SSL certificate?
+A custom domain such as contosowebstore.com will require the creation of a .pfx file from the SSL provider that will is Base64-encrypted before uploading to Azure. The following process can be used to create the correct file.
+
+1.  Review the instructions on [creating a website SSL
+    certificate](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure-ssl-certificate).
+
+2.  Retrieve your private key. This file will have a name structure such as
+    `www.contosowebstore.com\_private\_key.key`
+
+3.  Retrieve your certificate. This file will have a name structure such as
+    `www.contosowebstore.com\_ssl\_certificate.cer`
+
+4.  [Create a personal information exchange (pfx)
+    file](https://technet.microsoft.com/en-us/library/dd261744.aspx) protect
+    this file with a password.
+
+5.  Convert the pfx file into a string Base64 text file. For example, in
+    PowerShell you can use the following commands:
+```powershell
+$bytes = [System.IO.File]::ReadAllBytes("c:\key.pfx");
+$b64 = [System.Convert]::ToBase64String($bytes);
+[System.Io.File]::WriteAllText("C:\key_.txt", $b64);
+```
+
+####The scripts fail to run, I get a permission error XXXX, what do I do next?
+The following log-ons should be tested whenever you restart your PowerShell
+IDE session. This may not be required at all times, but strongly recommended to
+ensure the correct credentials are cached in your new session. ---at all times
+for this demo log in as the **admin** user in our example.
+
+Logging in to the powershell administrative
 
 
-# AZURE MARKETPLACE - 3RD PARTY GUIDANCE
-The following Azure Marketplace products are recommendations to help you achieve and manage continuous compliance  
+1.  [Connect to your Azure
+    AD](https://docs.microsoft.com/en-us/powershell/module/azuread/connect-azuread?view=azureadps-2.0)
+    service running the following command, with your admin user such as
+    admin\@pcidemo.onmicrosoft.com
+```powershell
+    Connect-AzureAD
+```
+2.  [Connect to your Azure Active
+    directory](https://docs.microsoft.com/en-us/powershell/module/msonline/connect-msolservice?view=azureadps-1.0)
+    running the following command, with your admin user such as
+    admin\@pcidemo.onmicrosoft.com
+```powershell
+    Connect-MsolService
+```
+3.  [Connect to your Azure
+    Resource](https://msdn.microsoft.com/en-us/library/mt125356.aspx) manager
+    running the following commands, with your admin user such as
+    admin\@pcidemo.onmicrosoft.com
+```powershell
+    login-azurermaccount
+```
+4.  Retrieve your subscription information running the following commands
+```powershell
+Get-AzureRmSubscription
+```
+
+#### What else do I need to consider once the solution is installed?
+Once the script has completed you should consider resetting your administrative passwords, including your ADsqladmin, and Admin users. The following command can be used to quickly reset passwords in PowerShell. 
+
+```powershell
+Set-MsolUserPassword -userPrincipalName [sqladmin@yourdomain] -NewPassword [NEWPASSWORD] -ForceChangePassword $false
+```
+
+#### Are there third party solutions that can help achieve or manage PCI compliance?
+The following examples in the marketplace partners that have solutions that can help with continous compliance efforts.
 
 | Security Layer                           	| Azure Marketplace Product(s)                                                                                                                                         	|
 |------------------------------------------	|----------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
@@ -45,13 +109,12 @@ The following Azure Marketplace products are recommendations to help you achieve
 | Extending Identity Security           	| [Azure Marketplace: Security + Identity](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/security-identity?page=1)                           	|
 | Extending Monitoring and Diagnostics 	| [Azure Marketplace: Monitoring + Diagnostics](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/monitoring-management?page=1&subcategories=monitoring-diagnostics) 	|
 
- 
+ #### How often is this solution updated? 
 
-# SUPPORT PROCESS
+This solution is maintained in three repositories, one private, and two public. Currently Avyan Consulting team provided the development branch of this solution, any questions or concerns contact. azurecompliance@avyanconsulting.com 
 
-This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, contact your Microsoft account representative.  Avyan Consulting team provided the development of this solution, any questions or concerns contact. azurecompliance@avyanconsulting.com **Developed under MIT licensing**
-
-The current version of the blueprint is avalible in preview, and no stable build has been commited. Please check back frequently for updates for the official release of this solution.
+The current version of the solution is avalible in preview,  no stable build has been commited.
+ Please check back frequently for updates for the official release of this solution.
 The next version pre-release, fixes and updates are located at [Avyan Consulting Git Repo](https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/)
 
 
