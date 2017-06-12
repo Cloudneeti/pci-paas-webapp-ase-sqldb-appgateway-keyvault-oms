@@ -1,24 +1,12 @@
-
-
-
-
 # TABLE OF CONTENTS 
 <!-- TOC -->
-- [ACKNOWLEDGMENTS](#acknowledgments)
-- [TABLE OF CONTENTS](#table-of-contents)
-- [SOLUTION DESCRIPTION OBJECTIVE AND SCENARIO](#solution-description-objective-and-scenario)
-- [USER SCENARIO](#user-scenario)
-- [PRE DEPLOYMENT REQUIREMENTS](#pre-deployment-requirements)
-- [SOLUTION DEPLOYMENT](#solution-deployment)
-- [POST DEPLOYMENT USER EXPERIENCE SETUP](#post-deployment-user-experience-setup)
-- [LOGGING AND MONITORING](#logging-and-monitoring)
-- [DEPLOYMENT ARCHITECTURE](#deployment-architecture)
-- [FAQ AND FIXES] <a href="FAQ.md"> FAQ </a> 
-- [FAQ AND FIXES2](#./FAQ.md)
-[FAQ3](https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/blob/master/FAQ.md)
-- [THREAT MODEL](#threat-model)
-- [AZURE MARKETPLACE - 3RD PARTY GUIDANCE](#azure-marketplace---3rd-party-guidance)
-- [SUPPORT PROCESS](#support-process)
+- <a href="Overview.md"> Solution Overview </a> 
+- <a href="Configuration.md"> Configuration and setup for solution </a> 
+- <a href="Payment processing solution.md"> The Payment Processing Solution (PCI)</a> 
+- <a href="Payment Sample dataset.md"> Customer Samples, and monitoring</a> 
+- <a href="FAQ.md"> Frequently Asked Questions </a> 
+
+
 <!-- /TOC -->
 
 

@@ -1,3 +1,16 @@
+# TABLE OF CONTENTS 
+<!-- TOC -->
+- <a href="Overview.md"> Solution Overview </a> 
+- <a href="Configuration.md"> Configuration and setup for solution </a> 
+- <a href="Payment processing solution.md"> The Payment Processing Solution (PCI)</a> 
+- <a href="Payment Sample dataset.md"> Customer Samples, and monitoring</a> 
+- <a href="FAQ.md"> Frequently Asked Questions </a> 
+
+
+<!-- /TOC -->
+
+
+
 # POC and data set deployment
 
 The following steps deploy and set up the contoso user experience. This portion of the deploment helps illustrate how the database, users, and data records help meet the PCI DSS compliance process. The steps in this section will illustrate how record protection requirements are enabled by encrypting the customer records that contain payment card data, and monitoring can be set up to collect logs, and maintain security.
