@@ -2,25 +2,45 @@
 .Synopsis
    Deploys and Configures Azure resources as a part of pre-deployment activity before deploying PCI-PaaS solution ARM templates.
 .DESCRIPTION
-    This script is used to create additional AD users to run various scenarios and creates AD Application and creates service principle to AD Application.This script 
-        should run by Global AD Administrator you created Global AD Admin in previous script(0-Setup-AdministrativeAccountAndPermission.ps1).
-    It also generate self signed certificate SSL for Internal App Service Environment and Application gateway (if required).If you already have your own valid SSL
-        certificate, you can provide it as an input parameters so it can be converted into base64 string for the purpose of template deployment.
-    
-    
-    
-    Important Note: This script should run before you start deployment of PCI-PaaS solution ARM templates. 
+    This script is created to perform several pre-requisites that are required to make sure customer have all the required input during the template deployment.
+    Below is the list of activities performed by this script -
+        -   Create 2 Azure AD Accounts - 1) SQL Account with Company Administrator Role and Contributor Permission on a Subscription.
+                                         2) Receptionist Account with Limited access.
+        -   Creates AD Application and Service Principle to AD Application.
+        -   Generates self-signed SSL certificate for Internal App Service Environment and Application gateway (if required) and Converts them into Base64 string
+                for template deployment.
+    You can also provide your own valid certificate and customHostName to configure Application Gateway with SSL endpoint. This script requires you to input certificate
+        path as parameter input and converts it to Base64 which you can later use during the template deployment.
+    The Script has 2 Switch parameters - 
+    1) enableSSL - Use this switch to create new self-signed certificate or convert existing certificate (by providing certificatePath) for Application Gateway SSL endpoint. 
+    2) enableADDomainPasswordPolicy - Use this switch to setup password policy with 60 days of validity at Domain Level.
 
+    Important Note: This script should run before you start deployment of PCI-PaaS solution ARM templates. Make sure you use Azure AD Global Administrator account with
+        Owner permission at Subscription level to execute this script. If you are not sure, We would advise you to run 0-Setup-AdministrativeAccountAndPermission.ps1 
+        before you execute this script.
 
 .EXAMPLE
-   Example of how to use this cmdlet
+    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -customHostName dummydomain.com -enableSSL -enableADDomainPasswordPolicy
+
+    This command will create Azure AD Accounts, self-signed certificate for ASE ILB, self-signed certificate for Application Gateway & setup password policy with 60 days 
+    validity at Domain level. 
 .EXAMPLE
-   Another example of how to use this cmdlet
+   .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -enableSSL -enableADDomainPasswordPolicy
+
+    This command will create Azure AD Accounts, self-signed certificate for ASE ILB with default customHostName, self-signed certificate for Application Gateway with default 
+    customHostName & setup password policy with 60 days validity at Domain level. 
+.EXAMPLE
+    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com
+
+    This command will create Azure AD Accounts & self-signed certificate for ASE ILB with default customHostName only
+    
+.EXAMPLE
+
 #>
 [CmdletBinding()]
 Param
     (
-        # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subsciption.
+        # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subscription.
         [Parameter(Mandatory=$True)] 
         [string]$globalAdminUserName, 
 
@@ -42,32 +62,56 @@ Param
 
         # This is used to create a unique website name in your organization. This could be your company name or business unit name
         [Parameter(Mandatory=$true)]
-        [string]
         [ValidateNotNullOrEmpty()]
+        [string]
         $suffix,
 
-        # Param2 help description
-        [string]
-        $customHostName,
+        # Provide Email address for SQL Threat Detection Alerts.
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]        
+        $sqlTDAlertEmailAddress,        
 
-        # Param2 help description
+        # Provide CustomDomain that will be used for creating ASE SubDomain & WebApp HostName e.g. contoso.com. This is not a Mandatory parameter. You can also leave
+        #   it blank if you want to use built-in domain - azurewebsites.net. 
         [string]
+        $customHostName = "azurewebsites.net",
+
+        # Provide certificate path if you are wiling to provide your own frontend ssl certificate for Application gateway.
+        [ValidateScript({
+            if(
+                (Test-Path $_)
+            ){$true}
+            Else {Throw "Parameter validtion failed due to invalid file path"}
+        })]  
+        [string]
+        $certificatePath,
+
+        # Use this swtich in combination with certificatePath parameter to setup frontend ssl on Application gateway.
+        [ValidateScript({
+            if(
+                (Get-Variable customHostName)
+            ){$true}
+            Else {Throw "Parameter validtion failed due to invalid customHostName"}
+        })]         
+        [switch]
         $enableSSL,
-        
-        # Param2 help description
-        [string]
-        $certificatePath
 
-        # Use this switch to enable new password policy with 60 days validity.
+        # Use this switch to enable new password policy with 60 days expiry at Azure AD Domain level.
         [switch]$enableADDomainPasswordPolicy               
     )
 
 Begin
     {
         $ErrorActionPreference = 'stop'
+        cd $PSScriptRoot    
+
+        ########### Manage directories ###########
+        # Create folder to store self-signed certificates
+        if(!(Test-path $pwd\Certificates)){mkdir $pwd\Certificates -Force | Out-Null }
 
         ########### Functions ###########
-        Write-Host -ForegroungColor Green "`nStep 1: Loading functions."
+        Write-Host -ForegroundColor Green "`nStep 1: Loading functions."
         # Function to convert certificates into Base64 String.
         function Convert-Certificate ($certPath)
         {
@@ -85,18 +129,23 @@ Begin
             (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + `
             ((10..99) | Get-Random -Count 1)
         }
-        Write-Host -ForegroundColor Yellow "`nFunctions loaded successfully."
+        Write-Host -ForegroundColor Yellow "`t* Functions loaded successfully."
 
         ########### Manage Variables ###########
         $ScriptFolder = Split-Path -Parent $PSCommandPath
         $sqlADAdminName = "sqlAdmin@"+$azureADDomainName
         $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
-        $cloudwiseAppServiceURL = "http://pcisolution"+(Get-Random -Maximum 999)+'.'+$azureADDomainName
+        $pciAppServiceURL = "http://pcisolution"+(Get-Random -Maximum 999)+'.'+$azureADDomainName
         $suffix = $suffix.Replace(' ', '').Trim()
         $displayName = ($suffix + " Azure PCI PAAS Sample")
-
+        if($enableSSL){
+            $sslORnon_ssl = 'ssl'
+        }else{
+            $sslORnon_ssl = 'non-ssl'
+        }
         # Generating common password 
         $newPassword = New-RandomPassword
+        $secNewPasswd = ConvertTo-SecureString $newPassword -AsPlainText -Force
 
         # Creating a Login credential.
         $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
@@ -104,18 +153,18 @@ Begin
 
         ########### Establishing connection to Azure ###########
         try {
-            Write-Host -ForegroundColor Green "`nStep 2:Establishing connection to Azure AD & Subscription"
+            Write-Host -ForegroundColor Green "`nStep 2: Establishing connection to Azure AD & Subscription"
 
             # Connecting to MSOL Service
-            Write-Host -ForegroundColor Yellow  "`t* Connecting to MSOL service."
-            Connect-MsolService -Credential $psCred
+            Write-Host -ForegroundColor Yellow  "`t* Connecting to Msol service."
+            Connect-MsolService -Credential $psCred | Out-null
             if(Get-MsolDomain){
                 Write-Host -ForegroundColor Yellow "`t* Connection to Msol Service established successfully."
             }
             
             # Connecting to Azure Subscription
             Write-Host -ForegroundColor Yellow "`t* Connecting to AzureRM Subscription - $subscriptionID."
-            Login-AzureRmAccount -Credential $psCred -SubscriptionId $subscriptionID
+            Login-AzureRmAccount -Credential $psCred -SubscriptionId $subscriptionID | Out-null
             if(Get-AzureRmContext){
                 Write-Host -ForegroundColor Yellow "`t* Connection to AzureRM Subscription established successfully."
             }
@@ -129,11 +178,12 @@ Process
 
         try {
             ########### Creating Users in Azure AD ###########
-            Write-Host ("`nStep 3:Create AD Users for SQL AD Admin & Receptionist to test various scenarios" ) -ForegroundColor Green
+            Write-Host ("`nStep 3: Create AD Users for SQL AD Admin & Receptionist to test various scenarios" ) -ForegroundColor Green
             
             # Creating SQL Admin & Receptionist Account if does not exist already.
             Write-Host -ForegroundColor Yellow "`t* Checking is $sqlADAdminName already exist in the directory."
-            $sqlADAdminObjectId = (Get-MsolUser -UserPrincipalName $sqlADAdminName -ErrorAction SilentlyContinue).ObjectID
+            $sqlADAdminDetails = Get-MsolUser -UserPrincipalName $sqlADAdminName -ErrorAction SilentlyContinue
+            $sqlADAdminObjectId= $sqlADAdminDetails.ObjectID
             if ($sqlADAdminObjectId -eq $null)  
             {    
                 $sqlADAdminDetails = New-MsolUser -UserPrincipalName $sqlADAdminName -DisplayName "SQLADAdministrator PCI Samples" -FirstName "SQL AD Administrator" -LastName "PCI Samples" -PasswordNeverExpires $false -StrongPasswordRequired $true
@@ -142,14 +192,23 @@ Process
                 Write-Host -ForegroundColor Yellow "`t* Promoting SQL AD User Account as Company Administrator."
                 Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberObjectId $sqlADAdminObjectId
             }
+
             # Setting up new password for SQL Global AD Admin.
             Write-Host -ForegroundColor Yellow "`t* Setting up password for SQL AD Admin Account"
-            Set-MsolUserPassword -userPrincipalName $SQLADAdminName -NewPassword $newPassword -ForceChangePassword $false
-            Start-Sleep -Seconds 10
+            Set-MsolUserPassword -userPrincipalName $SQLADAdminName -NewPassword $newPassword -ForceChangePassword $false | Out-Null
+            Start-Sleep -Seconds 30
+
             # Grant 'SQL Global AD Admin' access to the Azure subscription
             $RoleAssignment = Get-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/'+ $subscriptionID) -ErrorAction SilentlyContinue
-            if ($RoleAssignment -eq $null){New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )}
-            Else{ Write-Output "$($sqlADAdminDetails.SignInName) has already been assigned with Contributor permission on Subscription."}
+            if ($RoleAssignment -eq $null){
+                Write-Host -ForegroundColor Yellow "`t* Assigning $($sqlADAdminDetails.SignInName) with Contributor Role on Subscription - $subscriptionID"
+                New-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/' + $subscriptionID )
+                if (Get-AzureRmRoleAssignment -ObjectId $sqlADAdminObjectId -RoleDefinitionName Contributor -Scope ('/subscriptions/'+ $subscriptionID))
+                {
+                    Write-Host -ForegroundColor Cyan "`t* $($sqlADAdminDetails.SignInName) has been successfully assigned with Contributor Role on Subscription."
+                }
+            }
+            Else{ Write-Host -ForegroundColor Cyan "`t* $($sqlADAdminDetails.SignInName) has already been assigned with Contributor Role on Subscription."}
 
             Write-Host -ForegroundColor Yellow "`t* Checking is $receptionistUserName already exist in the directory."
             $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue).ObjectID
@@ -159,10 +218,10 @@ Process
             }
             # Setting up new password for Receptionist user account.
             Write-Host -ForegroundColor Yellow "`t* Setting up password for Receptionist User Account"
-            Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $newPassword -ForceChangePassword $false
+            Set-MsolUserPassword -userPrincipalName $receptionistUserName -NewPassword $newPassword -ForceChangePassword $false | Out-Null
         }
         catch {
-            
+            throw $_
         }
 
         try {
@@ -173,106 +232,127 @@ Process
             if ($tenantID -eq $null){$tenantID = (Get-AzureRmContext).Tenant.Id}
 
             # Create Active Directory Application
-            Write-Host ("`tStep 4.1: Attempting to Azure AD application") -ForegroundColor Yellow
-            $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $cloudwiseAppServiceURL -IdentifierUris $cloudwiseAppServiceURL -Password $newPassword
-            Write-Host ("`tAzure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Yellow
+            Write-Host ("`t* Step 4.1: Attempting to Azure AD application") -ForegroundColor Yellow
+            $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $pciAppServiceURL -IdentifierUris $pciAppServiceURL -Password $newPassword
+            $azureAdApplicationClientId = $azureAdApplication.ApplicationId.Guid
+            $azureAdApplicationObjectId = $azureAdApplication.ObjectId.Guid            
+            Write-Host ("`t* Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Yellow
 
             # Create a service principal for the AD Application and add a Reader role to the principal 
-            Write-Host ("`tStep 4.2: Attempting to create Service Principal") -ForegroundColor Yellow
+            Write-Host ("`t* Step 4.2: Attempting to create Service Principal") -ForegroundColor Yellow
             $principal = New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication.ApplicationId
             Start-Sleep -s 30 # Wait till the ServicePrincipal is completely created. Usually takes 20+secs. Needed as Role assignment needs a fully deployed servicePrincipal
-            Write-Host ("`tService Principal creation successful - " + $principal.DisplayName) -ForegroundColor Yellow
-            
+            Write-Host ("`t* Service Principal creation successful - " + $principal.DisplayName) -ForegroundColor Yellow
+            Start-Sleep -Seconds 30
+
             # Assign Reader Role to Service Principal on Azure Subscription
-            $scopedSubs = ("/subscriptions/" + $sub.Subscription)
-            Write-Host ("`tStep 4.3: Attempting Reader Role assignment" ) -ForegroundColor Yellow
-            New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId.Guid -Scope $scopedSubs
-            Write-Host ("`tReader Role assignment successful" ) -ForegroundColor Yellow    
+            $scopedSubs = ("/subscriptions/" + $subscriptionID)
+            Write-Host ("`t* Step 4.3: Attempting Reader Role assignment" ) -ForegroundColor Yellow
+            New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId.Guid -Scope $scopedSubs | Out-Null
+            Write-Host ("`t* Reader Role assignment successful" ) -ForegroundColor Yellow    
         }
         catch {
             throw $_
         }
 
+        try {
+            ########### Create Self-signed certificate for ASE ILB and Application Gateway ###########
+            Write-Host -ForegroundColor Green "`nStep 5: Create Self-signed certificate for ASE ILB and Application Gateway "
 
-### 4. Create a Self-signed certificate for ASE ILB and Application Gateway.
+            # Generate App Gateway Front End SSL certificate, if required and converts it to Base64 string.
+            if($enableSSL){
+                if($certificatePath) {
+                    Write-Host -ForegroundColor Yellow "`t* Converting customer provided certificate to Base64 string"
+                    $certData = Convert-Certificate -certPath $certificatePath
+                    $certPassword = "Customer provided certificate."
+                }
+                Else{
+                    Write-Host -ForegroundColor Yellow "`t* No valid certificate path was provided. Creating a new self-signed certificate and converting to Base64 string"
+                    $fileName = "appgwfrontendssl"
+                    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "www.$customHostName"
+                    $certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
+                    Write-Host -ForegroundColor Yellow "`t* Certificate created successfully. Exporting certificate into pfx format."
+                    Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.pfx" -Password $secNewPasswd | Out-null
+                    $certData = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.pfx"
+                    $certPassword = $newPassword
+                }
+            }
+            Else{
+                $certData = "null"
+                $certPassword = "null"
+            }
 
-### Generate App Gateway Front End SSL certificate string
-if($enableSSL){
-	if($certificatePath) {
-		$certData = Convert-Certificate -certPath $certificatePath
-		$certPassword = "$certificatePassword"
-	}
-	Else{
-		$fileName = "appgwfrontendssl"
-		$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "www.$customHostName"
-		$certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
-		$pfxpass = $sqlADAdminPassword
-		$password = ConvertTo-SecureString -String "$pfxpass" -Force -AsPlainText
-		Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.pfx" -Password $password
-		$certData = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.pfx"
-		$certPassword = $pfxpass
-	}
-}
-Else{
-	$certData = "null"
-	$certPassword = "null"
-}
-
-### Generate self-signed certificate for ASE ILB and convert into base64 string
-
-$fileName = "aseilbcertificate"
-$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "*.ase.$customHostName", "*.scm.ase.$customHostName"
-$certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
-$pfxpass = $sqlADAdminPassword
-$password = ConvertTo-SecureString -String "$pfxpass" -Force -AsPlainText
-Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.pfx" -Password $password
-Export-Certificate -Cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.cer"
-Start-Sleep -Seconds 3
-$aseCertData = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.cer"
-$asePfxBlobString = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.pfx"
-$asePfxPassword = $pfxpass
-$aseCertThumbprint = $certificate.Thumbprint
-
-      
-
-
-
-
-        if($enableADDomainPasswordPolicy){
-            # Setting up password policy 
-            Write "`nStep 4:Setting up password policy for $azureADDomainName domain"
-            Set-MsolPasswordPolicy -ValidityPeriod 60 -NotificationDays 14 -DomainName "$azureADDomainName"
+            ### Generate self-signed certificate for ASE ILB and convert into base64 string
+            Write-Host -ForegroundColor Yellow "`t* Creating a self-signed certificate for ASE ILB and converting to Base64 string"
+            $fileName = "aseilbcertificate"
+            $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "*.ase.$customHostName", "*.scm.ase.$customHostName"
+            $certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
+            Write-Host -ForegroundColor Yellow "`t* Certificate created successfully. Exporting certificate into .pfx & .cer format."
+            Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.pfx" -Password $secNewPasswd | Out-null
+            Export-Certificate -Cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.cer" | Out-null
+            Start-Sleep -Seconds 3
+            $aseCertData = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.cer"
+            $asePfxBlobString = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.pfx"
+            $asePfxPassword = $newPassword
+            $aseCertThumbprint = $certificate.Thumbprint
+        }
+        catch {
+            throw $_
         }
 
+        # Setup up Password Policy at Azure AD Domain Level, if allowed.
+        try{
+            if($enableADDomainPasswordPolicy){
+                Write-Host -ForegroundColor Green "`nStep 6: Setting up password policy for $azureADDomainName domain"
+                Set-MsolPasswordPolicy -ValidityPeriod 60 -NotificationDays 14 -DomainName "$azureADDomainName"
+                if (($passwordPolicy = Get-MsolPasswordPolicy -DomainName $azureADDomainName).ValidityPeriod -eq 60 ) {
+                    Write-Host -ForegroundColor Yellow "`t* Password policy has been set to 60 Days."
+                    $passwordValidityPeriod = $passwordPolicy.ValidityPeriod
+                }else{Write-Host -ForegroundColor Red "`t* Failed to set password policy to 60 Days. Please refer output for current password policy settings."}
+            }
+        }
+        catch{
+            throw $_
+        }
     }
 End
     {
-        Write-Host -ForegroundColor DarkGray "`n`tKindly save the below information for future reference purpose:"
+        Write-Host -ForegroundColor Green "`nKindly save the below information for future reference purpose:"
+
+        Write-Host -ForegroundColor Green "`n########################### Template Input Parameters - Start ###########################"
+        $templateInputTable = New-Object -TypeName Hashtable
+        $templateInputTable.Add('sslORnon_ssl',$sslORnon_ssl)
+        $templateInputTable.Add('certData',$certData)
+        $templateInputTable.Add('certPassword',$certPassword)
+        $templateInputTable.Add('aseCertData',$aseCertData)
+        $templateInputTable.Add('asePfxBlobString',$asePfxBlobString)
+        $templateInputTable.Add('asePfxPassword',$asePfxPassword)
+        $templateInputTable.Add('aseCertThumbprint',$aseCertThumbprint)
+        $templateInputTable.Add('bastionHostAdministratorUserName','bastionadmin')
+        $templateInputTable.Add('bastionHostAdministratorPassword',$newPassword)
+        $templateInputTable.Add('sqlAdministratorLoginUserName','sqladmin')
+        $templateInputTable.Add('sqlAdministratorLoginPassword',$newPassword)
+        $templateInputTable.Add('sqlThreatDetectionAlertEmailAddress',$sqlTDAlertEmailAddress)
+        $templateInputTable.Add('customHostName',$customHostName)
+        $templateInputTable.Add('azureAdApplicationClientId',$azureAdApplicationClientId)
+        $templateInputTable.Add('azureAdApplicationClientSecret',$newPassword)        
+        $templateInputTable.Add('azureAdApplicationObjectId',$azureAdApplicationObjectId)
+        $templateInputTable.Add('sqlAdAdminUserName',$sqlADAdminName)
+        $templateInputTable.Add('sqlAdAdminUserPassword',$newPassword)
+        $templateInputTable | Sort-Object Name  | Format-Table -AutoSize -Wrap -Expand EnumOnly 
+        Write-Host -ForegroundColor Green "`n########################### Template Input Parameters - End ###########################"
+
+        Write-Host -ForegroundColor Green "`n########################### Other Deployment Details - Start ###########################"
         $outputTable = New-Object -TypeName Hashtable
-        $outputTable.Add('resourceGroupName',$resourceGroupName)
-        $outputTable.Add('deploymentName',$DeploymentName)
-        $outputTable.Add('deploymentLocation',$location)
-        $outputTable.Add('deploymentType',$sslORnon_ssl)
-        $outputTable.Add('globalAdminUsername',$globalAdminUserName)
-        $outputTable.Add('globalAdminPassword',$globalAdminPassword)
-        $outputTable.Add('customDomain',$customDomain)
-        $outputTable.Add('Email address for SQL Threat Detection Alerts',$sqlTDAlertEmailAddress)
-        $outputTable.Add('automationAccountName',$automationaccname)
-        $outputTable.Add('azureADApplicationId',$azureAdApplicationClientId)
-        $outputTable.Add('azureADApplicationSecret',$commonPassword)
-        $outputTable.Add('applicationGatewaySslCert',$certData)
-        $outputTable.Add('applicationGatewaySslPassword',$certPassword)
-        $outputTable.Add('applicationGatewayBackendCertData',$aseCertData)
-        $outputTable.Add('aseIlbCertData',$asePfxBlobString)
-        $outputTable.Add('aseIlbCertPassword',$asePfxPassword)
-        $outputTable.Add('aseCertThumbprint',$aseCertThumbprint)
-        $outputTable.Add('bastionVMAdmin','bastionadmin')
-        $outputTable.Add('bastionVMAdminPassword',$commonPassword)
-        $outputTable.Add('sqlServerName',$SqlServer)
-        $outputTable.Add('sqlADAdminUsername',$sqlAdAdminUsername)
-        $outputTable.Add('sqlADAdminPassword',$commonPassword)
-        $outputTable.Add('sqlAdminUsername','sqladmin')
-        $outputTable.Add('salAdminPassword',$commonPassword)
-        $outputTable.Add('keyvaultName',$KeyVault)
-        $outputTable | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly 
+        $outputTable.Add('tenantId',$tenantID)
+        $outputTable.Add('subscriptionId',$subscriptionID)
+        $outputTable.Add('receptionistUserName',$receptionistUserName)
+        $outputTable.Add('receptionistPassword',$newPassword)
+        $outputTable.Add('passwordValidityPeriod',$passwordValidityPeriod)
+        $outputTable | Sort-Object Name  | Format-Table -AutoSize -Wrap -Expand EnumOnly 
+        Write-Host -ForegroundColor Green "`n########################### Other Deployment Details - End ###########################"
+
     }
+
+
+####################  End of Script ###############################
