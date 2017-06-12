@@ -1,3 +1,5 @@
+	
+
 <#
  Modules NEEDED FOR this script - * AzureRM   * AzureAD    * AzureDiagnosticsAndLogAnalytics   * SqlServer   * Enable-AzureRMDiagnostics (Script)
  Note: This script requires you to run script in an elevated mode i.e -Run As Administrator-
@@ -21,16 +23,16 @@ This script imports and Install required powershell modules and creates Global A
     
   
 #>
+	
+
 [CmdletBinding()]
 Param(
-    # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subsciption.
-    [Parameter(Mandatory=$True)] 
-    [string]$userName, 
 
-    # Provide password for Azure AD UserName.
+    # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subsciption.    
+	[Parameter(Mandatory=$True)] 
+	[string]$userName, 
     [Parameter(Mandatory=$True)] 
-    [string]$password,
-
+	[string]$password,
     # Provide registered Azure AD Domain Name for Global Administrator Account.
     [string]$azureADDomainName,
 	
@@ -54,6 +56,9 @@ Param(
     # Use this switch to Install Modules, if does not exist.
     [switch]$installModules
 )
+	
+	
+
 Begin{
     
     $ErrorActionPreference = 'stop'

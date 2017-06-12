@@ -1,41 +1,41 @@
 <#
-.Synopsis
-   Deploys and Configures Azure resources as a part of pre-deployment activity before deploying PCI-PaaS solution ARM templates.
-.DESCRIPTION
-    This script is created to perform several pre-requisites that are required to make sure customer have all the required input during the template deployment.
-    Below is the list of activities performed by this script -
+This script deploys and configures Azure resources as a part of a -pre-deployment- activity
+
+This script should run before you start deployment of PCI-PaaS solution templates. Use your Azure AD Global Administrator account with
+        Owner permission at Subscription level to execute this script. 
+		If you are not sure about your permissions, run 0-Setup-AdministrativeAccountAndPermission.ps1 before you execute this script.
+
+    This script performs several pre-requisites including 
         -   Create 2 Azure AD Accounts - 1) SQL Account with Company Administrator Role and Contributor Permission on a Subscription.
                                          2) Receptionist Account with Limited access.
         -   Creates AD Application and Service Principle to AD Application.
         -   Generates self-signed SSL certificate for Internal App Service Environment and Application gateway (if required) and Converts them into Base64 string
                 for template deployment.
-    You can also provide your own valid certificate and customHostName to configure Application Gateway with SSL endpoint. This script requires you to input certificate
-        path as parameter input and converts it to Base64 which you can later use during the template deployment.
-    The Script has 2 Switch parameters - 
+				
+				
+				
+    You can use the following switches parameters - 
     1) enableSSL - Use this switch to create new self-signed certificate or convert existing certificate (by providing certificatePath) for Application Gateway SSL endpoint. 
     2) enableADDomainPasswordPolicy - Use this switch to setup password policy with 60 days of validity at Domain Level.
 
-    Important Note: This script should run before you start deployment of PCI-PaaS solution ARM templates. Make sure you use Azure AD Global Administrator account with
-        Owner permission at Subscription level to execute this script. If you are not sure, We would advise you to run 0-Setup-AdministrativeAccountAndPermission.ps1 
-        before you execute this script.
-
-.EXAMPLE
+    
+USAGE 1, Create Azure AD Accounts, self-signed certificate for ASE ILB, custom domain, self-signed certificate for Application Gateway & setup password policy with 60 days.
+	
     .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -customHostName dummydomain.com -enableSSL -enableADDomainPasswordPolicy
 
-    This command will create Azure AD Accounts, self-signed certificate for ASE ILB, self-signed certificate for Application Gateway & setup password policy with 60 days 
-    validity at Domain level. 
-.EXAMPLE
+    
+USAGE 2, Create Azure AD Accounts, self-signed certificate for ASE ILB, custom domain, self-signed certificate for Application Gateway & setup password policy with 60 days.
+    
+	
    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -enableSSL -enableADDomainPasswordPolicy
 
-    This command will create Azure AD Accounts, self-signed certificate for ASE ILB with default customHostName, self-signed certificate for Application Gateway with default 
-    customHostName & setup password policy with 60 days validity at Domain level. 
-.EXAMPLE
+ 
+USAGE 3,  Create Azure AD Accounts & self-signed certificate for ASE ILB with default customHostName only
+
     .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com
 
-    This command will create Azure AD Accounts & self-signed certificate for ASE ILB with default customHostName only
     
-.EXAMPLE
-
+  
 #>
 [CmdletBinding()]
 Param
@@ -308,7 +308,10 @@ Process
                 if (($passwordPolicy = Get-MsolPasswordPolicy -DomainName $azureADDomainName).ValidityPeriod -eq 60 ) {
                     Write-Host -ForegroundColor Yellow "`t* Password policy has been set to 60 Days."
                     $passwordValidityPeriod = $passwordPolicy.ValidityPeriod
-                }else{Write-Host -ForegroundColor Red "`t* Failed to set password policy to 60 Days. Please refer output for current password policy settings."}
+                }else{
+				Write-Host -ForegroundColor Red "`t* Failed to set password policy to 60 Days." 
+				Write-Host -ForegroundColor Yellow "Please refer output for current password policy settings."
+				}
             }
         }
         catch{
@@ -317,7 +320,7 @@ Process
     }
 End
     {
-        Write-Host -ForegroundColor Green "`nKindly save the below information for future reference purpose:"
+        Write-Host -ForegroundColor Green "Common variables created for deployment"
 
         Write-Host -ForegroundColor Green "`n########################### Template Input Parameters - Start ###########################"
         $templateInputTable = New-Object -TypeName Hashtable
