@@ -119,7 +119,7 @@ Begin
             [System.Convert]::ToBase64String($fileContentBytes)
         }
 
-        # Function to create a strong 15 length Strong & Random password for Azure AD Gobal Admin Account.
+        # Function to create a strong 15 length Strong & Random password for the solution.
         function New-RandomPassword () 
         {
             # This function generates a strong 15 length random password using Capital & Small Aplhabets,Numbers and Special characters.
