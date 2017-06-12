@@ -1,27 +1,25 @@
 <#
-.Synopsis
-   Imports or Install required powershell modules and creates Global AD Admin account.
-.DESCRIPTION
-    This script will import or installs (if not available) various powershell modules that requires to run this deployment. It also creates Global Administrator account `
-        and assigns Owner permission on a given subscription.
-    If you already have Azure AD Global Administrator account with Subscription Owner permission, You can only directly execute the script without any parameters. You `
-        can refer Example-1 for reference.
-    However, If you are deploying the solution on a new subscription you will need to provide all parameters as shown in Example-2. You also need to provide a Switch `
-        'configureGlobalAdmin', otherwise script will throw a validation error.
-    This script auto generates Global Admin UserPrincipal Name as 'admin+(2 length random number between 10-99)@azureADDomainName' and 15 length strong password for Global `
-        Admin account and will print output at the completion of script. Please save the output for future reference purpose.
-        For example - Username - admin45@contoso.com ; Password - ECUbZ30@IrSiG53
-    Modules that will be Insatlled - * AzureRM   * AzureAD    * AzureDiagnosticsAndLogAnalytics   * SqlServer   * Enable-AzureRMDiagnostics (Script) 
-    
-    Important Note: This script requires you to run powershell in an elevated mode i.e Run As Administrator. Otherwise you might see issues while executing the script.
+ Modules NEEDED FOR this script - * AzureRM   * AzureAD    * AzureDiagnosticsAndLogAnalytics   * SqlServer   * Enable-AzureRMDiagnostics (Script)
+ Note: This script requires you to run script in an elevated mode i.e -Run As Administrator-
+ 
+ 
+ 
+This script imports and Install required powershell modules and creates Global AD Admin account.
 
-.EXAMPLE
-    Execute script without parameters to only Import / Install modules.
-    .\0-Setup-AdministrativeAccountAndPermission.ps1
-.EXAMPLE
-    Execute below command to Import / Install modules and also create Azure AD Global Admin Account with Subscription Owner access
-    .\0-Setup-AdministrativeAccountAndPermission.ps1 -azureADDomainName contoso.com -tenantId xxxxxx-9c8f-4e1e-941b-xxxxxx -subscriptionId xxxxx-f760-4a7e-bd98-xxxxxxxx `
+
+    This script will import or installs (if not available) required powershell modules to run this deployment. It also creates Global Administrator account 
+        and assigns Owner permission on a given subscription.
+		
+    If you already have Azure AD Global Administrator account with Subscription Owner permission, You can execute this script without any parameters.  
+        Example - .\0-Setup-AdministrativeAccountAndPermission.ps1
+    If you are deploying the solution on a -new subscription- you will need to run script with 'configureGlobalAdmin' switch  - otherwise script will throw a validation error.provide parameters 
+	    Example - .\0-Setup-AdministrativeAccountAndPermission.ps1 -azureADDomainName contoso.com -tenantId xxxxxx-9c8f-4e1e-941b-xxxxxx -subscriptionId xxxxx-f760-4a7e-bd98-xxxxxxxx 
         -configureGlobalAdmin
+       
+    This script auto generates Global Admin as 'admin+(2 length random number between 10-99)@azureADDomainName' and 15 length strong password for the account 
+        For example - Username - admin45@contoso.com ; Password 
+    
+  
 #>
 [CmdletBinding()]
 Param(
@@ -136,7 +134,8 @@ Process
                     Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed and imported in to the session"
                 }                
             }else {
-                Write-Host -ForegroundColor Red "`t* AzureRM module does not exist. Please run script with -installModules switch to install modules."
+                Write-Host -ForegroundColor Red "`t* AzureRM module does not exist. "
+				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
             }
         }
 
@@ -157,7 +156,8 @@ Process
                     Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed and imported in to the session"
                 }                
             }else {
-                Write-Host -ForegroundColor Red "`t* AzureAD module does not exist. Please run script with -installModules switch to install modules."
+                Write-Host -ForegroundColor Red "`t* AzureAD module does not exist. "
+				Write-Host -ForegroundColor Yellow "Please run script with -installModules switch to install modules."
             }
         }
 
@@ -176,7 +176,8 @@ Process
                     Write-Host "`t* Script installed successfully"
                 }
             }else {
-                Write-Host -ForegroundColor Red "`t* Enable-AzureRMDiagnostics script does not exist. Please run script with -installModules switch to install modules."
+                Write-Host -ForegroundColor Red "`t* Enable-AzureRMDiagnostics script does not exist. "
+				Write-Host -ForegroundColor Yellow "Please run script with -installModules switch to install modules."
             }            
         }
 
@@ -215,7 +216,8 @@ Process
                     Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed and imported in to the session"
                 }
             }else {
-                Write-Host -ForegroundColor Red "`t* SqlServer Module does not exist. Please run script with -installModules switch to install modules."
+                Write-Host -ForegroundColor Red "`t* SqlServer Module does not exist. "
+				Write-Host -ForegroundColor Yellow " run script with -installModules switch to install modules."
             }             
         }
     }
@@ -264,7 +266,7 @@ End
 {
     if($configureGlobalAdmin){
         Write-Host -ForegroundColor Green "`n######################################################################`n"
-        Write-Host -ForegroundColor Yellow "Kindly save the below information for future reference purpose:"
+        Write-Host -ForegroundColor Yellow "Script complete"
         $outputTable.Add('globalADAdminUserName',$globalADAdminUserName)
         $outputTable.Add('globalADAdminPassword',$globalADAdminPassword)
         $outputTable | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
