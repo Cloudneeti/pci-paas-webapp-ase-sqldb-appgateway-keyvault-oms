@@ -1,5 +1,4 @@
-﻿#Requires -RunAsAdministrator
-  Param (
+﻿Param (
  [Parameter(Mandatory=$true)]
  [String] $ResourceGroup,
 
@@ -31,22 +30,16 @@
  [String] $EnterpriseCertPlainPasswordForClassicRunAsAccount,
 
  [Parameter(Mandatory=$false)]
- [ValidateSet("AzureCloud","AzureUSGovernment")]
- [string]$EnvironmentName="AzureCloud",
-
- [Parameter(Mandatory=$false)]
  [int] $SelfSignedCertNoOfMonthsUntilExpired = 12
  )
 
  function CreateSelfSignedCertificate([string] $keyVaultName, [string] $certificateName, [string] $selfSignedCertPlainPassword,
                                [string] $certPath, [string] $certPathCer, [string] $selfSignedCertNoOfMonthsUntilExpired ) {
- $Cert = New-SelfSignedCertificate -DnsName $certificateName -CertStoreLocation cert:\LocalMachine\My `
-    -KeyExportPolicy Exportable -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" `
-    -NotAfter (Get-Date).AddMonths($selfSignedCertNoOfMonthsUntilExpired)
-
+ $Cert = New-SelfSignedCertificateEx -Subject "CN=$certificateName" -EKU "Server Authentication", "Client authentication" `
+         -NotAfter (Get-Date).AddMonths($selfSignedCertNoOfMonthsUntilExpired) -KU "KeyEncipherment, DigitalSignature" -SignatureAlgorithm SHA256 -Exportable
  $CertPassword = ConvertTo-SecureString $selfSignedCertPlainPassword -AsPlainText -Force
- Export-PfxCertificate -Cert ("Cert:\localmachine\my\" + $Cert.Thumbprint) -FilePath $certPath -Password $CertPassword -Force | Write-Verbose
- Export-Certificate -Cert ("Cert:\localmachine\my\" + $Cert.Thumbprint) -FilePath $certPathCer -Type CERT | Write-Verbose
+ Export-PfxCertificate -Cert ("Cert:\CurrentUser\my\" + $Cert.Thumbprint) -FilePath $certPath -Password $CertPassword -Force | Write-Verbose
+ Export-Certificate -Cert ("Cert:\CurrentUser\my\" + $Cert.Thumbprint) -FilePath $certPathCer -Type CERT | Write-Verbose
  }
 
  function CreateServicePrincipal([System.Security.Cryptography.X509Certificates.X509Certificate2] $PfxCert, [string] $applicationDisplayName) {  
@@ -91,18 +84,12 @@
  New-AzureRmAutomationConnection -ResourceGroupName $ResourceGroup -AutomationAccountName $automationAccountName -Name $connectionAssetName -ConnectionTypeName $connectionTypeName -ConnectionFieldValues $connectionFieldValues
  }
 
- Import-Module AzureRM.Profile
- Import-Module AzureRM.Resources
-
  $AzureRMProfileVersion= (Get-Module AzureRM.Profile).Version
  if (!(($AzureRMProfileVersion.Major -ge 2 -and $AzureRMProfileVersion.Minor -ge 1) -or ($AzureRMProfileVersion.Major -gt 2)))
  {
     Write-Error -Message "Please install the latest Azure PowerShell and retry. Relevant doc url : https://docs.microsoft.com/powershell/azureps-cmdlets-docs/ "
     return
  }
-
- Login-AzureRmAccount -EnvironmentName $EnvironmentName
- $Subscription = Select-AzureRmSubscription -SubscriptionId $SubscriptionId
 
  # Create a Run As account by using a service principal
  $CertifcateAssetName = "AzureRunAsCertificate"
@@ -148,7 +135,7 @@
       if ($EnterpriseCertPathForClassicRunAsAccount -and $EnterpriseCertPlainPasswordForClassicRunAsAccount ) {
       $PfxCertPathForClassicRunAsAccount = $EnterpriseCertPathForClassicRunAsAccount
       $PfxCertPlainPasswordForClassicRunAsAccount = $EnterpriseCertPlainPasswordForClassicRunAsAccount
-      $UploadMessage = $UploadMessage.Replace("#CERT#", $PfxCertPathForClassicRunAsAccount)
+      $UploadMessage = $UploadMessage.Replace("#CERT#", $PfxCertPathForClassicRunAsAccount) ##$$BUG$$ ## is this correct?
  } else {
       $ClassicRunAsAccountCertificateName = $AutomationAccountName+$ClassicRunAsAccountCertifcateAssetName
       $PfxCertPathForClassicRunAsAccount = Join-Path $env:TEMP ($ClassicRunAsAccountCertificateName + ".pfx")

@@ -40,6 +40,21 @@ USAGE 3,  Create Azure AD Accounts & self-signed certificate for ASE ILB with de
 [CmdletBinding()]
 Param
     (
+        # Provide resourceGroupName for deployment
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateLength(1,64)]
+        [ValidatePattern('^[\w]+$')]
+        $resourceGroupName,
+
+        # Provide location for deployment
+        [Parameter(Mandatory=$true)] 
+        [ValidateSet("eastasia","southeastasia","centralus","eastus","eastus2","westus","northcentralus","southcentralus","northeurope","westeurope","japanwest","japaneast",
+        "brazilsouth","australiaeast","australiasoutheast","southindia","centralindia","westindia","canadacentral","canadaeast","uksouth","ukwest","westcentralus","westus2",
+        "koreacentral","koreasouth")]
+        [string]
+        $location,
+
         # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subscription.
         [Parameter(Mandatory=$True)] 
         [string]$globalAdminUserName, 
@@ -66,11 +81,30 @@ Param
         [string]
         $suffix,
 
-        # Provide Email address for SQL Threat Detection Alerts.
+        # Provide Supported location/Region for Automation Account
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("japaneast","eastus2","westeurope","southeastasia","southcentralus","uksouth","westcentralus","northeurope","canadacentral","australiasoutheast",
+        "centralindia")]
+        [string]
+        $automationAcclocation,
+        
+        # Provide Email address for SQL Threat Detection Alerts
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]        
-        $sqlTDAlertEmailAddress,        
+        $sqlTDAlertEmailAddress,
+        
+        # Provide template Uri for deployment template
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]        
+        $templateUri,
+
+        # Provide artifacts location that will be uploaded to storage account
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]        
+        $_artifactslocation,            
 
         # Provide CustomDomain that will be used for creating ASE SubDomain & WebApp HostName e.g. contoso.com. This is not a Mandatory parameter. You can also leave
         #   it blank if you want to use built-in domain - azurewebsites.net. 
@@ -82,17 +116,21 @@ Param
             if(
                 (Test-Path $_)
             ){$true}
-            Else {Throw "Parameter validtion failed due to invalid file path"}
+            else {Throw "Parameter validtion failed due to invalid file path"}
         })]  
         [string]
         $certificatePath,
+
+        # Enter password for the certificate provided.
+        [string]
+        $certificatePassword,
 
         # Use this swtich in combination with certificatePath parameter to setup frontend ssl on Application gateway.
         [ValidateScript({
             if(
                 (Get-Variable customHostName)
             ){$true}
-            Else {Throw "Parameter validtion failed due to invalid customHostName"}
+            else {Throw "Parameter validtion failed due to invalid customHostName"}
         })]         
         [switch]
         $enableSSL,
@@ -103,8 +141,8 @@ Param
 
 Begin
     {
-        $ErrorActionPreference = 'stop'
-        cd $PSScriptRoot    
+        $errorActionPreference = 'stop'
+        Set-location $PSScriptRoot    
 
         ########### Manage directories ###########
         # Create folder to store self-signed certificates
@@ -129,10 +167,14 @@ Begin
             (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + `
             ((10..99) | Get-Random -Count 1)
         }
+
+        #  Function for self-signed certificate generator. Reference link - https://gallery.technet.microsoft.com/scriptcenter/Self-signed-certificate-5920a7c6
+        .".\1-click-deployment-nested\New-SelfSignedCertificateEx.ps1"
+
         Write-Host -ForegroundColor Yellow "`t* Functions loaded successfully."
 
         ########### Manage Variables ###########
-        $ScriptFolder = Split-Path -Parent $PSCommandPath
+        $scriptFolder = Split-Path -Parent $PSCommandPath
         $sqlADAdminName = "sqlAdmin@"+$azureADDomainName
         $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
         $pciAppServiceURL = "http://pcisolution"+(Get-Random -Maximum 999)+'.'+$azureADDomainName
@@ -143,6 +185,11 @@ Begin
         }else{
             $sslORnon_ssl = 'non-ssl'
         }
+        $automationaccname = "automationacc" + ((Get-Date).ToUniversalTime()).ToString('MMddHH')
+        $automationADApplication = "AutomationAppl" + ((Get-Date).ToUniversalTime()).ToString('MMddHH')
+        $deploymentName = "PCI-Deploy-"+ ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')
+        $_artifactslocationSasToken = "null"
+
         # Generating common password 
         $newPassword = New-RandomPassword
         $secNewPasswd = ConvertTo-SecureString $newPassword -AsPlainText -Force
@@ -208,7 +255,7 @@ Process
                     Write-Host -ForegroundColor Cyan "`t* $($sqlADAdminDetails.SignInName) has been successfully assigned with Contributor Role on Subscription."
                 }
             }
-            Else{ Write-Host -ForegroundColor Cyan "`t* $($sqlADAdminDetails.SignInName) has already been assigned with Contributor Role on Subscription."}
+            else{ Write-Host -ForegroundColor Cyan "`t* $($sqlADAdminDetails.SignInName) has already been assigned with Contributor Role on Subscription."}
 
             Write-Host -ForegroundColor Yellow "`t* Checking is $receptionistUserName already exist in the directory."
             $receptionistUserObjectId = (Get-MsolUser -UserPrincipalName $receptionistUserName -ErrorAction SilentlyContinue).ObjectID
@@ -266,18 +313,19 @@ Process
                     $certData = Convert-Certificate -certPath $certificatePath
                     $certPassword = "Customer provided certificate."
                 }
-                Else{
+                else{
                     Write-Host -ForegroundColor Yellow "`t* No valid certificate path was provided. Creating a new self-signed certificate and converting to Base64 string"
                     $fileName = "appgwfrontendssl"
-                    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "www.$customHostName"
-                    $certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
+                    $certificate = New-SelfSignedCertificateEx -Subject "CN=www.$customHostName" -SAN "www.$customHostName" -EKU "Server Authentication", "Client authentication" `
+                    -NotAfter $([datetime]::now.AddYears(5)) -KU "KeyEncipherment, DigitalSignature" -SignatureAlgorithm SHA256 -Exportable
+                    $certThumbprint = "cert:\CurrentUser\my\" + $certificate.Thumbprint
                     Write-Host -ForegroundColor Yellow "`t* Certificate created successfully. Exporting certificate into pfx format."
-                    Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.pfx" -Password $secNewPasswd | Out-null
-                    $certData = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.pfx"
+                    Export-PfxCertificate -cert $certThumbprint -FilePath "$scriptFolder\Certificates\$fileName.pfx" -Password $secNewPasswd | Out-null
+                    $certData = Convert-Certificate -certPath "$scriptFolder\Certificates\$fileName.pfx"
                     $certPassword = $newPassword
                 }
             }
-            Else{
+            else{
                 $certData = "null"
                 $certPassword = "null"
             }
@@ -285,14 +333,15 @@ Process
             ### Generate self-signed certificate for ASE ILB and convert into base64 string
             Write-Host -ForegroundColor Yellow "`t* Creating a self-signed certificate for ASE ILB and converting to Base64 string"
             $fileName = "aseilbcertificate"
-            $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname "*.ase.$customHostName", "*.scm.ase.$customHostName"
-            $certThumbprint = "cert:\localMachine\my\" + $certificate.Thumbprint
+            $certificate = New-SelfSignedCertificateEx -Subject "CN=*.ase.$customHostName" -SAN "*.ase.$customHostName", "*.scm.ase.$customHostName" -EKU "Server Authentication", "Client authentication" `
+            -NotAfter $([datetime]::now.AddYears(5)) -KU "KeyEncipherment, DigitalSignature" -SignatureAlgorithm SHA256 -Exportable
+            $certThumbprint = "cert:\CurrentUser\my\" + $certificate.Thumbprint
             Write-Host -ForegroundColor Yellow "`t* Certificate created successfully. Exporting certificate into .pfx & .cer format."
-            Export-PfxCertificate -cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.pfx" -Password $secNewPasswd | Out-null
-            Export-Certificate -Cert $certThumbprint -FilePath "$ScriptFolder\Certificates\$fileName.cer" | Out-null
+            Export-PfxCertificate -cert $certThumbprint -FilePath "$scriptFolder\Certificates\$fileName.pfx" -Password $secNewPasswd | Out-null
+            Export-Certificate -Cert $certThumbprint -FilePath "$scriptFolder\Certificates\$fileName.cer" | Out-null
             Start-Sleep -Seconds 3
-            $aseCertData = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.cer"
-            $asePfxBlobString = Convert-Certificate -certPath "$ScriptFolder\Certificates\$fileName.pfx"
+            $aseCertData = Convert-Certificate -certPath "$scriptFolder\Certificates\$fileName.cer"
+            $asePfxBlobString = Convert-Certificate -certPath "$scriptFolder\Certificates\$fileName.pfx"
             $asePfxPassword = $newPassword
             $aseCertThumbprint = $certificate.Thumbprint
         }
@@ -317,6 +366,62 @@ Process
         catch{
             throw $_
         }
+
+        # Create Resource group, Automation account, RunAs Account for Runbook and Initiate template deployment
+        try {
+                Write-Host -ForegroundColor Yellow "`nStep 7: Preparing for Template Deployment"
+                # Create Resource Group
+                Write-Output "`t* Creating a New Resource Group - $resourceGroupName at $location"
+                New-AzureRmResourceGroup -Name $resourceGroupName -location $location -Force | Out-Null
+                Write-Host -ForegroundColor Yellow "`t* ResoureGroup - $resourceGroupName has been created successfully"
+                Start-Sleep -Seconds 5
+
+                # Create Automation Account
+                Write-Host -ForegroundColor Yellow "`t* Creating an Automation Account -$automationaccname at $automationAcclocation under Resource Group - $resourceGroupName"
+                New-AzureRmAutomationAccount -Name "$automationaccname" -location "$automationAcclocation" -resourceGroupName "$resourceGroupName" | Out-Null
+                Write-Host -ForegroundColor Yellow "`t* Automation Account has been created successfully"
+                Start-Sleep -Seconds 5
+
+                # Create Automation Run-As Account to execute runbooks
+                Write-Host -ForegroundColor Yellow "`t* Creating RunAs account for runbooks to execute."
+                .\Scripts\New-RunAsAccount.ps1 -ResourceGroup $resourceGroupName -AutomationAccountName $automationaccname -SubscriptionId $subscriptionID -ApplicationDisplayName $automationADApplication `
+                -SelfSignedCertPlainPassword $newPassword -CreateClassicRunAsAccount $false
+                Start-Sleep -Seconds 5
+
+                Start-Process Powershell -ArgumentList "-NoExit", ".\Scripts\New-Deployment.ps1 -DeploymentName $deploymentName -ResourceGroupName $resourceGroupName -Location $location `
+                -TemplateUri $templateUri -_artifactsLocation $_artifactsLocation -_artifactsLocationSasToken $_artifactsLocationSasToken -sslORnon_ssl $sslORnon_ssl -certData $certData `
+                -certPassword $certPassword -aseCertData $aseCertData -asePfxBlobString $asePfxBlobString -asePfxPassword $asePfxPassword -aseCertThumbprint $aseCertThumbprint `
+                -bastionHostAdministratorPassword $newPassword -sqlAdministratorLoginPassword $newPassword -sqlThreatDetectionAlertEmailAddress $SqlTDAlertEmailAddress -automationAccountName $automationaccname `
+                -customHostName $customHostName -azureAdApplicationClientId $azureAdApplicationClientId -azureAdApplicationClientSecret $newPassword -azureAdApplicationObjectId $azureAdApplicationObjectId `
+                -sqlAdAdminUserName $SQLADAdminName -sqlAdAdminUserPassword $newPassword"
+            }
+
+        catch {
+            
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 End
     {
