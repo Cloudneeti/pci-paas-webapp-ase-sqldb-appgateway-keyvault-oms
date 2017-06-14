@@ -9,17 +9,29 @@
 #>
     param
     (
+    # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subscription.
+    [Parameter(Mandatory=$True)] 
+    [string]$subscriptionID,
+
+    # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subscription.
+    [Parameter(Mandatory=$True)] 
+    [string]$globalAdminUserName, 
+
+    # Provide password for Azure AD UserName.
+    [Parameter(Mandatory=$True)]
+    [string]$globalAdminPassword,
+
     [string] [Parameter(Mandatory=$true)] 
-	$DeploymentName,
+	$deploymentName,
 
     [string] [Parameter(Mandatory=$true)] 	
-    $ResourceGroupName,
+    $resourceGroupName,
 
     [string] [Parameter(Mandatory=$true)] 
-	$Location,
+	$location,
 
     [string] [Parameter(Mandatory=$true)] 
-	$TemplateUri,
+	$templateFile,
 
     [string] [Parameter(Mandatory=$true)] 
 	$_artifactsLocation,
@@ -82,15 +94,34 @@
     Begin
     {
         $ErrorActionPreference = 'Stop'
-	    Set-ExecutionPolicy RemoteSigned;
         cd $PSScriptRoot
         Write "Connecting to Azure.. "
-        Import-AzureRmContext -Path "$pwd\auth.json" -ErrorAction Stop ##$$BUG$$ #################MUST DELETE THIS FILE ONCE WE ARE DONE
-        <#
-        $mycreds = Get-Credential
-        $Login = Login-AzureRmAccount -SubscriptionId $SubscriptionID -Credential $mycreds
-        Connect-MsolService -Credential $mycreds
-        #>
+
+        # Creating a Login credential.
+        $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
+        $psCred = New-Object System.Management.Automation.PSCredential ($globalAdminUserName, $secpasswd)
+        
+        ########### Establishing connection to Azure ###########
+        try {
+            Write-Host -ForegroundColor Green "`nStep 2: Establishing connection to Azure AD & Subscription"
+
+            # Connecting to MSOL Service
+            Write-Host -ForegroundColor Yellow  "`t* Connecting to Msol service."
+            Connect-MsolService -Credential $psCred | Out-null
+            if(Get-MsolDomain){
+                Write-Host -ForegroundColor Yellow "`t* Connection to Msol Service established successfully."
+            }
+            
+            # Connecting to Azure Subscription
+            Write-Host -ForegroundColor Yellow "`t* Connecting to AzureRM Subscription - $subscriptionID."
+            Login-AzureRmAccount -Credential $psCred -SubscriptionId $subscriptionID | Out-null
+            if(Get-AzureRmContext){
+                Write-Host -ForegroundColor Yellow "`t* Connection to AzureRM Subscription established successfully."
+            }
+        }
+        catch {
+            Throw $_
+        }
         Try  
         {  
             Get-AzureRmContext  -ErrorAction Continue  
@@ -125,12 +156,12 @@
         Write "Initiating template deployment.."
         try
         {
-            New-AzureRmResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName  -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateUri $TemplateUri -DeploymentDebugLogLevel All -Force -Verbose
+            New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateFile $templateFile -DeploymentDebugLogLevel All -Force -Verbose
         }
         catch
         {
             "Command failed to execute. Please try to run it manually"
-            "New-AzureRmResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName  -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateUri $TemplateUri -DeploymentDebugLogLevel All -Force -Verbose"
+            "New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateFile $templateFile -DeploymentDebugLogLevel All -Force -Verbose"
             $OptionalParameters | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
             Break
         }
