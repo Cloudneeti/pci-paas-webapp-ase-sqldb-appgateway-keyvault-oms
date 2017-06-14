@@ -124,10 +124,10 @@ Process
     try {
         # Azure Resource Manager Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
-        If (Get-Module -ListAvailable -Name AzureRM) 
+        If (Get-Module -ListAvailable -Name AzureRM*) 
         {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Import-Module -Name AzureRM -NoClobber -Force 
+            Get-Module -ListAvailable -Name AzureRM* | Import-Module -NoClobber -Force
             if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
         }
         Else
