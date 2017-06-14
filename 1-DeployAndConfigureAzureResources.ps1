@@ -181,7 +181,7 @@ Begin
         $templatePath = "$PWD\azuredeploy.json"
         $ClientIPAddress = Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip
         $databaseName = "ContosoPayments"
-        $storageKeyType = "StorageAccessKey"
+        $artifactsStorageAccKeyType = "StorageAccessKey"
         $sqlContainerName = "pci-paas-sql-container"
         $sqlBackupName = ".\Artifacts\ContosoPayments.bacpac"
         $cmkName = "CMK1" 
@@ -189,8 +189,8 @@ Begin
         $keyName = "CMK1" 
         Set-Variable ArtifactsLocationName '_artifactsLocation' -Option ReadOnly -Force
         Set-Variable ArtifactsLocationSasTokenName '_artifactsLocationSasToken' -Option ReadOnly -Force
-        $StorageContainerName = 'artifacts'
-        $StorageResourceGroupName = $ResourceGroupName.ToLowerInvariant() + 'stageartifacts'                  
+        $storageContainerName = 'pci-container'
+        $storageResourceGroupName = 'pcistageartifacts' + ((Get-Date).ToUniversalTime()).ToString('MMddHHmm')                 
 
         # Generating common password 
         $newPassword = New-RandomPassword
@@ -199,6 +199,9 @@ Begin
         # Creating a Login credential.
         $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
         $psCred = New-Object System.Management.Automation.PSCredential ($globalAdminUserName, $secpasswd)
+        
+        # Create SQL Login credential
+        $sqlCredential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $sqlAdAdminUserName, $secNewPasswd
 
         ########### Establishing connection to Azure ###########
         try {
@@ -222,37 +225,49 @@ Begin
             Throw $_
         }
         $subId = ((Get-AzureRmContext).Subscription.Id).Replace('-', '').substring(0, 19)
-        $StorageAccountName = "stage$subId"  
+        $artifactsStorageAcc = "stage$subId" 
+        $sqlBackupToUpload = ".\artifacts\ContosoPayments.bacpac"
+        $sqlBacpacUri = "http://$artifactsStorageAcc.blob.core.windows.net/$storageContainerName/artifacts/ContosoPayments.bacpac"
+        
     }
     
 Process
     {
 try {
     # Create a storage account name if none was provided
-    $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $StorageAccountName})
+    $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc})
 
     # Create the storage account if it doesn't already exist
     if($StorageAccount -eq $null){
-        New-AzureRmResourceGroup -Location "$location" -Name $StorageResourceGroupName -Force
-        $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $StorageAccountName -Type 'Standard_LRS' -ResourceGroupName $StorageResourceGroupName -Location "$location"
+        New-AzureRmResourceGroup -Location "$location" -Name $storageResourceGroupName -Force
+        $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $artifactsStorageAcc -Type 'Standard_LRS' -ResourceGroupName $storageResourceGroupName -Location "$location"
     }
-    $StorageAccountContext = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $StorageAccountName}).Context
+    $StorageAccountContext = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc}).Context
     
-    $_artifactsLocation = $StorageAccountContext.BlobEndPoint + $StorageContainerName
+    $_artifactsLocation = $StorageAccountContext.BlobEndPoint + $storageContainerName
     
     # Copy files from the local storage staging location to the storage account container
-    New-AzureStorageContainer -Name $StorageContainerName -Context $StorageAccountContext -Permission Container -ErrorAction SilentlyContinue
+    New-AzureStorageContainer -Name $storageContainerName -Context $StorageAccountContext -Permission Container -ErrorAction SilentlyContinue | Out-Null
 
     $ArtifactFilePaths = Get-ChildItem $pwd\scripts -Recurse -File | ForEach-Object -Process {$_.FullName}
     foreach ($SourcePath in $ArtifactFilePaths) {
         $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
-        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $StorageContainerName -Context $StorageAccountContext -Force
+        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
     }
     $ArtifactFilePaths = Get-ChildItem $pwd\nested -Recurse -File | ForEach-Object -Process {$_.FullName}
     foreach ($SourcePath in $ArtifactFilePaths) {
         $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
-        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $StorageContainerName -Context $StorageAccountContext -Force
-    }    
+        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
+    }
+    $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File | ForEach-Object -Process {$_.FullName}
+    foreach ($SourcePath in $ArtifactFilePaths) {
+        $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
+        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
+    }
+
+    # Retrieve Access Key 
+    $artifactsStorageAccKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.ResourceGroupName -name $storageAccount.StorageAccountName -ErrorAction Stop)[0].value 
+    
 }
 catch {
     throw $_
@@ -420,7 +435,7 @@ catch {
             # Create Automation Run-As Account to execute runbooks
             Write-Host -ForegroundColor Yellow "`t* Creating RunAs account for runbooks to execute."
             .\1-click-deployment-nested\New-RunAsAccount.ps1 -ResourceGroup $resourceGroupName -AutomationAccountName $automationaccname -SubscriptionId $subscriptionID -ApplicationDisplayName $automationADApplication `
-            -SelfSignedCertPlainPassword $newPassword -CreateClassicRunAsAccount $false
+            -SelfSignedCertPlainPassword $newPassword -CreateClassicRunAsAccount $false | Out-Null
             Start-Sleep -Seconds 5
             }
 
@@ -477,39 +492,12 @@ catch {
             throw $_
         }
 
-        # Creating storage account and uploading sql bacpac to storage account.
-        try {
-            Write-Host -ForegroundColor Green  ("Step 9: Creating storage account for SQL Artifacts")
-            # Getting Keyvault and SQL server object
-            $allResource = (Get-AzureRmResource | ? ResourceGroupName -EQ $ResourceGroupName)
-            $sqlServerName =  ($allResource | ? ResourceType -eq 'Microsoft.Sql/servers').ResourceName
-            $keyVault = ($allResource | ? ResourceType -eq 'Microsoft.KeyVault/vaults').ResourceName
-            $storageName = "stgreleases"+$sqlServerName.Substring(10,5).ToLower()
-            # Create a new storage account.
-            $StorageAccountExists = Get-AzureRmStorageAccount -Name $StorageName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore
-            if ($StorageAccountExists -eq $null)  
-            {    
-                New-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $StorageName -Location $Location -Type "Standard_LRS" -EnableEncryptionService "Blob,File"
-            }
-            # Set a default storage account.
-            Set-AzureRmCurrentStorageAccount -StorageAccountName $StorageName -ResourceGroupName $ResourceGroupName
-            # Create a new SQL container.
-            $SQLContainerNameExists = Get-AzureStorageContainer -Name $SQLContainerName -ev notPresent -ea 0
-            if ($SQLContainerNameExists -eq $null)  
-            {    
-                New-AzureStorageContainer -Name $SQLContainerName -Permission Container 
-            }
-            # Upload a blob into a sql container.
-            Set-AzureStorageBlobContent -Container $SQLContainerName -File $SQLBackupToUpload -Force
-            $storageAccount = Get-AzureRmStorageAccount -ErrorAction Stop | where-object {$_.StorageAccountName -eq $StorageName} 
-            $StorageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.ResourceGroupName -name $storageAccount.StorageAccountName -ErrorAction Stop)[0].value 
-
-        }
-        catch {
-            throw $_
-        }
         # Updating SQL server firewall rule
         try {
+            # Getting Keyvault and SQL server object
+            $allResource = (Get-AzureRmResource | ? ResourceGroupName -EQ $resourceGroupName)
+            $sqlServerName =  ($allResource | ? ResourceType -eq 'Microsoft.Sql/servers').ResourceName
+            $keyVault = ($allResource | ? ResourceType -eq 'Microsoft.KeyVault/vaults').ResourceName
             Write-Host -ForegroundColor Green ("`nStep 10: Update SQL firewall with your ClientIp = " + $ClientIPAddress)
             $unqiueid = ((Get-Date).ToUniversalTime()).ToString('MMddHHmm')
             New-AzureRmSqlServerFirewallRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -FirewallRuleName "ClientIpRule$unqiueid" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress
@@ -517,29 +505,30 @@ catch {
         catch {
             throw $_
         }
+Break
+############### Tested till here ##################################
 
+################################### Pending from here ################################################
         # Import SQL bacpac and update azure SQL DB Data masking policy
         try{
-            $sqlpasswd = ConvertTo-SecureString -String $SQLServerAdministratorLoginPassword -AsPlainText -Force
-            $credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $SQLServerAdministratorLoginUserName, $sqlpasswd
             Write-Host ("`nStep 10: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Green
-            New-AzureRmSqlDatabaseImport -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName -DatabaseName $DatabaseName -StorageKeytype $StorageKeyType -StorageKey $StorageKey -StorageUri $StorageUri -AdministratorLogin $credential.UserName -AdministratorLoginPassword $credential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
+            New-AzureRmSqlDatabaseImport -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -StorageKeytype $artifactsStorageAccKeyType -StorageKey $artifactsStorageAccKey -StorageUri $sqlBacpacUri -AdministratorLogin $sqlCredential.UserName -AdministratorLoginPassword $sqlCredential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
             Start-Sleep -s 100
             Write-Host ("`nStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Yellow
-            Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName -DatabaseName $DatabaseName -DataMaskingState Enabled
+            Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -DataMaskingState Enabled
             Start-Sleep -s 15
-            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "FirstName" -MaskingFunction Default
-            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "LastName" -MaskingFunction Default
-            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName -DatabaseName $DatabaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "Customer_Id" -MaskingFunction SocialSecurityNumber
+            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "FirstName" -MaskingFunction Default
+            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "LastName" -MaskingFunction Default
+            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "Customer_Id" -MaskingFunction SocialSecurityNumber
         }
         catch {
             throw $_
         }
-Break
+
         try {
         Write-Host ("`nStep 7: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Yellow
         # Connect to your database.
-        $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $DatabaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + $SQLServerAdministratorLoginUserName + "`"" + ";Password=`"" + $SQLServerAdministratorLoginPassword + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+        $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $databaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + $SQLServerAdministratorLoginUserName + "`"" + ";Password=`"" + $SQLServerAdministratorLoginPassword + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
         $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
         $connection.ConnectionString = $connStr
         $connection.Connect()
@@ -549,11 +538,11 @@ Break
         #policy for the UserPrincipal
             Write-Host ("`nGiving Key Vault access permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
 
-                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $ResourceGroupName -PermissionsToKeys all  -PermissionsToSecrets all
+                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $resourceGroupName -PermissionsToKeys all  -PermissionsToSecrets all
 
-                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SqlAdAdminUserName -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SqlAdAdminUserName -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
 
-                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $ResourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
 
             Write-Host ("`nGranted permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
 
@@ -599,7 +588,7 @@ Break
             Write-Host ("`nStep 8: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Yellow
 
             # Start OMS Diagnostics
-            $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $ResourceGroupName
+            $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $resourceGroupName
 
             $resourceTypes = @( "Microsoft.Network/applicationGateways",
                                 "Microsoft.Network/NetworkSecurityGroups",
@@ -612,7 +601,7 @@ Break
 
             foreach($resourceType in $resourceTypes)
             {
-                Enable-AzureRMDiagnostics -ResourceGroupName $ResourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -Force -Update `
+                Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -Force -Update `
                 -ResourceType $resourceType -ErrorAction SilentlyContinue
             }
 
