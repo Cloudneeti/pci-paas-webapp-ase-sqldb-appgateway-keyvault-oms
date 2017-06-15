@@ -3,11 +3,8 @@
 <#
  Modules NEEDED FOR this script - * AzureRM   * AzureAD    * AzureDiagnosticsAndLogAnalytics   * SqlServer   * Enable-AzureRMDiagnostics (Script)
  Note: This script requires you to run script in an elevated mode i.e -Run As Administrator-
- 
- 
- 
+  
 This script imports and Install required powershell modules and creates Global AD Admin account.
-
 
     This script will import or installs (if not available) required powershell modules to run this deployment. It also creates Global Administrator account 
         and assigns Owner permission on a given subscription.
@@ -28,11 +25,6 @@ This script imports and Install required powershell modules and creates Global A
 [CmdletBinding()]
 Param(
 
-    # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subsciption.    
-	[Parameter(Mandatory=$True)] 
-	[string]$userName, 
-    [Parameter(Mandatory=$True)] 
-	[string]$password,
     # Provide registered Azure AD Domain Name for Global Administrator Account.
     [string]$azureADDomainName,
 	
@@ -92,21 +84,17 @@ Begin{
     # Login to Azure Subscrition & Azure AD 
     if($configureGlobalAdmin){
        try {
-            # Creating a login credential to login to Azure AD
-            $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
-            $psCred = New-Object System.Management.Automation.PSCredential ($userName, $secpasswd)
-
             # Login to Azure Subscription
-            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId."
-            if (Login-AzureRmAccount -subscriptionId $subscriptionId -Credential $psCred){
+            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId." #The -Credential parameter cannot be used with Microsoft Accounts. 
+            if (Login-AzureRmAccount -subscriptionId $subscriptionId){      #
                 Write-Host "`t* Connection was successful" -ForegroundColor Yellow
             }
 
             Start-Sleep -Seconds 10
             
-            # Connecting to Azure
-            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory."
-            Connect-AzureAD -TenantId $tenantId -Credential $psCred
+            # Connecting to Azure AD
+            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory." #The -Credential parameter cannot be used with Microsoft Accounts. 
+            Connect-AzureAD -TenantId $tenantId
             if(Get-AzureADDomain -Name $azureADDomainName){
                 Write-Host -ForegroundColor Yellow "`t* Successfully connected to Azure Active Directory."
             }
