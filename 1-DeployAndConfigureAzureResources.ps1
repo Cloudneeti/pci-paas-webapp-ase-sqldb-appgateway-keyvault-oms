@@ -178,12 +178,9 @@ Begin
         $automationADApplication = "AutomationAppl" + ((Get-Date).ToUniversalTime()).ToString('MMddHHmm')
         $deploymentName = "PCI-Deploy-"+ ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')
         $_artifactslocationSasToken = "null"
-        $templatePath = "$PWD\azuredeploy.json"
-        $ClientIPAddress = Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip
+        $clientIPAddress = Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip
         $databaseName = "ContosoPayments"
         $artifactsStorageAccKeyType = "StorageAccessKey"
-        $sqlContainerName = "pci-paas-sql-container"
-        $sqlBackupName = ".\Artifacts\ContosoPayments.bacpac"
         $cmkName = "CMK1" 
         $cekName = "CEK1" 
         $keyName = "CMK1" 
@@ -200,9 +197,6 @@ Begin
         $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
         $psCred = New-Object System.Management.Automation.PSCredential ($globalAdminUserName, $secpasswd)
         
-        # Create SQL Login credential
-        $sqlCredential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $sqlAdAdminUserName, $secNewPasswd
-
         ########### Establishing connection to Azure ###########
         try {
             Write-Host -ForegroundColor Green "`nStep 2: Establishing connection to Azure AD & Subscription"
@@ -225,9 +219,12 @@ Begin
             Throw $_
         }
         $subId = ((Get-AzureRmContext).Subscription.Id).Replace('-', '').substring(0, 19)
+        $context = Set-AzureRmContext -SubscriptionId $subscriptionId
+        $userPrincipalName = $context.Account.Id
         $artifactsStorageAcc = "stage$subId" 
         $sqlBackupToUpload = ".\artifacts\ContosoPayments.bacpac"
         $sqlBacpacUri = "http://$artifactsStorageAcc.blob.core.windows.net/$storageContainerName/artifacts/ContosoPayments.bacpac"
+
         
     }
     
@@ -449,9 +446,9 @@ catch {
             # Submitting templte deployment to new powershell session
             Write-Host -ForegroundColor Yellow "`t* Submitting deployment"
             Start-Process Powershell -ArgumentList "-NoExit", ".\1-click-deployment-nested\New-Deployment.ps1 -subscriptionID $subscriptionID -globalAdminUserName $globalAdminUserName -globalAdminPassword $globalAdminPassword -deploymentName $deploymentName -resourceGroupName $resourceGroupName -location $location -templateFile $PWD\azuredeploy.json -_artifactsLocation $_artifactsLocation -_artifactsLocationSasToken $_artifactsLocationSasToken -sslORnon_ssl $sslORnon_ssl -certData $certData -certPassword $certPassword -aseCertData $aseCertData -asePfxBlobString $asePfxBlobString -asePfxPassword $asePfxPassword -aseCertThumbprint $aseCertThumbprint -bastionHostAdministratorPassword $newPassword -sqlAdministratorLoginPassword $newPassword -sqlThreatDetectionAlertEmailAddress $SqlTDAlertEmailAddress -automationAccountName $automationaccname -customHostName $customHostName -azureAdApplicationClientId $azureAdApplicationClientId -azureAdApplicationClientSecret $newPassword -azureAdApplicationObjectId $azureAdApplicationObjectId -sqlAdAdminUserName $sqlAdAdminUserName -sqlAdAdminUserPassword $newPassword"
+            Write-Host "`t`t-> Waiting for deployment $deploymentName to submit.. " -ForegroundColor Yellow
             do
             {
-                Write-Host "`t`t-> Waiting for deployment $deploymentName to submit.. " -ForegroundColor Yellow
                 Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
                 Start-sleep -seconds 60
             }
@@ -464,16 +461,16 @@ catch {
 
         # Loop to check SQL server deployment.
         try {
+            Write-Host "`t`t-> Waiting for deployment deploy-SQLServerSQLDb to submit.. " -ForegroundColor Yellow            
             do
             {
-                Write-Host "`t`t-> Waiting for deployment deploy-SQLServerSQLDb to submit.. " -ForegroundColor Yellow
                 Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
                 Start-sleep -seconds 60
             }
             until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-SQLServerSQLDb' -ErrorAction SilentlyContinue) -ne $null) 
+            Write-Host -ForegroundColor Yellow "`t* Deployment 'deploy-SQLServerSQLDb' has been submitted."
             do
             {
-                Write-Host -ForegroundColor Yellow "`t* Deployment 'deploy-SQLServerSQLDb' has been submitted."
                 Write-Host -ForegroundColor Yellow "`t`t-> Deployment 'deploy-SQLServerSQLDb' is currently running.. Checking Deployment in 60 seconds.."
                 Start-Sleep -Seconds 60
             }
@@ -493,132 +490,127 @@ catch {
         }
 
         # Updating SQL server firewall rule
+        Write-Host -ForegroundColor Green "`nStep 9: Updating SQL server firewall rule."
         try {
-            # Getting Keyvault and SQL server object
+            # Getting SqlServer resource object
+            Write-Host -ForegroundColor Yellow "`t* Getting SQLServer resource object."
             $allResource = (Get-AzureRmResource | ? ResourceGroupName -EQ $resourceGroupName)
             $sqlServerName =  ($allResource | ? ResourceType -eq 'Microsoft.Sql/servers').ResourceName
-            $keyVault = ($allResource | ? ResourceType -eq 'Microsoft.KeyVault/vaults').ResourceName
-            Write-Host -ForegroundColor Green ("`nStep 10: Update SQL firewall with your ClientIp = " + $ClientIPAddress)
+            Write-Host -ForegroundColor Yellow ("`t* Updating SQL firewall with your ClientIp = " + $clientIPAddress)
             $unqiueid = ((Get-Date).ToUniversalTime()).ToString('MMddHHmm')
-            New-AzureRmSqlServerFirewallRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -FirewallRuleName "ClientIpRule$unqiueid" -StartIpAddress $ClientIPAddress -EndIpAddress $ClientIPAddress
+            New-AzureRmSqlServerFirewallRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -FirewallRuleName "ClientIpRule$unqiueid" -StartIpAddress $clientIPAddress -EndIpAddress $clientIPAddress
         }
         catch {
             throw $_
         }
-Break
-############### Tested till here ##################################
 
-################################### Pending from here ################################################
         # Import SQL bacpac and update azure SQL DB Data masking policy
+        Write-Host -ForegroundColor Green "`nStep 10: Importing SQL bacpac and Updating Azure SQL DB Data Masking Policy"
         try{
-            Write-Host ("`nStep 10: Import SQL backpac for release artifacts storage account" ) -ForegroundColor Green
-            New-AzureRmSqlDatabaseImport -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -StorageKeytype $artifactsStorageAccKeyType -StorageKey $artifactsStorageAccKey -StorageUri $sqlBacpacUri -AdministratorLogin $sqlCredential.UserName -AdministratorLoginPassword $sqlCredential.Password -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
+            # Getting Keyvault reource object
+            Write-Host -ForegroundColor Yellow "`t* Getting KeyVault resource object."
+            $keyVaultName = ($allResource | ? ResourceType -eq 'Microsoft.KeyVault/vaults').ResourceName
+            # Importing bacpac file
+            Write-Host ("`n`t* Importing SQL backpac from release artifacts storage account" ) -ForegroundColor Green
+            New-AzureRmSqlDatabaseImport -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -StorageKeytype $artifactsStorageAccKeyType -StorageKey $artifactsStorageAccKey -StorageUri $sqlBacpacUri -AdministratorLogin 'sqladmin' -AdministratorLoginPassword $secNewPasswd -Edition Standard -ServiceObjectiveName S0 -DatabaseMaxSizeBytes 50000
             Start-Sleep -s 100
-            Write-Host ("`nStep 5: Update Azure SQL DB Data masking policy" ) -ForegroundColor Yellow
+            Write-Host ("`n`t* Updating Azure SQL DB Data masking policy on FirstName & LastName Column" ) -ForegroundColor Yellow
             Set-AzureRmSqlDatabaseDataMaskingPolicy -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -DataMaskingState Enabled
             Start-Sleep -s 15
             New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "FirstName" -MaskingFunction Default
             New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "LastName" -MaskingFunction Default
-            New-AzureRmSqlDatabaseDataMaskingRule -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -DatabaseName $databaseName -SchemaName "dbo" -TableName "Customers" -ColumnName "Customer_Id" -MaskingFunction SocialSecurityNumber
+        }
+        catch {
+            throw $_
+        }
+        
+        # Create an Azure Active Directory administrator for SQL
+        try {
+            Write-Host ("`nStep 11: Update SQL Server for Azure Active Directory administrator =" + $SqlAdAdminUserName ) -ForegroundColor Green
+            Set-AzureRmSqlServerActiveDirectoryAdministrator -ResourceGroupName $ResourceGroupName -ServerName $SQLServerName -DisplayName $SqlAdAdminUserName
         }
         catch {
             throw $_
         }
 
+        # Encrypting Credit card information within database
         try {
-        Write-Host ("`nStep 7: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Yellow
+        Write-Host ("`nStep 12: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Green
         # Connect to your database.
-        $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $databaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + $SQLServerAdministratorLoginUserName + "`"" + ";Password=`"" + $SQLServerAdministratorLoginPassword + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+        Write-Host -ForegroundColor Yellow "`t* Connecting database - $databaseName on $sqlServerName"
+        $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $databaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + "sqladmin" + "`"" + ";Password=`"" + "$newPassword" + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
         $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
         $connection.ConnectionString = $connStr
         $connection.Connect()
         $server = New-Object Microsoft.SqlServer.Management.Smo.Server($connection)
         $database = $server.Databases[$databaseName]
 
-        #policy for the UserPrincipal
-            Write-Host ("`nGiving Key Vault access permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
-
+        #Granting Users & ServicePrincipal full access on Keyvault
+            Write-Host ("`t* Giving Key Vault access permissions to the Users and ServicePrincipal ..") -ForegroundColor Yellow
                 Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $resourceGroupName -PermissionsToKeys all  -PermissionsToSecrets all
-
                 Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SqlAdAdminUserName -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
-
                 Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+            Write-Host ("`t* Granted permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
 
-            Write-Host ("`nGranted permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
-
-        # Creating Master key settings
-
+        # Creating KeyVault Key to encrypt DB
+            Write-Host -ForegroundColor Yellow "`t* Creating a New Keyvault key."
             $key = (Add-AzureKeyVaultKey -VaultName $KeyVaultName -Name $keyName -Destination 'Software').ID
+
+        # Switching SQL commands context to the AD Application
+            Write-Host -ForegroundColor Yellow "`t* Creating SQL Column Master Key & Column Encryption Key."
             $cmkSettings = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyURL $key
-
-        # Start - Switching SQL commands context to the AD Application
             $sqlMasterKey = Get-SqlColumnMasterKey -Name $cmkName -InputObject $database -ErrorAction SilentlyContinue
-            if ($sqlMasterKey){Write "`nSQL Master Key $cmkName already exists."} 
+            if ($sqlMasterKey){Write-Host -ForegroundColor Yellow "`t* SQL Master Key $cmkName already exists."} 
             Else{New-SqlColumnMasterKey -Name $cmkName -InputObject $database -ColumnMasterKeySettings $cmkSettings}
-
-            Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $azureAdApplicationClientSecret -Tenant $tenantID
-            try {New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName} catch {}
+            Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $newPassword -Tenant $tenantID
+            New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName
             
+            Write-Host -ForegroundColor Yellow "`t* SQL encryption has been successfully created. Encrypting SQL Columns.."
             # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
             $ces = @()
             $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Number" -EncryptionType "Deterministic" -EncryptionKey $cekName
             $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Code" -EncryptionType "Deterministic" -EncryptionKey $cekName
             $ces += New-SqlColumnEncryptionSettings -ColumnName "dbo.Customers.CreditCard_Expiration" -EncryptionType "Deterministic" -EncryptionKey $cekName
-            try{
-                Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
-                Write "`nColumn CreditCard_Number, CreditCard_Code, CreditCard_Expiration have been successfully encrypted"
-            }
-            catch{
-                Write "`nColumn encryption has failed."
-                write "`n$Error[0]" ;Break
-            }
-            # End Encryption Columns
-
-        # End - Switching SQL commands context to the AD Application
-            
+            Set-SqlColumnEncryption -InputObject $database -ColumnEncryptionSettings $ces
+            Write-Host -ForegroundColor Yellow "`t* Column CreditCard_Number, CreditCard_Code, CreditCard_Expiration have been successfully encrypted"            
         }
         catch {
+            Write-Host -ForegroundColor Red "`t Column encryption has failed."
             throw $_
         }     
-
+        # Updating all services with OMS logging.
         try {
-            ########################
-            Write-Host "OMS Updates..." -foreground Yellow 
-
-            Write-Host ("`nStep 8: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Yellow
+            Write-Host ("`nStep 13: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Yellow
 
             # Start OMS Diagnostics
+            Write-Host -ForegroundColor Yellow "`t* Enabling diagnostics on all deployed resources."
             $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $resourceGroupName
 
             $resourceTypes = @( "Microsoft.Network/applicationGateways",
                                 "Microsoft.Network/NetworkSecurityGroups",
-                                "Microsoft.Web/serverFarms",
                                 "Microsoft.Sql/servers/databases",
-                                "Microsoft.Compute/virtualMachines",
-                                "Microsoft.Web/sites",
                                 "Microsoft.KeyVault/Vaults" ,
                                 "Microsoft.Automation/automationAccounts")
 
             foreach($resourceType in $resourceTypes)
             {
+                Write-Host -ForegroundColor Yellow "`t`t-> Enabling diagnostics for - $resourceType"
                 Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -Force -Update `
                 -ResourceType $resourceType -ErrorAction SilentlyContinue
             }
 
             $workspace = Find-AzureRmResource -ResourceType "Microsoft.OperationalInsights/workspaces" -ResourceNameContains $omsWS.Name
 
-            ########################
-            Write-Host ("`nStep 8.1: OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Yellow
-
+            Write-Host ("`t* OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Yellow
             foreach($resourceType in $resourceTypes)
             {
-                Write-Host ("Add-AzureDiagnosticsToLogAnalytics to " + $resourceType) -ForegroundColor Yellow
+                Write-Host ("`t`t-> Adding Azure Diagnostics to Log Analytics for -" + $resourceType) -ForegroundColor Yellow
                 $resource = Find-AzureRmResource -ResourceType $resourceType 
                 Add-AzureDiagnosticsToLogAnalytics $resource $workspace -ErrorAction SilentlyContinue
             }
         }
         catch {
-            
+            throw $_
         }
     }
 End
