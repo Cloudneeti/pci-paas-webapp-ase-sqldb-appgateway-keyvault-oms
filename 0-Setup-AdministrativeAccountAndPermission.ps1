@@ -21,7 +21,6 @@ This script imports and Install required powershell modules and creates Global A
   
 #>
 	
-
 [CmdletBinding()]
 Param(
 
@@ -48,8 +47,6 @@ Param(
     # Use this switch to Install Modules, if does not exist.
     [switch]$installModules
 )
-	
-	
 
 Begin{
     
@@ -80,9 +77,9 @@ Begin{
     # Hashtable for output table
     $outputTable = New-Object -TypeName Hashtable
 
-    Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription"
     # Login to Azure Subscrition & Azure AD 
     if($configureGlobalAdmin){
+       Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription"
        try {
             # Login to Azure Subscription
             Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId." #The -Credential parameter cannot be used with Microsoft Accounts. 
@@ -102,7 +99,8 @@ Begin{
        catch {
            Throw $_
        }
-
+    }else{
+        Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription - SKIPPED"
     }
 }
 Process
