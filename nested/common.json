@@ -177,7 +177,7 @@
         "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
         "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
         "enableSoftDelete": "[parameters('enableSoftDelete')]",
-        "createMode": "Incremental"
+        "createMode": "default"
       },
       "resources": [
         {
