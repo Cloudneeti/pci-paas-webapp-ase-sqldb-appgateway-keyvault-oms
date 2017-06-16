@@ -135,7 +135,7 @@ Begin
 
         ########### Manage directories ###########
         # Create folder to store self-signed certificates
-        if(!(Test-path $pwd\Certificates)){mkdir $pwd\Certificates -Force | Out-Null }
+        if(!(Test-path $pwd\certificates)){mkdir $pwd\certificates -Force | Out-Null }
 
         ########### Functions ###########
         Write-Host -ForegroundColor Green "`nStep 1: Loading functions."
@@ -225,7 +225,6 @@ Begin
         $sqlBackupToUpload = ".\artifacts\ContosoPayments.bacpac"
         $sqlBacpacUri = "http://$artifactsStorageAcc.blob.core.windows.net/$storageContainerName/artifacts/ContosoPayments.bacpac"
 
-        
     }
     
 Process
@@ -236,7 +235,8 @@ try {
 
     # Create the storage account if it doesn't already exist
     if($StorageAccount -eq $null){
-        New-AzureRmResourceGroup -Location "$location" -Name $storageResourceGroupName -Force
+        Write-Host -ForegroundColor Yellow "`t* Creating an Artifacts Resource group & Storage account."
+        New-AzureRmResourceGroup -Location "$location" -Name $storageResourceGroupName -Force | Out-Null
         $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $artifactsStorageAcc -Type 'Standard_LRS' -ResourceGroupName $storageResourceGroupName -Location "$location"
     }
     $StorageAccountContext = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc}).Context
@@ -256,7 +256,7 @@ try {
         $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
         Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
     }
-    $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File | ForEach-Object -Process {$_.FullName}
+    $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File -Filter "*.bacpac" | ForEach-Object -Process {$_.FullName}
     foreach ($SourcePath in $ArtifactFilePaths) {
         $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
         Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
@@ -358,7 +358,7 @@ catch {
                 if($certificatePath) {
                     Write-Host -ForegroundColor Yellow "`t* Converting customer provided certificate to Base64 string"
                     $certData = Convert-Certificate -certPath $certificatePath
-                    $certPassword = "Customer provided certificate."
+                    $certPassword = $certificatePassword
                 }
                 else{
                     Write-Host -ForegroundColor Yellow "`t* No valid certificate path was provided. Creating a new self-signed certificate and converting to Base64 string"
@@ -445,7 +445,7 @@ catch {
             Write-Host -ForegroundColor Green "`nStep 8: Initiating template deployment."
             # Submitting templte deployment to new powershell session
             Write-Host -ForegroundColor Yellow "`t* Submitting deployment"
-            Start-Process Powershell -ArgumentList "-NoExit", ".\1-click-deployment-nested\New-Deployment.ps1 -subscriptionID $subscriptionID -globalAdminUserName $globalAdminUserName -globalAdminPassword $globalAdminPassword -deploymentName $deploymentName -resourceGroupName $resourceGroupName -location $location -templateFile $PWD\azuredeploy.json -_artifactsLocation $_artifactsLocation -_artifactsLocationSasToken $_artifactsLocationSasToken -sslORnon_ssl $sslORnon_ssl -certData $certData -certPassword $certPassword -aseCertData $aseCertData -asePfxBlobString $asePfxBlobString -asePfxPassword $asePfxPassword -aseCertThumbprint $aseCertThumbprint -bastionHostAdministratorPassword $newPassword -sqlAdministratorLoginPassword $newPassword -sqlThreatDetectionAlertEmailAddress $SqlTDAlertEmailAddress -automationAccountName $automationaccname -customHostName $customHostName -azureAdApplicationClientId $azureAdApplicationClientId -azureAdApplicationClientSecret $newPassword -azureAdApplicationObjectId $azureAdApplicationObjectId -sqlAdAdminUserName $sqlAdAdminUserName -sqlAdAdminUserPassword $newPassword"
+            Start-Process Powershell -ArgumentList "-NoExit", ".\1-click-deployment-nested\Initiate-TemplateDeployment.ps1 -subscriptionID $subscriptionID -globalAdminUserName $globalAdminUserName -globalAdminPassword $globalAdminPassword -deploymentName $deploymentName -resourceGroupName $resourceGroupName -location $location -templateFile $PWD\azuredeploy.json -_artifactsLocation $_artifactsLocation -_artifactsLocationSasToken $_artifactsLocationSasToken -sslORnon_ssl $sslORnon_ssl -certData $certData -certPassword $certPassword -aseCertData $aseCertData -asePfxBlobString $asePfxBlobString -asePfxPassword $asePfxPassword -aseCertThumbprint $aseCertThumbprint -bastionHostAdministratorPassword $newPassword -sqlAdministratorLoginPassword $newPassword -sqlThreatDetectionAlertEmailAddress $SqlTDAlertEmailAddress -automationAccountName $automationaccname -customHostName $customHostName -azureAdApplicationClientId $azureAdApplicationClientId -azureAdApplicationClientSecret $newPassword -azureAdApplicationObjectId $azureAdApplicationObjectId -sqlAdAdminUserName $sqlAdAdminUserName -sqlAdAdminUserPassword $newPassword"
             Write-Host "`t`t-> Waiting for deployment $deploymentName to submit.. " -ForegroundColor Yellow
             do
             {
@@ -577,37 +577,75 @@ catch {
         catch {
             Write-Host -ForegroundColor Red "`t Column encryption has failed."
             throw $_
-        }     
-        # Updating all services with OMS logging.
-        try {
-            Write-Host ("`nStep 13: OMS -- Update all services for Diagnostics Logging" ) -ForegroundColor Yellow
+        } 
+        
+       # Configure Log Analytics to collect Azure diagnostic logs
+       try {
+            Write-Host ("`nStep 13: Configuring Log Analytics to collect Azure diagnostic logs" ) -ForegroundColor Yellow
+            
+            # Checking if application gateway deployment is submitted and complete before configuring OMS.    
+            Write-Host "`t`t-> Checking deployment deploy-AppGatewayWAF. " -ForegroundColor Yellow            
+            do
+            {
+                Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
+                Start-sleep -seconds 60
+            }
+            until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-AppGatewayWAF' -ErrorAction SilentlyContinue) -ne $null) 
+
+            Write-Host -ForegroundColor Yellow "`t* Deployment 'deploy-AppGatewayWAF' has been submitted."
+            do
+            {
+                Write-Host -ForegroundColor Yellow "`t`t-> Deployment 'deploy-AppGatewayWAF' is currently running.. Checking Deployment in 60 seconds.."
+                Start-Sleep -Seconds 60
+            }
+            While ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-AppGatewayWAF').ProvisioningState -notin ('Failed','Succeeded'))
+
+            if ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-AppGatewayWAF').ProvisioningState -eq 'Succeeded')
+            {
+                Write-Host -ForegroundColor Yellow "`t* Deployment deploy-AppGatewayWAF has completed successfully."
+            }
+            else
+            {
+                throw "Deployment deploy-AppGatewayWAF has failed. Please check portal for the reason."
+            }
 
             # Start OMS Diagnostics
-            Write-Host -ForegroundColor Yellow "`t* Enabling diagnostics on all deployed resources."
+            Write-Host -ForegroundColor Yellow "`t* Enabling resources for diagnostic metrics and enabling the workspace ID for the OMS workspace to receive metrics."
             $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $resourceGroupName
 
             $resourceTypes = @( "Microsoft.Network/applicationGateways",
-                                "Microsoft.Network/NetworkSecurityGroups",
-                                "Microsoft.Sql/servers/databases",
                                 "Microsoft.KeyVault/Vaults" ,
-                                "Microsoft.Automation/automationAccounts")
+					            "Microsoft.Automation/automationAccounts")
 
             foreach($resourceType in $resourceTypes)
             {
                 Write-Host -ForegroundColor Yellow "`t`t-> Enabling diagnostics for - $resourceType"
-                Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -Force -Update `
-                -ResourceType $resourceType -ErrorAction SilentlyContinue
+                Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -ResourceType $resourceType -Force -Update | Out-Null
             }
 
             $workspace = Find-AzureRmResource -ResourceType "Microsoft.OperationalInsights/workspaces" -ResourceNameContains $omsWS.Name
 
-            Write-Host ("`t* OMS -- Send Diagnostcis to OMS workspace" ) -ForegroundColor Yellow
+            # Update to be the storage account that logs will be written to. Storage account must be in the same region as the resource to monitor
+
+            $storageAccountId = (Find-AzureRmResource -ResourceType 'Microsoft.Storage/StorageAccounts' -ResourceGroupNameEquals $resourceGroupName -ResourceNameContains 'stgdiag').ResourceId
+
+            # update location to match your storage account location
+            $resources = Get-AzureRmResource | where { $_.ResourceType -in $resourceTypes -and $_.ResourceGroupName -eq "$resourceGroupName" }
+
+            foreach ($resource in $resources) {
+                Set-AzureRmDiagnosticSetting -ResourceId $resource.ResourceId -StorageAccountId $storageAccountId -Enabled $true -RetentionEnabled $true -RetentionInDays 1 | Out-null
+            }
+
+            Write-Host ("`t* Configure Log Analytics to collect Azure diagnostic logs" ) -ForegroundColor Yellow
             foreach($resourceType in $resourceTypes)
             {
                 Write-Host ("`t`t-> Adding Azure Diagnostics to Log Analytics for -" + $resourceType) -ForegroundColor Yellow
-                $resource = Find-AzureRmResource -ResourceType $resourceType 
-                Add-AzureDiagnosticsToLogAnalytics $resource $workspace -ErrorAction SilentlyContinue
+                $resource = Find-AzureRmResource -ResourceType $resourceType -ResourceGroupNameEquals $resourceGroupName
+                Add-AzureDiagnosticsToLogAnalytics $resource $workspace | out-Null
             }
+
+            # Enable the Log Analytics solution
+            Set-AzureRmOperationalInsightsIntelligencePack -ResourceGroupName $workspace.ResourceGroupName -WorkspaceName $workspace.Name -intelligencepackname KeyVault -Enabled $true
         }
         catch {
             throw $_

@@ -1,5 +1,3 @@
-	
-
 <#
  Modules NEEDED FOR this script - * AzureRM   * AzureAD    * AzureDiagnosticsAndLogAnalytics   * SqlServer   * Enable-AzureRMDiagnostics (Script)
  Note: This script requires you to run script in an elevated mode i.e -Run As Administrator-
