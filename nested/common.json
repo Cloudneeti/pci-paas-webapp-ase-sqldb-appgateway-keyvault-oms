@@ -42,7 +42,7 @@
     },
     "enableSoftDelete": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "Specifies if the vault is enabled for soft delete"
       }
