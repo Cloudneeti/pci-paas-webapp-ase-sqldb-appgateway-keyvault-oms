@@ -209,8 +209,8 @@ Begin
         $context = Set-AzureRmContext -SubscriptionId $subscriptionId
         $userPrincipalName = $context.Account.Id
         $artifactsStorageAcc = "stage$subId" 
-        $sqlBackupToUpload = ".\artifacts\ContosoPayments.bacpac"
         $sqlBacpacUri = "http://$artifactsStorageAcc.blob.core.windows.net/$storageContainerName/artifacts/ContosoPayments.bacpac"
+        $sqlsmodll = (Get-ChildItem "C:\Program Files\WindowsPowerShell\Modules\SqlServer" -Recurse -File -Filter "Microsoft.SqlServer.Smo.dll").FullName
 
     }
     
@@ -524,6 +524,7 @@ catch {
         try {
         Write-Host ("`nStep 12: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Green
         # Connect to your database.
+        Add-Type -Path $sqlsmodll
         Write-Host -ForegroundColor Yellow "`t* Connecting database - $databaseName on $sqlServerName"
         $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $databaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + "sqladmin" + "`"" + ";Password=`"" + "$newPassword" + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
         $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
