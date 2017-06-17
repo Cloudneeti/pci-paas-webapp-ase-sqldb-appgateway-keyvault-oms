@@ -216,47 +216,47 @@ Begin
     
 Process
     {
-try {
-    # Create a storage account name if none was provided
-    $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc})
+        try {
+            # Create a storage account name if none was provided
+            $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc})
 
-    # Create the storage account if it doesn't already exist
-    if($StorageAccount -eq $null){
-        Write-Host -ForegroundColor Yellow "`t* Creating an Artifacts Resource group & Storage account."
-        New-AzureRmResourceGroup -Location "$location" -Name $storageResourceGroupName -Force | Out-Null
-        $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $artifactsStorageAcc -Type 'Standard_LRS' -ResourceGroupName $storageResourceGroupName -Location "$location"
-    }
-    $StorageAccountContext = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc}).Context
-    
-    $_artifactsLocation = $StorageAccountContext.BlobEndPoint + $storageContainerName
-    
-    # Copy files from the local storage staging location to the storage account container
-    New-AzureStorageContainer -Name $storageContainerName -Context $StorageAccountContext -Permission Container -ErrorAction SilentlyContinue | Out-Null
+            # Create the storage account if it doesn't already exist
+            if($StorageAccount -eq $null){
+                Write-Host -ForegroundColor Yellow "`t* Creating an Artifacts Resource group & Storage account."
+                New-AzureRmResourceGroup -Location "$location" -Name $storageResourceGroupName -Force | Out-Null
+                $StorageAccount = New-AzureRmStorageAccount -StorageAccountName $artifactsStorageAcc -Type 'Standard_LRS' -ResourceGroupName $storageResourceGroupName -Location "$location"
+            }
+            $StorageAccountContext = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc}).Context
+            
+            $_artifactsLocation = $StorageAccountContext.BlobEndPoint + $storageContainerName
+            
+            # Copy files from the local storage staging location to the storage account container
+            New-AzureStorageContainer -Name $storageContainerName -Context $StorageAccountContext -Permission Container -ErrorAction SilentlyContinue | Out-Null
 
-    $ArtifactFilePaths = Get-ChildItem $pwd\scripts -Recurse -File | ForEach-Object -Process {$_.FullName}
-    foreach ($SourcePath in $ArtifactFilePaths) {
-        $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
-        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
-    }
-    $ArtifactFilePaths = Get-ChildItem $pwd\nested -Recurse -File | ForEach-Object -Process {$_.FullName}
-    foreach ($SourcePath in $ArtifactFilePaths) {
-        $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
-        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
-    }
-    $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File -Filter "*.bacpac" | ForEach-Object -Process {$_.FullName}
-    foreach ($SourcePath in $ArtifactFilePaths) {
-        $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
-        Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
-    }
+            $ArtifactFilePaths = Get-ChildItem $pwd\scripts -Recurse -File | ForEach-Object -Process {$_.FullName}
+            foreach ($SourcePath in $ArtifactFilePaths) {
+                $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
+                Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
+            }
+            $ArtifactFilePaths = Get-ChildItem $pwd\nested -Recurse -File | ForEach-Object -Process {$_.FullName}
+            foreach ($SourcePath in $ArtifactFilePaths) {
+                $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
+                Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
+            }
+            $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File -Filter "*.bacpac" | ForEach-Object -Process {$_.FullName}
+            foreach ($SourcePath in $ArtifactFilePaths) {
+                $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
+                Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
+            }
 
-    # Retrieve Access Key 
-    $artifactsStorageAccKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.ResourceGroupName -name $storageAccount.StorageAccountName -ErrorAction Stop)[0].value 
-    
-}
-catch {
-    throw $_
-}
-        
+            # Retrieve Access Key 
+            $artifactsStorageAccKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageAccount.ResourceGroupName -name $storageAccount.StorageAccountName -ErrorAction Stop)[0].value 
+            
+        }
+        catch {
+            throw $_
+        }
+
         try {
             ########### Creating Users in Azure AD ###########
             Write-Host ("`nStep 3: Create AD Users for SQL AD Admin & Receptionist to test various scenarios" ) -ForegroundColor Green
@@ -522,29 +522,29 @@ catch {
 
         # Encrypting Credit card information within database
         try {
-        Write-Host ("`nStep 12: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Green
-        # Connect to your database.
-        Add-Type -Path $sqlsmodll
-        Write-Host -ForegroundColor Yellow "`t* Connecting database - $databaseName on $sqlServerName"
-        $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $databaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + "sqladmin" + "`"" + ";Password=`"" + "$newPassword" + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-        $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
-        $connection.ConnectionString = $connStr
-        $connection.Connect()
-        $server = New-Object Microsoft.SqlServer.Management.Smo.Server($connection)
-        $database = $server.Databases[$databaseName]
+            Write-Host ("`nStep 12: Encrypt SQL DB column Credit card Information" ) -ForegroundColor Green
+            # Connect to your database.
+            Add-Type -Path $sqlsmodll
+            Write-Host -ForegroundColor Yellow "`t* Connecting database - $databaseName on $sqlServerName"
+            $connStr = "Server=tcp:" + $sqlServerName + ".database.windows.net,1433;Initial Catalog=" + "`"" + $databaseName + "`"" + ";Persist Security Info=False;User ID=" + "`"" + "sqladmin" + "`"" + ";Password=`"" + "$newPassword" + "`"" + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+            $connection = New-Object Microsoft.SqlServer.Management.Common.ServerConnection
+            $connection.ConnectionString = $connStr
+            $connection.Connect()
+            $server = New-Object Microsoft.SqlServer.Management.Smo.Server($connection)
+            $database = $server.Databases[$databaseName]
 
-        #Granting Users & ServicePrincipal full access on Keyvault
+            #Granting Users & ServicePrincipal full access on Keyvault
             Write-Host ("`t* Giving Key Vault access permissions to the Users and ServicePrincipal ..") -ForegroundColor Yellow
-                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $resourceGroupName -PermissionsToKeys all  -PermissionsToSecrets all
-                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SqlAdAdminUserName -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
-                Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+            Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $userPrincipalName -ResourceGroupName $resourceGroupName -PermissionsToKeys all  -PermissionsToSecrets all
+            Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -UserPrincipalName $SqlAdAdminUserName -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
+            Set-AzureRmKeyVaultAccessPolicy -VaultName $KeyVaultName -ServicePrincipalName $azureAdApplicationClientId -ResourceGroupName $resourceGroupName -PermissionsToKeys all -PermissionsToSecrets all
             Write-Host ("`t* Granted permissions to the users and serviceprincipals ..") -ForegroundColor Yellow
 
-        # Creating KeyVault Key to encrypt DB
+            # Creating KeyVault Key to encrypt DB
             Write-Host -ForegroundColor Yellow "`t* Creating a New Keyvault key."
             $key = (Add-AzureKeyVaultKey -VaultName $KeyVaultName -Name $keyName -Destination 'Software').ID
 
-        # Switching SQL commands context to the AD Application
+            # Switching SQL commands context to the AD Application
             Write-Host -ForegroundColor Yellow "`t* Creating SQL Column Master Key & Column Encryption Key."
             $cmkSettings = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyURL $key
             $sqlMasterKey = Get-SqlColumnMasterKey -Name $cmkName -InputObject $database -ErrorAction SilentlyContinue
@@ -552,7 +552,7 @@ catch {
             Else{New-SqlColumnMasterKey -Name $cmkName -InputObject $database -ColumnMasterKeySettings $cmkSettings}
             Add-SqlAzureAuthenticationContext -ClientID $azureAdApplicationClientId -Secret $newPassword -Tenant $tenantID
             New-SqlColumnEncryptionKey -Name $cekName -InputObject $database -ColumnMasterKey $cmkName
-            
+                
             Write-Host -ForegroundColor Yellow "`t* SQL encryption has been successfully created. Encrypting SQL Columns.."
             # Encrypt the selected columns (or re-encrypt, if they are already encrypted using keys/encrypt types, different than the specified keys/types.
             $ces = @()
@@ -564,78 +564,6 @@ catch {
         }
         catch {
             Write-Host -ForegroundColor Red "`t Column encryption has failed."
-            throw $_
-        } 
-        
-       # Configure Log Analytics to collect Azure diagnostic logs
-       try {
-            Write-Host ("`nStep 13: Configuring Log Analytics to collect Azure diagnostic logs" ) -ForegroundColor Yellow
-            
-            # Checking if application gateway deployment is submitted and complete before configuring OMS.    
-            Write-Host "`t`t-> Checking deployment deploy-AppGatewayWAF. " -ForegroundColor Yellow            
-            do
-            {
-                Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
-                Start-sleep -seconds 60
-            }
-            until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-AppGatewayWAF' -ErrorAction SilentlyContinue) -ne $null) 
-
-            Write-Host -ForegroundColor Yellow "`t* Deployment 'deploy-AppGatewayWAF' has been submitted."
-            do
-            {
-                Write-Host -ForegroundColor Yellow "`t`t-> Deployment 'deploy-AppGatewayWAF' is currently running.. Checking Deployment in 60 seconds.."
-                Start-Sleep -Seconds 60
-            }
-            While ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-AppGatewayWAF').ProvisioningState -notin ('Failed','Succeeded'))
-
-            if ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name 'deploy-AppGatewayWAF').ProvisioningState -eq 'Succeeded')
-            {
-                Write-Host -ForegroundColor Yellow "`t* Deployment deploy-AppGatewayWAF has completed successfully."
-            }
-            else
-            {
-                throw "Deployment deploy-AppGatewayWAF has failed. Please check portal for the reason."
-            }
-
-            # Start OMS Diagnostics
-            Write-Host -ForegroundColor Yellow "`t* Enabling resources for diagnostic metrics and enabling the workspace ID for the OMS workspace to receive metrics."
-            $omsWS = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $resourceGroupName
-
-            $resourceTypes = @( "Microsoft.Network/applicationGateways",
-                                "Microsoft.KeyVault/Vaults" ,
-					            "Microsoft.Automation/automationAccounts")
-
-            foreach($resourceType in $resourceTypes)
-            {
-                Write-Host -ForegroundColor Yellow "`t`t-> Enabling diagnostics for - $resourceType"
-                Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -ResourceType $resourceType -Force -Update | Out-Null
-            }
-
-            $workspace = Find-AzureRmResource -ResourceType "Microsoft.OperationalInsights/workspaces" -ResourceNameContains $omsWS.Name
-
-            # Update to be the storage account that logs will be written to. Storage account must be in the same region as the resource to monitor
-
-            $storageAccountId = (Find-AzureRmResource -ResourceType 'Microsoft.Storage/StorageAccounts' -ResourceGroupNameEquals $resourceGroupName -ResourceNameContains 'stgdiag').ResourceId
-
-            # update location to match your storage account location
-            $resources = Get-AzureRmResource | where { $_.ResourceType -in $resourceTypes -and $_.ResourceGroupName -eq "$resourceGroupName" }
-
-            foreach ($resource in $resources) {
-                Set-AzureRmDiagnosticSetting -ResourceId $resource.ResourceId -StorageAccountId $storageAccountId -Enabled $true -RetentionEnabled $true -RetentionInDays 1 | Out-null
-            }
-
-            Write-Host ("`t* Configure Log Analytics to collect Azure diagnostic logs" ) -ForegroundColor Yellow
-            foreach($resourceType in $resourceTypes)
-            {
-                Write-Host ("`t`t-> Adding Azure Diagnostics to Log Analytics for -" + $resourceType) -ForegroundColor Yellow
-                $resource = Find-AzureRmResource -ResourceType $resourceType -ResourceGroupNameEquals $resourceGroupName
-                Add-AzureDiagnosticsToLogAnalytics $resource $workspace | out-Null
-            }
-
-            # Enable the Log Analytics solution
-            Set-AzureRmOperationalInsightsIntelligencePack -ResourceGroupName $workspace.ResourceGroupName -WorkspaceName $workspace.Name -intelligencepackname KeyVault -Enabled $true
-        }
-        catch {
             throw $_
         }
     }
