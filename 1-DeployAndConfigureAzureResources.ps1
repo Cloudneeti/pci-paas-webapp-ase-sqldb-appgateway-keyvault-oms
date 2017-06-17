@@ -48,14 +48,6 @@ Param
         [string]
         $resourceGroupName,
 
-        # Provide location for deployment
-        [Parameter(Mandatory=$true)] 
-        [ValidateSet("eastasia","southeastasia","centralus","eastus","eastus2","westus","northcentralus","southcentralus","northeurope","westeurope","japanwest","japaneast",
-        "brazilsouth","australiaeast","australiasoutheast","southindia","centralindia","westindia","canadacentral","canadaeast","uksouth","ukwest","westcentralus","westus2",
-        "koreacentral","koreasouth")]
-        [string]
-        $location,
-
         # Provide Azure AD UserName with Global Administrator permission on Azure AD and Service Administrator / Co-Admin permission on Subscription.
         [Parameter(Mandatory=$True)] 
         [string]$globalAdminUserName, 
@@ -82,13 +74,6 @@ Param
         [string]
         $suffix,
 
-        # Provide Supported location/Region for Automation Account
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("japaneast","eastus2","westeurope","southeastasia","southcentralus","uksouth","westcentralus","northeurope","canadacentral","australiasoutheast",
-        "centralindia")]
-        [string]
-        $automationAcclocation,
-        
         # Provide Email address for SQL Threat Detection Alerts
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -163,6 +148,8 @@ Begin
         Write-Host -ForegroundColor Yellow "`t* Functions loaded successfully."
 
         ########### Manage Variables ###########
+        $location = 'eastus'
+        $automationAcclocation = 'eastus2'
         $scriptFolder = Split-Path -Parent $PSCommandPath
         $sqlAdAdminUserName = "sqlAdmin@"+$azureADDomainName
         $receptionistUserName = "receptionist_EdnaB@"+$azureADDomainName
