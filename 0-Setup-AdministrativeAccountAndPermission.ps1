@@ -106,9 +106,9 @@ Process
     # Importing / Installing Powershell Modules
     Write-Host -ForegroundColor Green "`nStep 2: Importing / Installing Powershell Modules"
     try {
-        # Azure Resource Manager Powershell Modules
+        # AzureRM Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
-        If (Get-Module -ListAvailable -Name AzureRM*) 
+        If (Get-Module -ListAvailable -Name AzureRM) 
         {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
             Get-Module -ListAvailable -Name AzureRM* | Import-Module -NoClobber -Force
@@ -116,53 +116,88 @@ Process
         }
         Else
         {
-            if (installModules) {
-                # Installing Azure AD Module
+            if ($installModules) {
+                # Installing AzureRM Module
                 Install-Module AzureRM -AllowClobber; 
-                if(Get-Module AzureRM | Out-Null){
-                    Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed and imported in to the session"
-                }                
+                Start-Sleep -Seconds 10
+                if(Get-Module -ListAvailable AzureRM ){
+                    Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed"
+                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
+                    Get-Module -ListAvailable -Name AzureRM* | Import-Module -NoClobber -Force
+                    if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
+                }
             }else {
                 Write-Host -ForegroundColor Red "`t* AzureRM module does not exist. "
 				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
             }
-        }
+        }   
 
-        # Azure Active Directory Powershell Modules
+        # MSOnline Powershell Modules
+        Write-Host -ForegroundColor Yellow "`t* Checking if MSOnline module already exist."
+        If (Get-Module -ListAvailable -Name MSOnline) 
+        {   
+            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
+            Get-Module -ListAvailable -Name MSOnline | Import-Module -NoClobber -Force
+            if(Get-Module -Name MSOnline) {Write-Host -ForegroundColor Yellow "`t* MSOnline Module imported successfully."}
+        }
+        Else
+        {
+            if ($installModules) {
+                # Installing MSOnline Module
+                Install-Module MSOnline -AllowClobber; 
+                Start-Sleep -Seconds 10
+                if(Get-Module -ListAvailable MSOnline ){
+                    Write-Host -ForegroundColor Yellow "`t* MSOnline Module successfully installed"
+                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
+                    Get-Module -ListAvailable -Name MSOnline | Import-Module -NoClobber -Force
+                    if(Get-Module -Name MSOnline) {Write-Host -ForegroundColor Yellow "`t* MSOnline Module imported successfully."}
+                }
+            }else {
+                Write-Host -ForegroundColor Red "`t* MSOnline module does not exist. "
+				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+            }
+        }        
+
+        # AzureAD Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureAD module already exist."
         If (Get-Module -ListAvailable -Name AzureAD) 
         {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Import-Module -Name AzureAD -NoClobber -Force
-            if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`t* AzureAD Module imported successfully."}             
+            Get-Module -ListAvailable -Name AzureAD | Import-Module -NoClobber -Force
+            if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`t* AzureAD Module imported successfully."}
         }
         Else
-        { 
-            if (installModules) {
+        {
+            if ($installModules) {
                 # Installing AzureAD Module
-                Install-Module AzureAD -AllowClobber;
-                if(Get-Module AzureAD | Out-Null){
-                    Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed and imported in to the session"
-                }                
+                Install-Module AzureAD -AllowClobber; 
+                Start-Sleep -Seconds 10
+                if(Get-Module -ListAvailable AzureAD ){
+                    Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed"
+                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
+                    Get-Module -ListAvailable -Name AzureAD | Import-Module -NoClobber -Force
+                    if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`t* AzureAD Module imported successfully."}
+                }
             }else {
                 Write-Host -ForegroundColor Red "`t* AzureAD module does not exist. "
-				Write-Host -ForegroundColor Yellow "Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
             }
-        }
+        }   
 
         <# This script takes a SubscriptionID, ResourceType, ResourceGroup and a workspace ID as parameters, analyzes the subscription or
             specific ResourceGroup defined for the resources specified in $Resources, and enables those resources for diagnostic metrics
             also enabling the workspace ID for the OMS workspace to receive these metrics.#>
             
         Write-Host -ForegroundColor Yellow "`t* Checking if Enable-AzureRMDiagnostics script is installed."
-        If (Get-InstalledScript -Name Enable-AzureRMDiagnostics) 
+        If (Get-InstalledScript -Name Enable-AzureRMDiagnostics -ErrorAction SilentlyContinue) 
         {   
             Write-Host -ForegroundColor Yellow "`t* Enable-AzureRMDiagnostics script is already installed."
         }else {
-            if (installModules) {
+            if ($installModules) {
                 Install-Script -Name Enable-AzureRMDiagnostics -Force
-                if(Get-InstalledScript -Name Enable-AzureRMDiagnostics | Out-Null){
-                    Write-Host "`t* Script installed successfully"
+                Start-Sleep -Seconds 10
+                if(Get-InstalledScript -Name Enable-AzureRMDiagnostics ){
+                    Write-Host -ForegroundColor Yellow "`t* Script installed successfully"
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* Enable-AzureRMDiagnostics script does not exist. "
@@ -170,45 +205,57 @@ Process
             }            
         }
 
-        #Enable Log Analytics to collect logs from Azure Diagnostics
-        Write-Host -ForegroundColor Yellow "`t* Checking if AzureDiagnosticsAndLogAnalytics module is already exist."
+        # AzureDiagnosticsAndLogAnalytics Powershell Modules
+        Write-Host -ForegroundColor Yellow "`t* Checking if AzureDiagnosticsAndLogAnalytics module already exist."
         If (Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics) 
-        {
+        {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Import-Module AzureDiagnosticsAndLogAnalytics -NoClobber -Force 
-            if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}            
+            Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics | Import-Module -NoClobber -Force
+            if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}
         }
-        Else{
-            if (installModules) {
+        Else
+        {
+            if ($installModules) {
                 # Installing AzureDiagnosticsAndLogAnalytics Module
-                Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber
-                if (Get-Module -Name AzureDiagnosticsAndLogAnalytics | Out-Null ) {
-                    Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed and imported in to the session"
+                Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber; 
+                Start-Sleep -Seconds 10
+                if(Get-Module -ListAvailable AzureDiagnosticsAndLogAnalytics ){
+                    Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed"
+                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
+                    Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics | Import-Module -NoClobber -Force
+                    if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}
                 }
-            }            
-        }
+            }else {
+                Write-Host -ForegroundColor Red "`t* AzureDiagnosticsAndLogAnalytics module does not exist. "
+				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+            }
+        }   
 
-        # This module allows SQL Server administrators and developers to automate server administration
+        # SqlServer Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if SqlServer module already exist."
         If (Get-Module -ListAvailable -Name SqlServer) 
         {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Import-Module -Name SqlServer -NoClobber -Force
-            if(Get-Module -Name SqlServer) {Write-Host -ForegroundColor Yellow "`t* SqlServer Module imported successfully."}             
+            Get-Module -ListAvailable -Name SqlServer | Import-Module -NoClobber -Force
+            if(Get-Module -Name SqlServer) {Write-Host -ForegroundColor Yellow "`t* SqlServer Module imported successfully."}
         }
         Else
-        { 
-            if (installModules) {
+        {
+            if ($installModules) {
                 # Installing SqlServer Module
-                Install-Module SqlServer -AllowClobber;
-                if(Get-Module SqlServer | Out-Null){
-                    Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed and imported in to the session"
+                Install-Module SqlServer -AllowClobber; 
+                Start-Sleep -Seconds 10
+                if(Get-Module -ListAvailable SqlServer ){
+                    Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed"
+                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
+                    Get-Module -ListAvailable -Name SqlServer | Import-Module -NoClobber -Force
+                    if(Get-Module -Name SqlServer) {Write-Host -ForegroundColor Yellow "`t* SqlServer Module imported successfully."}
                 }
             }else {
-                Write-Host -ForegroundColor Red "`t* SqlServer Module does not exist. "
-				Write-Host -ForegroundColor Yellow " run script with -installModules switch to install modules."
-            }             
-        }
+                Write-Host -ForegroundColor Red "`t* SqlServer module does not exist. "
+				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+            }
+        }   
     }
     catch {
         Throw $_
@@ -224,7 +271,7 @@ Process
             $adAdmin = New-AzureADUser -DisplayName "Global Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true `
             -MailNickName "PCIAdmin" -UserPrincipalName $globalADAdminUserName
             Start-Sleep -Seconds 10
-            if (Get-AzureADUser -ObjectId "$globalADAdminUserName"| Out-Null){
+            if (Get-AzureADUser -ObjectId "$globalADAdminUserName"){
                 Write-Host -ForegroundColor Yellow "`t* Azure AD Global Admin - $globalADAdminUserName created successfully."
             }
             #Get the Compay AD Admin ObjectID
