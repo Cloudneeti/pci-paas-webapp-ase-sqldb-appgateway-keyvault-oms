@@ -20,18 +20,6 @@ This solution illustrates the management of credit card data including card numb
 ![](images/4tier.png)
 
 
-
-# TABLE OF CONTENTS 
-<!-- TOC -->
-- <a href="Overview.md"> Solution Overview </a> 
-- <a href="Configuration.md"> Configuration and setup for solution </a> 
-- <a href="Payment processing solution.md"> The Payment Processing Solution (PCI)</a> 
-- <a href="Payment Sample dataset.md"> Customer Samples, and monitoring</a> 
-- <a href="FAQ.md"> Frequently Asked Questions </a> 
-
-
-<!-- /TOC -->
-
 ### Components of this solution
 
 -   **Reference architecture**. The reference architecture provides the design that was used for the Contoso webstore solution.
