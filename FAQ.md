@@ -28,8 +28,6 @@
 > The installation requires a custom domain and SSL certificate to meet PCI DSS requirements and protect the client side traffic from snooping. Microsoft
 recommends that a custom domain be purchased with [an SSL package](https://d.docs.live.net/7b2b5032e10686e1/Azure%20Compliance/PCI%20DSS%20quickstart/1.%09https:/docs.microsoft.com/en-us/azure/app-service-web/web-sites-purchase-ssl-web-site).
 Microsoft offers the ability to create a domain and request an SSL certificate from a Microsoft partner.
-#### Why do I need local admin rights to run the `./pre-post-deployment` script ?
-> PowerShell modules require elivated privileges to install service modules on your PC. This solution provides several scripts, and commands to verify that all the modules are installed, in the 'Client software requirements' section of the deployment guide.
 #### Why do Application gateway backend health status showing `unhealthy` ?
 > This deployment assumes that VIP address [ASE ILB >> Properties >> Virtual IP Address] assinged to ASE ILB would be 10.0.3.8 (observed behaviour). However, it might get changed to 10.0.3.9. If  the application gateway backend health is listed as `un-healthy`, verify that ASE ILB VIP address and application backend pool targets are same. Update the application gateway backend pool targets with ASE ILB VIP. (https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal#add-servers-to-backend-pools)
 #### How do I set up the administrator properly to use this solution.
@@ -45,29 +43,6 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 [How to deploy ASE](http://www.bizbert.com/bizbert/2016/01/07/AppServiceEnvironmentsHowToDeployAPIAppsToAVirtualNetwork.aspx)
 #### How do I use this solution in my production deployment, environment?
 > This solution including the scripts, template, and documentation are designed to help you build a pilot or demo site. Utilizing this solution does not provide a customer ready to run solution, it only illustrates the components required to build for a secure and compliant end to end solution. For instance, Custom Host Names, SSL Certificates, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions, Key vault rotation policies, usage of existing AD Admins and RBAC roles, usage of existing AD Applications and Service Principals will require customization and change to meet your custom production ready solution.
-#### How do I create a custom SSL certificate?
-A custom domain such as contosowebstore.com will require the creation of a .pfx file from the SSL provider that will is Base64-encrypted before uploading to Azure. The following process can be used to create the correct file.
-
-1.  Review the instructions on [creating a website SSL
-    certificate](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure-ssl-certificate).
-
-2.  Retrieve your private key. This file will have a name structure such as
-    `www.contosowebstore.com\_private\_key.key`
-
-3.  Retrieve your certificate. This file will have a name structure such as
-    `www.contosowebstore.com\_ssl\_certificate.cer`
-
-4.  [Create a personal information exchange (pfx)
-    file](https://technet.microsoft.com/en-us/library/dd261744.aspx) protect
-    this file with a password.
-
-5.  Convert the pfx file into a string Base64 text file. For example, in
-    PowerShell you can use the following commands:
-```powershell
-$bytes = [System.IO.File]::ReadAllBytes("c:\key.pfx");
-$b64 = [System.Convert]::ToBase64String($bytes);
-[System.Io.File]::WriteAllText("C:\key_.txt", $b64);
-```
 
 ####The scripts fail to run, I get a permission error XXXX, what do I do next?
 The following log-ons should be tested whenever you restart your PowerShell

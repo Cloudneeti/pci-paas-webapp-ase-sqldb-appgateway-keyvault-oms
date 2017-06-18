@@ -1,10 +1,10 @@
 # TABLE OF CONTENTS 
 <!-- TOC -->
 - <a href="Overview.md"> Solution Overview </a> 
-- <a href="Configuration.md"> Configuration and setup for solution </a> 
-- <a href="Payment processing solution.md"> The Payment Processing Solution (PCI)</a> 
-- <a href="Payment Sample dataset.md"> Customer Samples, and monitoring</a> 
-- <a href="FAQ.md"> Frequently Asked Questions </a> 
+- <a href="0-Setup-AdministrativeAccountAndPermission.md"> Preconfiguration script that verifies user, subscription, and local module configurations </a> 
+- <a href="1-DeployAndConfigureAzureResources.md"> The Payment Processing Solution (PCI) deployment PowerShell script</a> 
+- <a href="Payment Sample dataset.md"> Customer Samples, and monitoring explored</a> 
+- <a href="FAQ.md"> Frequently Asked Questions and troubleshooting</a> 
 
 
 <!-- /TOC -->
