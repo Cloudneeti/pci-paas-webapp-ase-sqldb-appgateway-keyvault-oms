@@ -107,6 +107,9 @@ Get-AzureRmSubscription
 #### What else do I need to consider once the solution is installed?
 Once the script has completed you should consider resetting your administrative passwords, including your ADsqladmin, and Admin users. The following command can be used to quickly reset passwords in PowerShell. 
 
+#### When I run the scripts, I receive the following error "New-Alias : The alias is not allowed, because an alias with the name 'Login-AzureRmAccount' already exists."
+This error is related to conflicting PowerShell Modules. To fix, uninstall all PowerShell msi and modules. 
+
 ```powershell
 Set-MsolUserPassword -userPrincipalName [sqladmin@yourdomain] -NewPassword [NEWPASSWORD] -ForceChangePassword $false
 ```

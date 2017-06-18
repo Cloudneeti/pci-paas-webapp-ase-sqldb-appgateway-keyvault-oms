@@ -37,72 +37,44 @@ This solution illustrates the management of credit card data including card numb
 -   **Reference architecture**. The reference architecture provides the design that was used for the Contoso webstore solution.
 -   **Azure Resource Manager templates**. In this deployment, JavaScript Object Notation (.JSON) files provide Microsoft Azure the ability to automatically deploy the components of the reference architecture after the configuration parameters are provided during setup.
 -   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
-    -   Module installation script that will install required PowerShell modules for
-    the installation. This script will require local administrator rights.
-    -   Global administrator setup script establishes the needed admin user to
-    deploy the solution
-    -   A pre-installation process that establishes user roles and establishes
-    required parameters in Microsoft Active Directory to ensure the correct
-    role-based access control mechanisms are deployed. This process includes
-    configuring separation of duties for core administrators and users.
-    -   A post-installation process that deploys an a web front-end
-    runtime, and SQL backpack](https://github.com/Microsoft/azure-sql-security-sample) built by the Microsoft SQL team, and revised for this scenario by Avyan Consulting Corp. The Contoso webstore Demo Application provides the framework for the solution user scenario. The templates and scripts build out a web application and SQL database that use the App Service Environment to provide service isolation     from the front end to the back end. The script also establishes a means to manage changes in the environment by creating a dev/test environment. For additional details about the reference architecture, data flow, and configuration, see Section 6 of this document.
-
-### Visualize Azure Resources before you deploy 
-
-For deployment details refer to section DEPLOYMENT GUIDE below
-
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAvyanConsultingCorp%2Fpci-paas-webapp-ase-sqldb-appgateway-keyvault-oms%2Fmaster%2Fazuredeploy.json" target="_blank">
-<img src="http://armviz.io/visualizebutton.png"/>
-</a>
-
-
-
+    -   Module installation, and Global administrator setup script script will install and verify that required PowerShell modules, and Global adminisitrator are configured correctly.
+    -   A installation PowerSHell script that deploys the end to end solution. that includes the components built (https://github.com/Microsoft/azure-sql-security-sample) built by the Microsoft SQL team. 
 
 ## USER SCENARIO
 
+The Payment processing solution for PCI DSS enablement will address the following use case -
 
-> This scenario illustrates how a fictitious webstore moved their payment card processing to a pure cloud based payment processing using Azure services. 
+> This scenario illustrates how a fictitious webstore moved their payment card processing to a cloud based payment processing using Azure services, the solution addresses the collection of basic user information, and their payment information. The solution does not process, or resolve the purchase of the card holder data (CHD) 
 
 
 
+### Use Case
+A small webstore called, 'Contoso webstore' is ready to move their payment system to the cloud. They have selected Microsoft Azure to host the process for purchasing and to allow a  clerk to collect credit card payments from their customer.
 
-A small webstore called, Contoso webstore is ready to move their payment system to the cloud. They have selected Microsoft Azure to host the
- process for purchasing and to allow a  clerk to collect credit card payments from their customer.
+The administrator is looking for a solution that can be quickly deployable to achieve his goals in illustrating a cloud born solution. He will use this proof-of-concept (POC) to discuss with his stakeholders how Azure can be used to accomplish:
 
-The administrator is looking for a solution can be quickly deployable to achieve his goals. He will use this proof-of-concept (POC) to understand how Azure can be used to accomplish the following:
+-   Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements
 
--   Collect, store, and retrieve payment card data while complying with
-    stringent Payment Card Industry, Data Security Standards (PCI DSS)
-    requirements
 
-Because this is a POC that installs the required elements to operate a service,
-it is not a customer ready-to-go solution. It requires careful understanding of
-all the regulations and laws that your organization must abide by.
-
-*You will be responsible for conducting appropriate security and compliance reviews of any
+> You will be responsible for conducting appropriate security and compliance reviews of any
 solution built with the architecture used by this POC, as requirements may vary
 based on the specifics of your implementation and geography. PCI DSS requires
 that you work directly with an accredited Qualified Security Assessor to certify
-your production ready solution.*
+your production ready solution.
 
-### The contosowebstore POC
+### Elements of the Proof of Concept (POC), Demo
 
-The POC solution is designed with the following fictitious employees of `contosowebstore.com`:
+The POC solution is designed with the following fictitious elements
+Domain site `contosowebstore.com`
 
-Two user roles are used only to illustrate use case, and provide insight into the user interface, and two service backend users are created durring the installation of this solution.  
-
-The following two service users are created to manage and administer the solution.
-
-
+User roles used to illustrate the use case, and provide insight into the user interface.
 
 #### Role: Site and Subscription Admin
 
 |Item      |Example|
 |----------|------|
-|Username: |`admin`|
-| First name: |`Admin`|
-|Last name: |`Admin`|
+|Username: |`adminXX@contosowebstore.onmicrosoft.com`|
+| Name: |`Global Admin Azure PCI Samples`|
 |User type:| `Subscription Administrator`|
 
 
@@ -114,9 +86,10 @@ The following two service users are created to manage and administer the solutio
 
 |Item      |Example|
 |----------|------|
-|Username: |`sqladmin`|
-| First name: |`SQL`|
-|Last name: |`Admin`|
+|Username: |`sqlAdmin@contosowebstore.onmicrosoft.com`|
+| Name: |`SQLADAdministrator PCI Samples`|
+| First name: |`SQL AD Administrator`|
+|Last name: |`PCI Samples`|
 |User type:| `Administrator`|
 
 
@@ -129,23 +102,20 @@ The following two service users are created to manage and administer the solutio
 
 |Item      |Example|
 |----------|------|
-|Username:| `EdnaB`|
+|Username:| `receptionist_EdnaB@contosowebstore.onmicrosoft.com`|
+| Name: |`Edna Benson`|
 | First name:| `Edna`|
 |Last name:| `Benson`|
 | User type: |`Member`|
 
-Edna Benson is the Clerk, and business manager. She is responsible to ensure that customer information is accurate, and billing is completed. Edna will use the **Customer** data in the following manner:
-
+Edna Benson is the receptonist, and business manager. She is responsible to ensure that customer information is accurate, and billing is completed. Edna is the user loged in for all interactions of the POC DEMO website. Edna's rightsare as followes: 
 
 * Edna can Create, read customer information *
 * Edna will be able to modify customer information.
 * Edna can overwrite (or replace) credit card number, expiration, and CVC verification information.
 
 
-
-
-
-In the `Contoso webstore` Demo User Application, you will be logged in to is configured to use **Edna** and able to test the capabilities of the deployed environment.
+> In the `Contoso webstore` Demo User Application, you will be logged in to is configured to use **Edna** and able to test the capabilities of the deployed environment.
 
 
 
