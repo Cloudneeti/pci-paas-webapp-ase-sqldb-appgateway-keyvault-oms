@@ -4,7 +4,7 @@
 
 
 
-## Desscription
+## Description
   
 
 
@@ -24,7 +24,7 @@ This solution illustrates the management of credit card data including card numb
 
 -   **Reference architecture**. The reference architecture provides the design that was used for the Contoso webstore solution.
 -   **Azure Resource Manager templates**. In this deployment, JavaScript Object Notation (.JSON) files provide Microsoft Azure the ability to automatically deploy the components of the reference architecture after the configuration parameters are provided during setup.
--   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
+-   **PowerShell scripts**. The scripts created by [Avyan Consulting Corp](http://www.avyanconsulting.com/azureservices) solution help set up the end-to-end solution. The scripts consist of:
     -   Module installation, and Global administrator setup script script will install and verify that required PowerShell modules, and Global adminisitrator are configured correctly.
     -   A installation PowerSHell script that deploys the end to end solution. that includes the components built (https://github.com/Microsoft/azure-sql-security-sample) built by the Microsoft SQL team. 
 
@@ -63,7 +63,7 @@ User roles used to illustrate the use case, and provide insight into the user in
 |----------|------|
 |Username: |`adminXX@contosowebstore.onmicrosoft.com`|
 | Name: |`Global Admin Azure PCI Samples`|
-|User type:| `Subscription Administrator`|
+|User type:| `Subscription Administrator and Azure Active Directory Global Administrator`|
 
 
 * admin cannot read credit card information unmasked. In addition, all actions are logged.
@@ -116,26 +116,23 @@ consist of the following items:
 
 | **Service type** | **Custom name** | **Region** | **Description** | **Estimated Cost** | 
 | ----------------- | --------------- | ----------- | -------------- | ----------------- | 
-| Virtual Machines | Virtual Machines | South Central US | 1 Standard virtual machine(s), D1 (1 cores, 3.5 GB RAM, 50 GB disk) size: 1 months | $96.72 | 
-| App Service | App Service | South Central US | 1 instance(s), 744 hours, size: s1, standard tier, 0 SNI connection(s), 0 IP connection(s) | $74.40 | 
-| IP Addresses | IP Addresses | East US | arm type, 1 public IP Address(es) x 1 months | $2.98 | 
+| Virtual Machines | Virtual Machines | South Central US | 1 Standard virtual machine(s), 1 Standard virtual machine(s), A2 v2 (2 cores, 4 GB RAM, 20 GB disk) size: 744 hours | $101.18 | 
+| App Service | App Service | South Central US | 1 instance(s), 744 hours, size: P1, premium tier, 0 SNI connection(s), 0 IP connection(s) | $223.20 | 
+| IP Addresses | IP Addresses | East US | arm type, 2 public IP Address(es) x 744 hours | $5.95 | 
 | SQL Database | SQL Database | East US | 1 standard database(s) x 1 months, size: s0 | $15.03 | 
 | Storage | Storage | East US | 5/GB storage: Block blob type, Basic tier, LRS redundancy | $0.10 | 
 | Storage | Storage | East US | 1 GB storage Table and Queue type. Basic tier, LRS redundancy, 1 x100,000 transactions | $0.07 | 
 | Storage | Storage | East US | standard-s4 Disk type with 1 Managed disks | $0.77 | 
 | Application Insights | Application Insights | East US | basic tier in us-east region with 2 GBs and 0 multi-step web test(s). | $2.30 | 
 | Log Analytics | Log Analytics | East US | 1 GB(s), standalone tier | $2.30 | 
-| Traffic Manager | Traffic Manager | East US | 2 million(s)/mo queries, 2 Azure endpoints, 0 external endpoints | $1.80 | 
 | Security Center | Security Center | East US |  | $15.00 | 
-| Key Vault | Key Vault | East US | 1 operations, 1 certificate renewals, 1 HSM keys in the us-east region | $4.03 | 
+| Key Vault | Key Vault | East US | 1000 operations, 0 certificate renewals, 0 HSM keys in the us-east region | $0.03 | 
 | Azure Active Directory | Azure Active Directory | East US | free tier, per-user MFA billing model, 10 MFA user(s), 25001-100000 directory objects, 0 hours | $14.00 | 
 | Application Gateway | Application Gateway | East US | 1 instance(s) x 1 months, 1 GB data processed, outbound transfers:: 5 GB | $93.74 | 
-| Azure DNS | Azure DNS | East US | 1 zone(s), 0 million queries | $0.50 | 
-| Traffic Manager | Traffic Manager | East US | 1 million(s)/mo queries, 1 Azure endpoints, 0 external endpoints | $0.90 | 
-| | | | | **Monthly Total $324.64** |
-| | | | | **Annual Total  $3,895.73** |
+| | | | | **Monthly Total $473.67** |
+| | | | | **Annual Total  $5,684.04** |
  
-Disclaimer 
+Disclaimer: 
 All prices shown are in US Dollar ($). This estimate was created in April 2017 
 
 This solution used the following Azure services (details to the deployment

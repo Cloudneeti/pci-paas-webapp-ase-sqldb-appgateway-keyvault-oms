@@ -42,7 +42,7 @@
     },
     "enableSoftDelete": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "Specifies if the vault is enabled for soft delete"
       }
@@ -176,8 +176,7 @@
         "enabledForDeployment": "[parameters('enabledForDeployment')]",
         "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
         "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
-        "enableSoftDelete": "[parameters('enableSoftDelete')]",
-        "createMode": "Incremental"
+        "createMode": "default"
       },
       "resources": [
         {
