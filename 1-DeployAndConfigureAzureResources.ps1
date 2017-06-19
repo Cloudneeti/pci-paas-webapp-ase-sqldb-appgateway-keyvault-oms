@@ -34,6 +34,10 @@ USAGE 3,  Create Azure AD Accounts & self-signed certificate for ASE ILB with de
 
     .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com
 
+USAGE 4,  Create Azure AD Accounts & custom certificate for AppGateway with default customHostName only
+
+    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -certificatePath 'C:\...pfx' -certificatepassword 'Pass' -enableSSL
+
     
   
 #>
