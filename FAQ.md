@@ -1,3 +1,15 @@
+
+# TABLE OF CONTENTS 
+<!-- TOC -->
+- <a href="Overview.md"> Solution Overview </a> 
+- <a href="Configuration.md"> Configuration and setup for solution </a> 
+- <a href="Payment processing solution.md"> The Payment Processing Solution (PCI)</a> 
+- <a href="Payment Sample dataset.md"> Customer Samples, and monitoring</a> 
+- <a href="FAQ.md"> Frequently Asked Questions </a> 
+
+
+<!-- /TOC -->
+
 # FAQ AND FIXES
 
 #### I can't seem to be able to log in, or run the PowerShell scripts with my Subscription user? 
@@ -16,8 +28,6 @@
 > The installation requires a custom domain and SSL certificate to meet PCI DSS requirements and protect the client side traffic from snooping. Microsoft
 recommends that a custom domain be purchased with [an SSL package](https://d.docs.live.net/7b2b5032e10686e1/Azure%20Compliance/PCI%20DSS%20quickstart/1.%09https:/docs.microsoft.com/en-us/azure/app-service-web/web-sites-purchase-ssl-web-site).
 Microsoft offers the ability to create a domain and request an SSL certificate from a Microsoft partner.
-#### Why do I need local admin rights to run the `./pre-post-deployment` script ?
-> PowerShell modules require elivated privileges to install service modules on your PC. This solution provides several scripts, and commands to verify that all the modules are installed, in the 'Client software requirements' section of the deployment guide.
 #### Why do Application gateway backend health status showing `unhealthy` ?
 > This deployment assumes that VIP address [ASE ILB >> Properties >> Virtual IP Address] assinged to ASE ILB would be 10.0.3.8 (observed behaviour). However, it might get changed to 10.0.3.9. If  the application gateway backend health is listed as `un-healthy`, verify that ASE ILB VIP address and application backend pool targets are same. Update the application gateway backend pool targets with ASE ILB VIP. (https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-create-gateway-portal#add-servers-to-backend-pools)
 #### How do I set up the administrator properly to use this solution.
@@ -34,9 +44,53 @@ Microsoft offers the ability to create a domain and request an SSL certificate f
 #### How do I use this solution in my production deployment, environment?
 > This solution including the scripts, template, and documentation are designed to help you build a pilot or demo site. Utilizing this solution does not provide a customer ready to run solution, it only illustrates the components required to build for a secure and compliant end to end solution. For instance, Custom Host Names, SSL Certificates, Virtual network address spacing, NSG routing, existing Storage and Databases, existing enterprise-wide OMS workspaces and solutions, Key vault rotation policies, usage of existing AD Admins and RBAC roles, usage of existing AD Applications and Service Principals will require customization and change to meet your custom production ready solution.
 
+####The scripts fail to run, I get a permission error XXXX, what do I do next?
+The following log-ons should be tested whenever you restart your PowerShell
+IDE session. This may not be required at all times, but strongly recommended to
+ensure the correct credentials are cached in your new session. ---at all times
+for this demo log in as the **admin** user in our example.
 
-# AZURE MARKETPLACE - 3RD PARTY GUIDANCE
-The following Azure Marketplace products are recommendations to help you achieve and manage continuous compliance  
+Logging in to the powershell administrative
+
+
+1.  [Connect to your Azure
+    AD](https://docs.microsoft.com/en-us/powershell/module/azuread/connect-azuread?view=azureadps-2.0)
+    service running the following command, with your admin user such as
+    admin\@pcidemo.onmicrosoft.com
+```powershell
+    Connect-AzureAD
+```
+2.  [Connect to your Azure Active
+    directory](https://docs.microsoft.com/en-us/powershell/module/msonline/connect-msolservice?view=azureadps-1.0)
+    running the following command, with your admin user such as
+    admin\@pcidemo.onmicrosoft.com
+```powershell
+    Connect-MsolService
+```
+3.  [Connect to your Azure
+    Resource](https://msdn.microsoft.com/en-us/library/mt125356.aspx) manager
+    running the following commands, with your admin user such as
+    admin\@pcidemo.onmicrosoft.com
+```powershell
+    login-azurermaccount
+```
+4.  Retrieve your subscription information running the following commands
+```powershell
+Get-AzureRmSubscription
+```
+
+#### What else do I need to consider once the solution is installed?
+Once the script has completed you should consider resetting your administrative passwords, including your ADsqladmin, and Admin users. The following command can be used to quickly reset passwords in PowerShell. 
+
+#### When I run the scripts, I receive the following error "New-Alias : The alias is not allowed, because an alias with the name 'Login-AzureRmAccount' already exists."
+This error is related to conflicting PowerShell Modules. To fix, uninstall all PowerShell msi and modules. 
+
+```powershell
+Set-MsolUserPassword -userPrincipalName [sqladmin@yourdomain] -NewPassword [NEWPASSWORD] -ForceChangePassword $false
+```
+
+#### Are there third party solutions that can help achieve or manage PCI compliance?
+The following examples in the marketplace partners that have solutions that can help with continous compliance efforts.
 
 | Security Layer                           	| Azure Marketplace Product(s)                                                                                                                                         	|
 |------------------------------------------	|----------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
@@ -45,13 +99,12 @@ The following Azure Marketplace products are recommendations to help you achieve
 | Extending Identity Security           	| [Azure Marketplace: Security + Identity](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/security-identity?page=1)                           	|
 | Extending Monitoring and Diagnostics 	| [Azure Marketplace: Monitoring + Diagnostics](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/category/monitoring-management?page=1&subcategories=monitoring-diagnostics) 	|
 
- 
+ #### How often is this solution updated? 
 
-# SUPPORT PROCESS
+This solution is maintained in three repositories, one private, and two public. Currently Avyan Consulting team provided the development branch of this solution, any questions or concerns contact. azurecompliance@avyanconsulting.com 
 
-This blueprint is maintained in three repositories, one private, and two public. For a consutation/demo/workshop, contact your Microsoft account representative.  Avyan Consulting team provided the development of this solution, any questions or concerns contact. azurecompliance@avyanconsulting.com **Developed under MIT licensing**
-
-The current version of the blueprint is avalible in preview, and no stable build has been commited. Please check back frequently for updates for the official release of this solution.
+The current version of the solution is avalible in preview,  no stable build has been commited.
+ Please check back frequently for updates for the official release of this solution.
 The next version pre-release, fixes and updates are located at [Avyan Consulting Git Repo](https://github.com/AvyanConsultingCorp/pci-paas-webapp-ase-sqldb-appgateway-keyvault-oms/)
 
 
