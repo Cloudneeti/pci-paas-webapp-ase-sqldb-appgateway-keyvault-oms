@@ -3,6 +3,7 @@
 This PowerShell script is used to deploy the Payment Card Payment processing solution for PCI DSS enablement.Deploying solution requires that a subscription be configured with the right permissions, and roles. Details can be found in the  <a href="0-Setup-AdministrativeAccountAndPermission.ps1"> configuration readme. </a>  
 ```powershell
 .\1-DeployAndConfigureAzureResources.ps1
+-resourceGroupName <String>
 -globalAdminUserName <String>
 -globalAdminPassword <String>
 -azureADDomainName <String>
@@ -10,8 +11,8 @@ This PowerShell script is used to deploy the Payment Card Payment processing sol
 -suffix <String>
 -sqlTDAlertEmailAddress <String>
 -customHostName <String>
--enableSSL 
--enableADDomainPasswordPolicy
+-enableSSL <Switch>
+-enableADDomainPasswordPolicy <Switch>
 ```
 
 ### Deployment Timeline
@@ -29,6 +30,7 @@ components. The total time required is approximately 1.5 hours from when the
     
 ```powershell
 .\1-DeployAndConfigureAzureResources.ps1 
+-resourceGroupName contosowebstore
 -globalAdminUserName adminXX@contosowebstore.onmicrosoft.com 
 -globalAdminPassword **************
 -azureADDomainName contosowebstore.onmicrosoft.com 
@@ -39,12 +41,13 @@ components. The total time required is approximately 1.5 hours from when the
 
 ```
 
-This command will create required Azure accounts, generate a self-signed certificate for ASE ILB, Application Gateway, use a provided custom domain, and setup password policy with 60 days.
+This command will create required Azure accounts, generate a self-signed certificate for ASE ILB & Application Gateway SSL endpoint, use a provided custom domain.
 
 ## Example 2 deploy with custom certificate, custom domain, and set password policy
 
 ```powershell
 .\1-DeployAndConfigureAzureResources.ps1
+-resourceGroupName contosowebstore
 -globalAdminUserName adminXX@contosowebstore.onmicrosoft.com 
 -globalAdminPassword **************
 -azureADDomainName contosowebstore.onmicrosoft.com 
@@ -55,7 +58,7 @@ This command will create required Azure accounts, generate a self-signed certifi
 -enableADDomainPasswordPolicy
 ```
 
-This command will create required Azure accounts, and be deployed with a custom web SSL certificate generate a self-signed certificate for ASE ILB, Application Gateway, use a provided custom domain, and setup password policy with 60 days.
+This command will create required Azure accounts, generate a self-signed certificate for ASE ILB & Application Gateway SSL endpoint, use a provided custom domain and setup password policy with 60 days.
 
 
 
@@ -64,6 +67,10 @@ This command will create required Azure accounts, and be deployed with a custom 
 
 
 ## Required Parameters
+
+>-resourceGroupName <String>
+
+Specifies the Resource Group name in which all resources will be deployed.
 
 >-globalAdminUserName <String>
 
@@ -82,7 +89,7 @@ Specifies the password for the AD Global Admin.
 
 >-suffix <String>
 
-Suffix is used as an identifier in the deployment of the solution. THis can be any character, or identifier such as a business unit name.
+Suffix is used as an identifier in the deployment of the solution. This can be any character, or identifier such as a business unit name.
 
 >-sqlTDAlertEmailAddress <String>
 
@@ -108,7 +115,7 @@ enable SSL on the ApplicationGateway allowing the user to browse on the website 
 | Input          | Usage |
 |----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | none           | Customer can use the application on http (e.g. http://...)  |
-| Switch present | Customer can use the application on **`https`** (e.g. https://...).  When this switch is used in combination with `certificatePath` and `certificatePassword`, it will enable a custom certificate on the AppGateway. You want to pass a custom certificate, please have the .pfx certificate file ./certificates folder.  The following process can be used to create the correct file. |  
+| Switch present | Customer can use the application on **`https`** (e.g. https://...).  When this switch is used in combination with `appGatewaySslCertPath` and `appGatewaySslCertPwd`, it will enable a custom certificate on the AppGateway. You want to pass a custom certificate, please have the .pfx certificate file. The following process can be used to create the correct file. |  
 
 1.  Review the instructions on [creating a website SSL
     certificate](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure-ssl-certificate).
