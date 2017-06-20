@@ -139,8 +139,6 @@
   },
   "variables": {
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
-    "storageAccountPreRelease": "stgpcipaasreleases",
-    "webContainerName": "pci-paas-web-container",
     "webPackageName": "ContosoWebStore.zip",
     "publicIpAddressName": "publicIp-AppGateway",
     "aseNsgGroupName": "nsg-ASE",
@@ -178,7 +176,8 @@
       "endIp": "[concat(variables('aseSubnetBaseAddress'), '.255')]"
     },
     "webSiteName": "[concat('webapp', '-pciwebapp')]",
-    "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('webContainerName'),'/',variables('webPackageName'))]",
+    "artifactsFolder": "artifacts",
+    "packageURI": "[concat(parameters('_artifactsLocation'), '/', variables('artifactsFolder'), '/', variables('webPackageName'), parameters('_artifactsLocationSasToken'))]",
     "nestedTemplateFolder": "nested",
     "aseTemplateFileName": "asedeploy.json",
     "sqlServerTemplateFileName": "sqlserverdeploy.json",
