@@ -181,16 +181,12 @@
     "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('webContainerName'),'/',variables('webPackageName'))]",
     "nestedTemplateFolder": "nested",
     "aseTemplateFileName": "asedeploy.json",
-    "gatewayTemplateFileName": "appgatewaydeploy.json",
     "sqlServerTemplateFileName": "sqlserverdeploy.json",
     "commonTemplateFileName": "common.json",
     "webAppTemplateFileName": "webappdeploy.json",
     "vmBastionTemplateFileName": "vmBastion.json",
-    "dnsTemplateFileName": "dnsZone.json",
-    "newZoneName": "[parameters('customHostName')]",
     "omsTemplateFileName": "omsworkspace.json",
     "omsWorkspaceName": "[concat('oms-WS-pci-paas-', uniqueString(resourceGroup().id))]",
-    "omsSolutionsTemplateFileName": "omsSolutions.json",
     "automationAccountTemplateFileName": "automationAccount.json",
     "tagValues": {
       "layer": "dummy",
@@ -598,25 +594,6 @@
           "tagValues": {
             "value": "[variables('tagValues')]"
           }
-        }
-      }
-    },
-    {
-      "name": "deploy-DNSZone",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-02-01",
-      "dependsOn": [
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('dnsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "newZoneName": { "value": "[variables('NewZoneName')]" },
-          "aseVirtualIP": { "value": "[variables('aseBackendVirtualIp')]" },
-          "tagValues": { "value": "[variables('tagValues')]" }
         }
       }
     },
