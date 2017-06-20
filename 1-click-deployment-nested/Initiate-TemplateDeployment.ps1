@@ -95,7 +95,6 @@
     {
         $ErrorActionPreference = 'Stop'
         cd $PSScriptRoot
-        Write "Connecting to Azure.. "
 
         # Creating a Login credential.
         $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
@@ -103,7 +102,7 @@
         
         ########### Establishing connection to Azure ###########
         try {
-            Write-Host -ForegroundColor Green "`nStep 2: Establishing connection to Azure AD & Subscription"
+            Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription"
 
             # Connecting to MSOL Service
             Write-Host -ForegroundColor Yellow  "`t* Connecting to Msol service."
@@ -153,15 +152,15 @@
     }
     Process
     {
-        Write "Initiating template deployment.."
+        Write-Host -ForegroundColor Green "`nStep 2: Initiating template deployment.."
         try
         {
             New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateFile $templateFile -DeploymentDebugLogLevel All -Force -Verbose
         }
         catch
         {
-            "Command failed to execute. Please try to run it manually"
-            "New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateFile $templateFile -DeploymentDebugLogLevel All -Force -Verbose"
+            Write-Host -ForegroundColor Red "`nCommand failed to execute. Please try to run it manually"
+            Write-Host -ForegroundColor Red "`nCommand executed:`n`nNew-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -Mode Incremental -TemplateParameterObject $OptionalParameters -TemplateFile $templateFile -DeploymentDebugLogLevel All -Force -Verbose"
             $OptionalParameters | Sort-Object Name | Format-Table -AutoSize -Wrap -Expand EnumOnly
             Break
         }

@@ -139,8 +139,6 @@
   },
   "variables": {
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
-    "storageAccountPreRelease": "stgpcipaasreleases",
-    "webContainerName": "pci-paas-web-container",
     "webPackageName": "ContosoWebStore.zip",
     "publicIpAddressName": "publicIp-AppGateway",
     "aseNsgGroupName": "nsg-ASE",
@@ -178,19 +176,16 @@
       "endIp": "[concat(variables('aseSubnetBaseAddress'), '.255')]"
     },
     "webSiteName": "[concat('webapp', '-pciwebapp')]",
-    "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('webContainerName'),'/',variables('webPackageName'))]",
+    "artifactsFolder": "artifacts",
+    "packageURI": "[concat(parameters('_artifactsLocation'), '/', variables('artifactsFolder'), '/', variables('webPackageName'), parameters('_artifactsLocationSasToken'))]",
     "nestedTemplateFolder": "nested",
     "aseTemplateFileName": "asedeploy.json",
-    "gatewayTemplateFileName": "appgatewaydeploy.json",
     "sqlServerTemplateFileName": "sqlserverdeploy.json",
     "commonTemplateFileName": "common.json",
     "webAppTemplateFileName": "webappdeploy.json",
     "vmBastionTemplateFileName": "vmBastion.json",
-    "dnsTemplateFileName": "dnsZone.json",
-    "newZoneName": "[parameters('customHostName')]",
     "omsTemplateFileName": "omsworkspace.json",
     "omsWorkspaceName": "[concat('oms-WS-pci-paas-', uniqueString(resourceGroup().id))]",
-    "omsSolutionsTemplateFileName": "omsSolutions.json",
     "automationAccountTemplateFileName": "automationAccount.json",
     "tagValues": {
       "layer": "dummy",
@@ -602,25 +597,6 @@
       }
     },
     {
-      "name": "deploy-DNSZone",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-02-01",
-      "dependsOn": [
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('dnsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "newZoneName": { "value": "[variables('NewZoneName')]" },
-          "aseVirtualIP": { "value": "[variables('aseBackendVirtualIp')]" },
-          "tagValues": { "value": "[variables('tagValues')]" }
-        }
-      }
-    },
-    {
       "name": "deploy-IlbAseCertificate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-02-01",
@@ -640,6 +616,36 @@
           "password": { "value": "[parameters('asepfxPassword')]" },
           "certificateThumbprint": { "value": "[parameters('asecertThumbprint')]" },
           "certificateName": { "value": "[concat('*.ase.',parameters('customHostName'))]" }
+        }
+      }
+    },
+    {
+      "name": "deploy-BastionVM",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-CommonInfrastructure')]",
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('vmBastionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": { "value": "[parameters('bastionHostAdministratorUserName')]" },
+          "adminPassword": { "value": "[parameters('bastionHostAdministratorPassword')]" },
+          "dnsLabelPrefix": { "value": "[concat('pcisamples',uniqueString(resourceGroup().id))]" },
+          "virtualNetworkName": { "value": "[variables('virtualNetworkName')]" },
+          "subnetName": { "value": "[variables('bastionSubnetName')]" },
+          "networkSecurityGroupName": { "value": "[variables('bastionNsgGroupName')]" },
+          "diagnosticsStorageAccountName": { "value": "[variables('storageAccountDiagnostics')]" },
+          "omsWorkspaceName": { "value": "[variables('omsWorkspaceName')]" },
+          "aadClientID": { "value": "[parameters('azureAdApplicationClientId')]" },
+          "aadClientSecret": { "value": "[parameters('azureAdApplicationClientSecret')]" },
+          "keyVaultName": { "value": "[variables('keyVaultName')]" },
+          "tagValues": { "value": "[variables('tagValues')]" }
         }
       }
     },

@@ -24,6 +24,7 @@ This PowerShell script is used to verify pre-deployment requirements for the Pay
  
  - AzureRM
  - AzureAD
+ - MSOnline
  - AzureDiagnosticsAndLogAnalytics
  - SqlServer
  - Enable-AzureRMDiagnostics (Script)
