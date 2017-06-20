@@ -119,9 +119,12 @@ Param
 
 Begin
     {
-        $errorActionPreference = 'stop'
-        Set-location $PSScriptRoot    
-
+        # Preference variable
+        $ProgressPreference = 'SilentlyContinue'
+        $ErrorActionPreference = 'Stop'
+        
+        Set-location $PSScriptRoot
+        
         ########### Manage directories ###########
         # Create folder to store self-signed certificates
         if(!(Test-path $pwd\certificates)){mkdir $pwd\certificates -Force | Out-Null }
@@ -247,7 +250,7 @@ Process
                 $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
                 Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
             }
-            $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File -Filter "*.bacpac" | ForEach-Object -Process {$_.FullName}
+            $ArtifactFilePaths = Get-ChildItem $pwd\artifacts -Recurse -File | ForEach-Object -Process {$_.FullName}
             foreach ($SourcePath in $ArtifactFilePaths) {
                 $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
                 Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
