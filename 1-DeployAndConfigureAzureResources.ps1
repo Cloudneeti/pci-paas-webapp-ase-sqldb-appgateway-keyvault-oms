@@ -11,35 +11,32 @@ This script should run before you start deployment of PCI-PaaS solution template
         -   Creates AD Application and Service Principle to AD Application.
         -   Generates self-signed SSL certificate for Internal App Service Environment and Application gateway (if required) and Converts them into Base64 string
                 for template deployment.
-				
-				
-				
+
     You can use the following switches parameters - 
-    1) enableSSL - Use this switch to create new self-signed certificate or convert existing certificate (by providing certificatePath) for Application Gateway SSL endpoint. 
+    1) enableSSL - Use this switch to create new self-signed certificate or convert existing certificate (by providing appGatewaySslCertPath & appGatewaySslCertPwd ) for Application Gateway SSL endpoint. 
     2) enableADDomainPasswordPolicy - Use this switch to setup password policy with 60 days of validity at Domain Level.
 
+You will use appGatewaySslCertPath & appGatewaySslCertPwd parameter only when you are willing to upload your own certificate for Application Gateway HTTPS endpoint. appGatewaySslCertPath parameter 
+    will require you to enter absolute path for your certificate pfx file. Make sure certificate is in .pfx format with password protected.
+
+Please note - By default, Application gateway will always communicate with App Service Environment using HTTPS.
     
-USAGE 1, Create Azure AD Accounts, self-signed certificate for ASE ILB, custom domain, self-signed certificate for Application Gateway & setup password policy with 60 days.
+USAGE 1, Create Azure AD Accounts, self-signed certificate for ASE ILB, customer provided customHostName, self-signed certificate for Application Gateway & setup password policy with 60 days.
 	
-    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -customHostName dummydomain.com -enableSSL -enableADDomainPasswordPolicy
-
+    .\1-DeployAndConfigureAzureResources.ps1 -resourceGroupName contosowebstore -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -customHostName dummydomain.com -enableSSL -enableADDomainPasswordPolicy
     
-USAGE 2, Create Azure AD Accounts, self-signed certificate for ASE ILB, custom domain, self-signed certificate for Application Gateway & setup password policy with 60 days.
-    
+USAGE 2, Create Azure AD Accounts, self-signed certificate for ASE ILB, default customHostName, self-signed certificate for Application Gateway & setup password policy with 60 days.
 	
-   .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -enableSSL -enableADDomainPasswordPolicy
+   .\1-DeployAndConfigureAzureResources.ps1 -resourceGroupName contosowebstore -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -enableSSL -enableADDomainPasswordPolicy
 
- 
-USAGE 3,  Create Azure AD Accounts & self-signed certificate for ASE ILB with default customHostName only
+USAGE 3,  Create Azure AD Accounts, customer provided customHostName & certificate for AppGateway SSL endpoint.
 
-    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com
+    .\1-DeployAndConfigureAzureResources.ps1 -resourceGroupName contosowebstore -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -customHostName dummydomain.com -appGatewaySslCertPath 'C:\...pfx' -appGatewaySslCertPwd 'Pass' -enableSSL 
 
-USAGE 4,  Create Azure AD Accounts & custom certificate for AppGateway with default customHostName only
+USAGE 4,  Create Azure AD Accounts & self-signed certificate for ASE ILB with default customHostName only. (No HTTPS endpoint on Application Gateway.)
 
-    .\1-DeployAndConfigureAzureResources.ps1 -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com -certificatePath 'C:\...pfx' -certificatepassword 'Pass' -enableSSL
+    .\1-DeployAndConfigureAzureResources.ps1 -resourceGroupName contosowebstore -globalAdminUserName admin1@contoso.com -globalAdminPassword ********** -azureADDomainName contoso.com -subscriptionID xxxxxxx-f760-xxxx-bd98-xxxxxxxx -suffix PCIDemo -sqlTDAlertEmailAddress email@dummy.com
 
-    
-  
 #>
 [CmdletBinding()]
 Param
@@ -89,7 +86,7 @@ Param
         [string]
         $customHostName = "azurewebsites.net",
 
-        # Provide certificate path if you are wiling to provide your own frontend ssl certificate for Application gateway.
+        # Provide certificate path if you are willing to provide your own frontend ssl certificate for Application gateway.
         [ValidateScript({
             if(
                 (Test-Path $_)
@@ -97,13 +94,13 @@ Param
             else {Throw "Parameter validtion failed due to invalid file path"}
         })]  
         [string]
-        $certificatePath,
+        $appGatewaySslCertPath,
 
         # Enter password for the certificate provided.
         [string]
-        $certificatePassword,
+        $appGatewaySslCertPwd,
 
-        # Use this swtich in combination with certificatePath parameter to setup frontend ssl on Application gateway.
+        # Use this swtich in combination with appGatewaySslCertPath parameter to setup frontend ssl on Application gateway.
         [ValidateScript({
             if(
                 (Get-Variable customHostName)
@@ -123,10 +120,21 @@ Begin
         $ProgressPreference = 'SilentlyContinue'
         $ErrorActionPreference = 'Stop'
         
+        #Change Path to Script directory
         Set-location $PSScriptRoot
-        
+
+        Write-Host -ForegroundColor Green "`nStep 0: Checking Pre-requisites."
+
+        # Checking AzureRM Context version
+        Write-Host -ForegroundColor Yellow "`nChecking AzureRM Context version.."
+        if ((get-command get-azurermcontext).version -le "3.0"){
+            Write-Host -ForegroundColor Red "`nThis script requires PowerShell to 3.0 or greater"
+            Break
+        }
+
         ########### Manage directories ###########
         # Create folder to store self-signed certificates
+        Write-Host -ForegroundColor Yellow "`nCreating Certificates folder to store self-signed certificates."
         if(!(Test-path $pwd\certificates)){mkdir $pwd\certificates -Force | Out-Null }
 
         ########### Functions ###########
@@ -349,10 +357,10 @@ Process
 
             # Generate App Gateway Front End SSL certificate, if required and converts it to Base64 string.
             if($enableSSL){
-                if($certificatePath) {
+                if($appGatewaySslCertPath) {
                     Write-Host -ForegroundColor Yellow "`t* Converting customer provided certificate to Base64 string"
-                    $certData = Convert-Certificate -certPath $certificatePath
-                    $certPassword = $certificatePassword
+                    $certData = Convert-Certificate -certPath $appGatewaySslCertPath
+                    $certPassword = $appGatewaySslCertPwd
                 }
                 else{
                     Write-Host -ForegroundColor Yellow "`t* No valid certificate path was provided. Creating a new self-signed certificate and converting to Base64 string"
