@@ -79,7 +79,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2017-03-01",
       "name": "[variables('applicationGatewayName')]",
       "type": "Microsoft.Network/applicationGateways",
       "location": "[resourceGroup().location]",
@@ -215,7 +215,9 @@
         },
         "webApplicationFirewallConfiguration": {
           "enabled": true,
-          "firewallMode": "Prevention"
+          "firewallMode": "Prevention",
+          "ruleSetType": "OWASP",
+          "ruleSetVersion": "3.0"
         }
       },
       "resources": [
