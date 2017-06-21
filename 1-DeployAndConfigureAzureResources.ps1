@@ -225,7 +225,7 @@ Begin
         $userPrincipalName = $context.Account.Id
         $artifactsStorageAcc = "stage$subId" 
         $sqlBacpacUri = "http://$artifactsStorageAcc.blob.core.windows.net/$storageContainerName/artifacts/ContosoPayments.bacpac"
-        $sqlsmodll = (Get-ChildItem "C:\Program Files\WindowsPowerShell\Modules\SqlServer" -Recurse -File -Filter "Microsoft.SqlServer.Smo.dll").FullName
+        $sqlsmodll = (Get-ChildItem "$env:programfiles\WindowsPowerShell\Modules\SqlServer" -Recurse -File -Filter "Microsoft.SqlServer.Smo.dll").FullName
 
     }
     
