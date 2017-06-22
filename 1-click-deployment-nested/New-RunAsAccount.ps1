@@ -84,13 +84,6 @@
  New-AzureRmAutomationConnection -ResourceGroupName $ResourceGroup -AutomationAccountName $automationAccountName -Name $connectionAssetName -ConnectionTypeName $connectionTypeName -ConnectionFieldValues $connectionFieldValues
  }
 
- $AzureRMProfileVersion= (Get-Module AzureRM.Profile).Version
- if (!(($AzureRMProfileVersion.Major -ge 2 -and $AzureRMProfileVersion.Minor -ge 1) -or ($AzureRMProfileVersion.Major -gt 2)))
- {
-    Write-Error -Message "Please install the latest Azure PowerShell and retry. Relevant doc url : https://docs.microsoft.com/powershell/azureps-cmdlets-docs/ "
-    return
- }
-
  # Create a Run As account by using a service principal
  $CertifcateAssetName = "AzureRunAsCertificate"
  $ConnectionAssetName = "AzureRunAsConnection"
