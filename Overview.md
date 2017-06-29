@@ -56,15 +56,20 @@ It is also highly advised that a clean installation of PowerShell be used to dep
 -azureADDomainName contosowebstore.onmicrosoft.com 
 -subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX 
 -suffix PCIcontosowebstore
+-customHostName contosowebstore.com
 -sqlTDAlertEmailAddress edna@contosowebstore.com 
--enableSSL 
+-enableSSL
+-enableADDomainPasswordPolicy 
 ```
 review the 1-DeployAndConfigureAzureResources for detailed usage instructions
 
 3. Deploy OMS logging and resources
  ```powershell
-.\2-EnableOMSLoggingOnResources.ps1 -resourceGroupName contosowebstore -globalAdminUserName adminXX@contosowebstore.onmicrosoft.com -globalAdminPassword **************
-    -subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+.\2-EnableOMSLoggingOnResources.ps1 
+-resourceGroupName contosowebstore 
+-globalAdminUserName adminXX@contosowebstore.onmicrosoft.com 
+-globalAdminPassword **************
+-subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 ```
 
  review the 2-EnableOMSLoggingOnResources for detailed usage instructions
