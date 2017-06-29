@@ -12,7 +12,7 @@ The Azure blueprint solution is intended to simplify azure adoption, showcase co
 The solution joint developed with Avyan consulting (Microsoft MVP partner) was designed to illustrate an end to end solution that can satisfy the needs in organizations that maybe looking for a cloud solution to reduce the burden, or cost of deployment.
 This solution enables the ability to:
 
--	Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS) requirements.
+-	Collect, store, and retrieve payment card data while complying with stringent Payment Card Industry, Data Security Standards (PCI DSS 3.2) requirements.
 
 This solution illustrates the management of credit card data including card number, expiration, CVC (Card Verification Check) numbers securely in a four-tier secure and compliant solution could be deployed as an end-to-end Azure solution.
 
@@ -28,9 +28,56 @@ This solution illustrates the management of credit card data including card numb
     -   Module installation, and Global administrator setup script script will install and verify that required PowerShell modules, and Global adminisitrator are configured correctly.
     -   A installation PowerSHell script that deploys the end to end solution. that includes the components built (https://github.com/Microsoft/azure-sql-security-sample) built by the Microsoft SQL team. 
 
+	
+## DEPLOYING THE SOLUTION
+
+The deployment of this sample requires few steps that all can be run using Microsoft PowerShell v5. To be able to connect to the website, it is required that you provide a custom domain name, such as contoso.com. However the custom domain name is not required to successfully deploy the solution for it to run.
+
+It is also highly advised that a clean installation of PowerShell be used to deploy the solution, or an understanding how to verify that your are running the latest modules required for the scripts to run correctly. For our example we use a Windows 10 VM that we log into, and run the following commands (note we are enabling the custom domain command)
+
+1. Install the required modules, and set up the administrator roles correctly.
+```powershell
+ .\0-Setup-AdministrativeAccountAndPermission.ps1 
+-azureADDomainName contosowebstore.onmicrosoft.com
+-tenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+-subscriptionId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+-configureGlobalAdmin 
+-installModules
+ ```
+ 
+ review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions
+ 
+ 2. Install the solution-update-management 
+ ```powershell
+.\1-DeployAndConfigureAzureResources.ps1 
+-resourceGroupName contosowebstore
+-globalAdminUserName adminXX@contosowebstore.onmicrosoft.com 
+-globalAdminPassword **************
+-azureADDomainName contosowebstore.onmicrosoft.com 
+-subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX 
+-suffix PCIcontosowebstore
+-sqlTDAlertEmailAddress edna@contosowebstore.com 
+-enableSSL 
+```
+review the 1-DeployAndConfigureAzureResources for detailed usage instructions
+
+3. Deploy OMS logging and resources
+ ```powershell
+.\2-EnableOMSLoggingOnResources.ps1 -resourceGroupName contosowebstore -globalAdminUserName adminXX@contosowebstore.onmicrosoft.com -globalAdminPassword **************
+    -subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+```
+
+ review the 2-EnableOMSLoggingOnResources for detailed usage instructions
+ 
+  
+
+
+
+
+	
 ## USER SCENARIO
 
-The Payment processing solution for PCI DSS enablement will address the following use case -
+The Payment processing solution for PCI DSS 3.2 enablement will address the following use case -
 
 > This scenario illustrates how a fictitious webstore moved their payment card processing to a cloud based payment processing using Azure services, the solution addresses the collection of basic user information, and their payment information. The solution does not process, or resolve the purchase of the card holder data (CHD) 
 
