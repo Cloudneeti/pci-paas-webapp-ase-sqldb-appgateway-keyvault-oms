@@ -137,7 +137,9 @@ enable SSL on the ApplicationGateway allowing the user to browse on the website 
 
 > -customHostName
 
-Specifies a custom domain for the deployment. If this parameter is used you will be required to update the applications IP address with DNS hosting provider
+Specifies a custom domain for the deployment. To be able to connect to the website, it is required that you provide a custom domain name, such as contoso.com. This is enabled by using the '-customHostName' switch on step2. [Details to purchase, and enable a custom domain.](https://docs.microsoft.com/en-us/azure/app-service-web/custom-dns-web-site-buydomains-web-app)
+A custom domain name is not required to successfully deploy the solution for it to run, however you will not be able to connect to the website for demonstration purposes.
+If this parameter is used you will be required to update the applications IP address with your DNS hosting provider (custom domain name)
 
 #### Update DNS setting with Application Gateway IP
 

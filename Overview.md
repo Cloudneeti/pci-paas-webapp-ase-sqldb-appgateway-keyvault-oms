@@ -31,7 +31,8 @@ This solution illustrates the management of credit card data including card numb
 	
 ## DEPLOYING THE SOLUTION
 
-The deployment of this sample requires few steps that all can be run using Microsoft PowerShell v5. To be able to connect to the website, it is required that you provide a custom domain name, such as contoso.com. However the custom domain name is not required to successfully deploy the solution for it to run.
+The deployment of this sample requires few steps that all can be run using Microsoft PowerShell v5. To be able to connect to the website, it is required that you provide a custom domain name, such as contoso.com. This is enabled by using the '-customHostName' switch on step2. [Details to purchase, and enable a custom domain.](https://docs.microsoft.com/en-us/azure/app-service-web/custom-dns-web-site-buydomains-web-app)
+A custom domain name is not required to successfully deploy the solution for it to run, however you will not be able to connect to the website for demonstration purposes.
 
 It is also highly advised that a clean installation of PowerShell be used to deploy the solution, or an understanding how to verify that your are running the latest modules required for the scripts to run correctly. For our example we use a Windows 10 VM that we log into, and run the following commands (note we are enabling the custom domain command)
 
