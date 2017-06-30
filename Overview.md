@@ -45,19 +45,10 @@ It is also highly advised that a clean installation of PowerShell be used to dep
 -installModules
  ```
  
-<<<<<<< HEAD
-<<<<<<< HEAD
- review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions
-=======
- 
- <a href="0-Setup-AdministrativeAccountAndPermission.md"> review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions </a> 
->>>>>>> refs/remotes/origin/development
-=======
 
  
  <a href="0-Setup-AdministrativeAccountAndPermission.md"> review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions </a> 
 
->>>>>>> refs/remotes/origin/development
  
  2. Install the solution-update-management 
  ```powershell
@@ -73,16 +64,9 @@ It is also highly advised that a clean installation of PowerShell be used to dep
 -enableSSL
 -enableADDomainPasswordPolicy 
 ```
-<<<<<<< HEAD
-<<<<<<< HEAD
-review the 1-DeployAndConfigureAzureResources for detailed usage instructions
-=======
-=======
 
 
->>>>>>> refs/remotes/origin/development
 <a href="1-DeployAndConfigureAzureResources.md"> review the 1-DeployAndConfigureAzureResources for detailed usage instructions </a> 
->>>>>>> refs/remotes/origin/development
 
 
 3. Deploy OMS logging and resources
@@ -94,17 +78,7 @@ review the 1-DeployAndConfigureAzureResources for detailed usage instructions
 -subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 ```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
- review the 2-EnableOMSLoggingOnResources for detailed usage instructions
-=======
- review the 2-EnableOMSLoggingOnResources.ps1 for detailed usage instructions, located in this folder.
->>>>>>> refs/remotes/origin/development
- 
-  
-=======
 <a href="Payment Sample dataset.md"> review the 2-EnableOMSLoggingOnResources.ps1 or Payment Sample dataset.md for detailed usage instructions </a> 
->>>>>>> refs/remotes/origin/development
 
 
 
