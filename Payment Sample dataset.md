@@ -2,7 +2,21 @@
 
 The following provides details to manage user level experience of the deployed solution. This portion of the deploment helps illustrate how the database, users, and data records help meet the PCI DSS compliance process. The steps in this section will illustrate how record protection requirements are enabled by encrypting the customer records that contain payment card data, and monitoring can be set up to collect logs, and maintain security.
 
+# ONE STEP DEPLOYMENT
+As outlined in the overview you can deploy the sqlencryption, and monitoring with the following steps.
 
+1. Deploy OMS logging and resources
+ ```powershell
+.\2-EnableOMSLoggingOnResources.ps1 
+-resourceGroupName contosowebstore 
+-globalAdminUserName adminXX@contosowebstore.onmicrosoft.com 
+-globalAdminPassword **************
+-subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+```
+
+ review the 2-EnableOMSLoggingOnResources for detailed usage instructions
+
+  
 
 ## Testing SQL Transparent Data Encryption (TDE)
 
@@ -38,7 +52,7 @@ Server Management Studio:
     SELECT * FROM [dbo].[customers]
 ```
 
-You will need to edit the `PostDeploymentSQL.sql` script under the
+You will need to edit the `3-GrantAccessOnDB.sql` script under the
 pre-post-deployment folder
 
 -   Replace `XXXX` with your AD domain name. In our example:
@@ -49,10 +63,10 @@ You can copy the script from the deployment file and run it in a new SQL query.
 
 
 
-## Enabling Logging and Monitoring
+## Enabling Logging and Monitoring (Manually)
 
 The following sections address security controls that are required to enable
-extensive logging, monitoring, security detection, and anti-malware protection.
+extensive logging, monitoring, security detection, and anti-malware protection. The following was done using the '2-EnableOMSLoggingOnResources.ps1' script.
 
 #### Operations Management Suite (OMS) configuration
 
