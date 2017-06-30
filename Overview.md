@@ -45,7 +45,8 @@ It is also highly advised that a clean installation of PowerShell be used to dep
 -installModules
  ```
  
- review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions
+ 
+ <a href="0-Setup-AdministrativeAccountAndPermission.md"> review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions </a> 
  
  2. Install the solution-update-management 
  ```powershell
@@ -61,7 +62,7 @@ It is also highly advised that a clean installation of PowerShell be used to dep
 -enableSSL
 -enableADDomainPasswordPolicy 
 ```
-review the 1-DeployAndConfigureAzureResources for detailed usage instructions
+<a href="1-DeployAndConfigureAzureResources.md"> review the 1-DeployAndConfigureAzureResources for detailed usage instructions </a> 
 
 3. Deploy OMS logging and resources
  ```powershell
@@ -72,7 +73,7 @@ review the 1-DeployAndConfigureAzureResources for detailed usage instructions
 -subscriptionID XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 ```
 
- review the 2-EnableOMSLoggingOnResources for detailed usage instructions
+ review the 2-EnableOMSLoggingOnResources.ps1 for detailed usage instructions, located in this folder.
  
   
 
