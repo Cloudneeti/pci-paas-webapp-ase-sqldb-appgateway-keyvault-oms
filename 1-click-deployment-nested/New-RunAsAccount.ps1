@@ -33,6 +33,8 @@
  [int] $SelfSignedCertNoOfMonthsUntilExpired = 12
  )
 
+ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
  function CreateSelfSignedCertificate([string] $keyVaultName, [string] $certificateName, [string] $selfSignedCertPlainPassword,
                                [string] $certPath, [string] $certPathCer, [string] $selfSignedCertNoOfMonthsUntilExpired ) {
  $Cert = New-SelfSignedCertificateEx -Subject "CN=$certificateName" -EKU "Server Authentication", "Client authentication" `

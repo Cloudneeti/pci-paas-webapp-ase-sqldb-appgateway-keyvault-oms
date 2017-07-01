@@ -119,6 +119,7 @@ Begin
         # Preference variable
         $ProgressPreference = 'SilentlyContinue'
         $ErrorActionPreference = 'Stop'
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
         
         #Change Path to Script directory
         Set-location $PSScriptRoot

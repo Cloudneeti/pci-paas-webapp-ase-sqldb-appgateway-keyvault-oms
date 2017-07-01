@@ -49,6 +49,7 @@ Param(
 Begin{
     
     $ErrorActionPreference = 'stop'
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
     # Functions
 
