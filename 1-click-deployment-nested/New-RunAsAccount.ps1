@@ -51,7 +51,7 @@
 
  $KeyCredential = New-Object  Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADKeyCredential
  $KeyCredential.StartDate = $CurrentDate
- $KeyCredential.EndDate= [DateTime]$PfxCert.GetExpirationDateString()
+ $KeyCredential.EndDate= Get-Date $PfxCert.GetExpirationDateString()
  $KeyCredential.EndDate = $KeyCredential.EndDate.AddDays(-1)
  $KeyCredential.KeyId = $KeyId
  $KeyCredential.CertValue  = $keyValue
