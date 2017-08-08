@@ -67,7 +67,6 @@ B - Global Administrator account setup.
 -suffix PCIcontosowebstore
 -customHostName contosowebstore.com
 -sqlTDAlertEmailAddress edna@contosowebstore.com 
--enableSSL
 -enableADDomainPasswordPolicy 
 ```
 
