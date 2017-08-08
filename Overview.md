@@ -37,16 +37,21 @@ A custom domain name is not required to successfully deploy the solution for it 
 It is also highly advised that a clean installation of PowerShell be used to deploy the solution, or an understanding how to verify that your are running the latest modules required for the scripts to run correctly. For our example we use a Windows 10 VM that we log into, and run the following commands (note we are enabling the custom domain command)
 
 1. Install the required modules, and set up the administrator roles correctly.
+
+A - Module installation.
+```powershell
+ .\0-Setup-AdministrativeAccountAndPermission.ps1 
+-installModules
+ ```
+ 
+B - Global Administrator account setup.
 ```powershell
  .\0-Setup-AdministrativeAccountAndPermission.ps1 
 -azureADDomainName contosowebstore.onmicrosoft.com
 -tenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 -subscriptionId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
--configureGlobalAdmin 
--installModules
+-configureGlobalAdmin
  ```
- 
-
  
  <a href="0-Setup-AdministrativeAccountAndPermission.md"> review the 0-Setup-AdministrativeAccountAndPermission for detailed usage instructions </a> 
 
