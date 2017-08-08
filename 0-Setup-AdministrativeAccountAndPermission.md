@@ -4,14 +4,6 @@
 
 This PowerShell script is used to verify pre-deployment requirements for the Payment Card Payment processing solution for PCI DSS enablement.
  
-```powershell
-0-Setup-AdministrativeAccountAndPermission.ps1 
--azureADDomainName <String>
--tenantId <String>
--subscriptionId <String>
--configureGlobalAdmin
--installModules
-```
 
 
 # Description 
@@ -37,7 +29,7 @@ This PowerShell script is used to verify pre-deployment requirements for the Pay
 ```
 This command will validate, and install missing required PowerShell modules to deploy the Payment Card Payment processing solution for PCI DSS enablement.
 
-## Example 2 Installing required modules and configuring a global admin
+## Example 2 Configuring your global admin
 
 ```powershell
  .\0-Setup-AdministrativeAccountAndPermission.ps1 
@@ -45,7 +37,7 @@ This command will validate, and install missing required PowerShell modules to d
 -tenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 -subscriptionId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 -configureGlobalAdmin 
--installModules
+
  ```
 
  This command will deploy installed modules, and setup the solution  on a **new subscription**. It will create a the user adminXX@contosowebstore.onmicrosoft.com with a randomly generated strong passwords **(Minimum 15 characters, with Upper and Lower case
