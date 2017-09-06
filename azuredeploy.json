@@ -16,16 +16,49 @@
         "description": "Reserved for deploying using Visual Studio. Please keep it as an empty string"
       }
     },
+    "sslORnon_ssl": {
+      "type": "string",
+      "allowedValues": [
+        "ssl",
+        "non-ssl"
+      ]
+    },
     "certData": {
       "type": "securestring",
+      "defaultValue": "null",
       "metadata": {
         "description": "Base-64 encoded form of the .pfx file"
       }
     },
     "certPassword": {
       "type": "securestring",
+      "defaultValue": "null",
       "metadata": {
         "description": "Password for .pfx certificate"
+      }
+    },
+    "aseCertData": {
+      "type": "string",
+      "metadata": {
+        "description": "Base-64 encoded form of the .cer file"
+      }
+    },
+    "asePfxBlobString": {
+      "type": "string",
+      "metadata": {
+        "description": "Base-64 encoded form of the .pfx file"
+      }
+    },
+    "asePfxPassword": {
+      "type": "string",
+      "metadata": {
+        "description": "Password for .pfx certificate"
+      }
+    },
+    "aseCertThumbprint": {
+      "type": "string",
+      "metadata": {
+        "description": "Certificate Thumbprint"
       }
     },
     "bastionHostAdministratorUserName": {
@@ -106,9 +139,7 @@
   },
   "variables": {
     "storageAccountDiagnostics": "[concat('stgdiag', uniquestring(resourceGroup().id))]",
-    "storageAccountPreRelease": "stgpcipaasreleases",
-    "webContainerName": "pci-paas-web-container",
-    "webPackageName": "ContosoClinic.zip",
+    "webPackageName": "ContosoWebStore.zip",
     "publicIpAddressName": "publicIp-AppGateway",
     "aseNsgGroupName": "nsg-ASE",
     "wafNsgGroupName": "nsg-WAF-Gateway",
@@ -121,7 +152,7 @@
     "bastionSubnetAddressPrefix": "10.0.2.0/24",
     "aseSubnetBaseAddress": "10.0.3",
     "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
-    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.9')]",
+    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -145,25 +176,22 @@
       "endIp": "[concat(variables('aseSubnetBaseAddress'), '.255')]"
     },
     "webSiteName": "[concat('webapp', '-pciwebapp')]",
-    "packageURI": "[concat('http://',variables('storageAccountPreRelease'),'.blob.core.windows.net/',variables('webContainerName'),'/',variables('webPackageName'))]",
+    "artifactsFolder": "artifacts",
+    "packageURI": "[concat(parameters('_artifactsLocation'), '/', variables('artifactsFolder'), '/', variables('webPackageName'), parameters('_artifactsLocationSasToken'))]",
     "nestedTemplateFolder": "nested",
     "aseTemplateFileName": "asedeploy.json",
-    "gatewayTemplateFileName": "appgatewaydeploy.json",
     "sqlServerTemplateFileName": "sqlserverdeploy.json",
     "commonTemplateFileName": "common.json",
     "webAppTemplateFileName": "webappdeploy.json",
     "vmBastionTemplateFileName": "vmBastion.json",
-    "dnsTemplateFileName": "dnsZone.json",
-    "newZoneName": "[parameters('customHostName')]",
     "omsTemplateFileName": "omsworkspace.json",
     "omsWorkspaceName": "[concat('oms-WS-pci-paas-', uniqueString(resourceGroup().id))]",
-    "omsSolutionsTemplateFileName": "omsSolutions.json",
     "automationAccountTemplateFileName": "automationAccount.json",
     "tagValues": {
       "layer": "dummy",
       "environment": "Pilot",
       "projectname": "PCI PaaS Reference Architecture",
-      "dataprofile": "PHI(Protected Health Information)",
+      "dataprofile": "PCI-CCTD (Credit Card Transaction Data)",
       "department": "IT - Avyan Consulting",
       "businessUnit": "Cloud - IT COE"
     }
@@ -189,6 +217,9 @@
           "ApplicationObjectId": {
             "value": "[parameters('azureAdApplicationObjectId')]"
           },
+          "applicationClientId": {
+            "value": "[parameters('azureAdApplicationClientId')]"
+          },          
           "storageAccountName": {
             "value": "[variables('storageAccountDiagnostics')]"
           },
@@ -358,6 +389,7 @@
           ],
           "apiVersion": "2015-07-01",
           "properties": {
+            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]",
             "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountDiagnostics'))]",
             "logs": [
               {
@@ -450,7 +482,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('gatewayTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/appgateway/appgatewaydeploy-',parameters('sslORnon_ssl'),'.json',parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -477,6 +509,9 @@
           },
           "certPassword": {
             "value": "[parameters('certPassword')]"
+          },
+          "aseCertData": {
+            "value": "[parameters('aseCertData')]"
           },
           "wafSubnetName": {
             "value": "[variables('wafSubnetName')]"
@@ -562,21 +597,25 @@
       }
     },
     {
-      "name": "deploy-DNSZone",
+      "name": "deploy-IlbAseCertificate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-02-01",
       "dependsOn": [
+        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-WebAppAndPackage')]"
       ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('dnsTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/aseilbcertdeploy.json', parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "newZoneName": { "value": "[variables('NewZoneName')]" },
-          "aseVirtualIP": { "value": "[variables('aseBackendVirtualIp')]" },
-          "tagValues": { "value": "[variables('tagValues')]" }
+          "appServiceEnvironmentName": { "value": "[variables('aseName')]" },
+          "existingAseLocation": { "value": "[variables('aseLocation')]" },
+          "pfxBlobString": { "value": "[parameters('asepfxBlobString')]" },
+          "password": { "value": "[parameters('asepfxPassword')]" },
+          "certificateThumbprint": { "value": "[parameters('asecertThumbprint')]" },
+          "certificateName": { "value": "[concat('*.ase.',parameters('customHostName'))]" }
         }
       }
     },
@@ -893,6 +932,20 @@
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 120,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowOutboundtoAzureDomain",
+            "properties": {
+              "description": "Allowing Outbound access on port 53 is required for communication with Azure DNS servers",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "53",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 130,
               "direction": "Outbound"
             }
           }

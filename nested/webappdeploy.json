@@ -59,7 +59,7 @@
   },
   "variables": {
     "defaultSqlServerName": "[concat('sqlserver-', uniqueString(resourceGroup().id))]",
-    "defaultSqlDatabaseName": "ContosoClinicDB",
+    "defaultSqlDatabaseName": "ContosoPayments",
     "defaultAppServicePlanName": "[concat('contosoplan', uniqueString(resourceGroup().id))]",
     "defaultAppServicePlanSku": "Basic",
     "defaultAppServicePlanWorkerSize": "0"
@@ -191,7 +191,9 @@
           "location": "[parameters('location')]",
           "apiVersion": "2015-08-01",
           "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('siteName'))]"
+            "[concat('Microsoft.Web/sites/', parameters('siteName'))]",
+            "connectionstrings",
+            "logs"
           ],
           "tags": {
             "displayName": "WebAppMSDeploy"

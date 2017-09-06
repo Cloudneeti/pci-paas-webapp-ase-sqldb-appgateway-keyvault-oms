@@ -61,3 +61,25 @@ While ($count -lt $NumberofSchedules)
     $Sch = Register-AzureRmAutomationScheduledRunbook -RunbookName $RunbookName -AutomationAccountName $AAAccount -ResourceGroupName $AAResourceGroup -ScheduleName "$ScheduleName-$Count"
     $RunbookStartTime = $RunbookStartTime.AddMinutes($RunFrequency)
 }
+
+# ---------- Create Schedules for Restarting WebApp ---------------
+
+$RunbookName = "restartwebapp"
+$ScheduleName = "restartwebapp"
+
+$RunbookStartTime = $Date = $([DateTime]::Now.AddMinutes(11))
+
+[int]$RunFrequency = 60
+$NumberofSchedules = 60 / $RunFrequency
+"$NumberofSchedules schedules will be created"
+
+$Count = 0
+While ($count -lt $NumberofSchedules)
+{
+    $count ++
+
+    "Creating schedule $ScheduleName-$Count for $RunbookStartTime for runbook $RunbookName"
+    $Schedule = New-AzureRmAutomationSchedule -Name "$ScheduleName-$Count" -StartTime $RunbookStartTime -HourInterval 1 -AutomationAccountName $AAAccount -ResourceGroupName $AAResourceGroup
+    $Sch = Register-AzureRmAutomationScheduledRunbook -RunbookName $RunbookName -AutomationAccountName $AAAccount -ResourceGroupName $AAResourceGroup -ScheduleName "$ScheduleName-$Count"
+    $RunbookStartTime = $RunbookStartTime.AddMinutes($RunFrequency)
+}

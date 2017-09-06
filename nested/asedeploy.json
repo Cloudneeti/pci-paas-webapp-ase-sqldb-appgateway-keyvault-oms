@@ -152,16 +152,7 @@
         },
         "multiSize": "[parameters('frontEndSize')]",
         "multiRoleCount": "[parameters('frontEndCount')]",
-        "clusterSettings": [
-          {
-            "name": "DisableTls1.0",
-            "value": "1"
-          },
-          {
-            "name": "FrontEndSSLCipherSuiteOrder",
-            "value": "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384_P256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256_P256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA_P256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA_P256"
-          }
-        ],
+        "clusterSettings": [],
         "workerPools": [
           {
             "workerSizeId": 0,
