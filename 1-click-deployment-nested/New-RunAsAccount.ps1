@@ -33,6 +33,8 @@
  [int] $SelfSignedCertNoOfMonthsUntilExpired = 12
  )
 
+ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
  function CreateSelfSignedCertificate([string] $keyVaultName, [string] $certificateName, [string] $selfSignedCertPlainPassword,
                                [string] $certPath, [string] $certPathCer, [string] $selfSignedCertNoOfMonthsUntilExpired ) {
  $Cert = New-SelfSignedCertificateEx -Subject "CN=$certificateName" -EKU "Server Authentication", "Client authentication" `
@@ -49,7 +51,7 @@
 
  $KeyCredential = New-Object  Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADKeyCredential
  $KeyCredential.StartDate = $CurrentDate
- $KeyCredential.EndDate= [DateTime]$PfxCert.GetExpirationDateString()
+ $KeyCredential.EndDate= Get-Date $PfxCert.GetExpirationDateString()
  $KeyCredential.EndDate = $KeyCredential.EndDate.AddDays(-1)
  $KeyCredential.KeyId = $KeyId
  $KeyCredential.CertValue  = $keyValue
@@ -82,13 +84,6 @@
  function CreateAutomationConnectionAsset ([string] $resourceGroup, [string] $automationAccountName, [string] $connectionAssetName, [string] $connectionTypeName, [System.Collections.Hashtable] $connectionFieldValues ) {
  Remove-AzureRmAutomationConnection -ResourceGroupName $resourceGroup -AutomationAccountName $automationAccountName -Name $connectionAssetName -Force -ErrorAction SilentlyContinue
  New-AzureRmAutomationConnection -ResourceGroupName $ResourceGroup -AutomationAccountName $automationAccountName -Name $connectionAssetName -ConnectionTypeName $connectionTypeName -ConnectionFieldValues $connectionFieldValues
- }
-
- $AzureRMProfileVersion= (Get-Module AzureRM.Profile).Version
- if (!(($AzureRMProfileVersion.Major -ge 2 -and $AzureRMProfileVersion.Minor -ge 1) -or ($AzureRMProfileVersion.Major -gt 2)))
- {
-    Write-Error -Message "Please install the latest Azure PowerShell and retry. Relevant doc url : https://docs.microsoft.com/powershell/azureps-cmdlets-docs/ "
-    return
  }
 
  # Create a Run As account by using a service principal

@@ -36,6 +36,9 @@ param (
 )
 
 try {
+    
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+    
     # Creating a Login credential.
     $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
     $psCred = New-Object System.Management.Automation.PSCredential ($globalAdminUserName, $secpasswd)

@@ -122,7 +122,7 @@ function New-SelfSignedCertificateEx {
 	exportable keys.
 .Example
 	New-SelfsignedCertificateEx -Subject "CN=Test Code Signing" -EKU "Code Signing" -KeySpec "Signature" `
-	-KeyUsage "DigitalSignature" -FriendlyName "Test code signing" -NotAfter $([datetime]::now.AddYears(5))
+	-KeyUsage "DigitalSignature" -FriendlyName "Test code signing" -NotAfter $((Get-Date).AddYears(5))
 	
 	Creates a self-signed certificate intended for code signing and which is valid for 5 years. Certificate
 	is saved in the Personal store of the current user account.
@@ -159,9 +159,9 @@ function New-SelfSignedCertificateEx {
 		[Parameter(Mandatory = $true, Position = 0)]
 		[string]$Subject,
 		[Parameter(Position = 1)]
-		[datetime]$NotBefore = [DateTime]::Now.AddDays(-1),
+		$NotBefore = (Get-Date).AddDays(-1),
 		[Parameter(Position = 2)]
-		[datetime]$NotAfter = $NotBefore.AddDays(365),
+		$NotAfter = $NotBefore.AddDays(365),
 		[string]$SerialNumber,
 		[Alias('CSP')]
 		[string]$ProviderName = "Microsoft Enhanced Cryptographic Provider v1.0",
@@ -191,6 +191,7 @@ function New-SelfSignedCertificateEx {
 		[switch]$AllowSMIME,
 		[switch]$Exportable
 	)
+	Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 	$ErrorActionPreference = "Stop"
 	if ([Environment]::OSVersion.Version.Major -lt 6) {
 		$NotSupported = New-Object NotSupportedException -ArgumentList "Windows XP and Windows Server 2003 are not supported!"

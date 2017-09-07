@@ -49,6 +49,7 @@ Param(
 Begin{
     
     $ErrorActionPreference = 'stop'
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
     # Functions
 
@@ -108,29 +109,29 @@ Process
     try {
         # AzureRM Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
-        If (Get-Module -ListAvailable -Name AzureRM) 
+        If ((Get-Module -ListAvailable AzureRM).Version -contains '4.1.0') 
         {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Get-Module -ListAvailable -Name AzureRM* | Import-Module -NoClobber -Force
-            if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
+            Import-Module -Name AzureRM -RequiredVersion '4.1.0'
+            if((Get-Module AzureRM).Version -contains '4.1.0') {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
         }
         Else
         {
             if ($installModules) {
                 # Installing AzureRM Module
-                Install-Module AzureRM -AllowClobber; 
+                Install-Module AzureRM -RequiredVersion 4.1.0 -AllowClobber; 
                 Start-Sleep -Seconds 10
-                if(Get-Module -ListAvailable AzureRM ){
+                if((Get-Module -ListAvailable AzureRM).Version -contains '4.1.0'){
                     Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed"
                     Write-Host -ForegroundColor Yellow "`t* Trying to import module."
-                    Get-Module -ListAvailable -Name AzureRM* | Import-Module -NoClobber -Force
-                    if(Get-Module -Name AzureRM) {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
+                    Import-Module -Name AzureRM -RequiredVersion '4.1.0'
+                    if((Get-Module AzureRM).Version -contains '4.1.0') {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
                 }
             }else {
-                Write-Host -ForegroundColor Red "`t* AzureRM module does not exist. "
+                Write-Host -ForegroundColor Red "`t* AzureRM module 4.1.0 does not exist. "
 				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
             }
-        }   
+        }
 
         # MSOnline Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if MSOnline module already exist."

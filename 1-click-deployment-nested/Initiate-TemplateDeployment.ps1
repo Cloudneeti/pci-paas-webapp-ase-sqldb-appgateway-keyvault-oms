@@ -93,8 +93,10 @@
 
     Begin
     {
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
         $ErrorActionPreference = 'Stop'
         cd $PSScriptRoot
+
 
         # Creating a Login credential.
         $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
