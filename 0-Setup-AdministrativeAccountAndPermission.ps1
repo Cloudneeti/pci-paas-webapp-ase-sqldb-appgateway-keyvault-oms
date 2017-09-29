@@ -16,7 +16,6 @@ This script imports and Install required powershell modules and creates Global A
     This script auto generates Global Admin as 'admin+(2 length random number between 10-99)@azureADDomainName' and 15 length strong password for the account 
         For example - Username - admin45@contoso.com ; Password 
     
-  
 #>
 	
 [CmdletBinding()]
@@ -76,36 +75,11 @@ Begin{
     # Hashtable for output table
     $outputTable = New-Object -TypeName Hashtable
 
-    # Login to Azure Subscrition & Azure AD 
-    if($configureGlobalAdmin){
-       Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription"
-       try {
-            # Login to Azure Subscription
-            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId." #The -Credential parameter cannot be used with Microsoft Accounts. 
-            if (Login-AzureRmAccount -subscriptionId $subscriptionId){      #
-                Write-Host "`t* Connection was successful" -ForegroundColor Yellow
-            }
-
-            Start-Sleep -Seconds 10
-            
-            # Connecting to Azure AD
-            Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory." #The -Credential parameter cannot be used with Microsoft Accounts. 
-            Connect-AzureAD -TenantId $tenantId
-            if(Get-AzureADDomain -Name $azureADDomainName){
-                Write-Host -ForegroundColor Yellow "`t* Successfully connected to Azure Active Directory."
-            }
-       }
-       catch {
-           Throw $_
-       }
-    }else{
-        Write-Host -ForegroundColor Green "`nStep 1: Establishing connection to Azure AD & Subscription - SKIPPED"
-    }
 }
 Process
 {
     # Importing / Installing Powershell Modules
-    Write-Host -ForegroundColor Green "`nStep 2: Importing / Installing Powershell Modules"
+    Write-Host -ForegroundColor Green "`nStep 1: Importing / Installing Powershell Modules"
     try {
         # AzureRM Powershell Modules
         Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
@@ -129,7 +103,7 @@ Process
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* AzureRM module 4.1.0 does not exist. "
-				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }
 
@@ -155,7 +129,7 @@ Process
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* MSOnline module does not exist. "
-				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }        
 
@@ -181,7 +155,7 @@ Process
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* AzureAD module does not exist. "
-				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }   
 
@@ -202,7 +176,7 @@ Process
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* Enable-AzureRMDiagnostics script does not exist. "
-				Write-Host -ForegroundColor Yellow "Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }            
         }
 
@@ -228,7 +202,7 @@ Process
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* AzureDiagnosticsAndLogAnalytics module does not exist. "
-				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }   
 
@@ -254,7 +228,7 @@ Process
                 }
             }else {
                 Write-Host -ForegroundColor Red "`t* SqlServer module does not exist. "
-				Write-Host -ForegroundColor Yellow " Please run script with -installModules switch to install modules."
+				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }   
     }
@@ -266,8 +240,15 @@ Process
     if ($configureGlobalAdmin)
     {   
         # Creating Global Administrator Account & Making it Company Administrator in Azure Active Directory
-        Write-Host -ForegroundColor Green "`nStep 3: Creating Azure AD Global Admin - $globalADAdminUserName"
+        Write-Host -ForegroundColor Green "`nStep 2: Creating Azure AD Global Admin - $globalADAdminUserName"
         try {
+             # Connecting to Azure AD
+             Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Active Directory. Enter username and password when prompted." #The -Credential parameter cannot be used with Microsoft Accounts. 
+             Connect-AzureAD -TenantId $tenantId
+             if(Get-AzureADDomain -Name $azureADDomainName){
+                 Write-Host -ForegroundColor Yellow "`t* Successfully connected to Azure Active Directory."
+             }
+
             # Creating Azure Global Admin Account
             $adAdmin = New-AzureADUser -DisplayName "Global Admin Azure PCI Samples" -PasswordProfile $newUserPasswordProfile -AccountEnabled $true `
             -MailNickName "PCIAdmin" -UserPrincipalName $globalADAdminUserName
@@ -287,8 +268,13 @@ Process
         }
 
         # Assigning Owner permission to Global Administrator Account on a Subscription
-        Write-Host -ForegroundColor Green "`nStep 4: Configuring subscription - $subscriptionId"        
+        Write-Host -ForegroundColor Green "`nStep 3: Configuring subscription - $subscriptionId"        
         try {
+             # Login to Azure Subscription
+             Write-Host -ForegroundColor Yellow "`t* Connecting to Azure Subscription - $subscriptionId. Enter username and password when prompted. " #The -Credential parameter cannot be used with Microsoft Accounts. 
+             if (Login-AzureRmAccount -subscriptionId $subscriptionId){      #
+                 Write-Host "`t* Connection was successful" -ForegroundColor Yellow
+             }
             # Assigning Owner Permission
 			Write-Host "`t* Assigning Subscription Owner permission to $globalADAdminUserName" -ForegroundColor Yellow
 			New-AzureRmRoleAssignment -ObjectId $adAdmin.ObjectId -RoleDefinitionName Owner -Scope "/Subscriptions/$subscriptionId" 
