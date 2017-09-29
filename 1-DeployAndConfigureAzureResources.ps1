@@ -100,13 +100,7 @@ Param
         [string]
         $appGatewaySslCertPwd,
 
-        # Use this swtich in combination with appGatewaySslCertPath parameter to setup frontend ssl on Application gateway.
-        [ValidateScript({
-            if(
-                (Get-Variable customHostName)
-            ){$true}
-            else {Throw "Parameter validtion failed due to invalid customHostName"}
-        })]         
+        # Use this swtich in combination with appGatewaySslCertPath parameter to setup frontend ssl on Application gateway.     
         [switch]
         $enableSSL,
 
@@ -140,6 +134,20 @@ Begin
 
         ########### Functions ###########
         Write-Host -ForegroundColor Green "`nStep 1: Loading functions."
+
+        <#
+        .SYNOPSIS
+            Registers RPs
+        #>
+        Function RegisterRP {
+            Param(
+                [string]$ResourceProviderNamespace
+            )
+
+            Write-Host -ForegroundColor Yellow "`t* Registering resource provider '$ResourceProviderNamespace'";
+            Register-AzureRmResourceProvider -ProviderNamespace $ResourceProviderNamespace | Out-Null;
+        }
+
         # Function to convert certificates into Base64 String.
         function Convert-Certificate ($certPath)
         {
@@ -232,6 +240,27 @@ Begin
     
 Process
     {
+        try {
+            # Register RPs
+            $resourceProviders = @(
+                "Microsoft.Storage",
+                "Microsoft.Automation",
+                "Microsoft.Compute",
+                "Microsoft.KeyVault",
+                "Microsoft.Network",
+                "Microsoft.AppService"
+            )
+            if($resourceProviders.length) {
+                Write-Host -ForegroundColor Yellow "`t* Registering resource providers"
+                foreach($resourceProvider in $resourceProviders) {
+                    RegisterRP($resourceProvider);
+                }
+            }
+        }
+        catch {
+            throw $_
+        }
+        
         try {
             # Create a storage account name if none was provided
             $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $artifactsStorageAcc})
