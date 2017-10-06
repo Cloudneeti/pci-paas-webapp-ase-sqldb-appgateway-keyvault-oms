@@ -33,7 +33,7 @@
  [int] $SelfSignedCertNoOfMonthsUntilExpired = 12
  )
 
- Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+ Set-Executionpolicy -Scope CurrentUser -ExecutionPolicy UnRestricted -Force
 
  function CreateSelfSignedCertificate([string] $keyVaultName, [string] $certificateName, [string] $selfSignedCertPlainPassword,
                                [string] $certPath, [string] $certPathCer, [string] $selfSignedCertNoOfMonthsUntilExpired ) {

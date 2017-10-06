@@ -191,7 +191,7 @@ function New-SelfSignedCertificateEx {
 		[switch]$AllowSMIME,
 		[switch]$Exportable
 	)
-	Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+	Set-Executionpolicy -Scope CurrentUser -ExecutionPolicy UnRestricted -Force
 	$ErrorActionPreference = "Stop"
 	if ([Environment]::OSVersion.Version.Major -lt 6) {
 		$NotSupported = New-Object NotSupportedException -ArgumentList "Windows XP and Windows Server 2003 are not supported!"

@@ -93,7 +93,7 @@
 
     Begin
     {
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+        Set-Executionpolicy -Scope CurrentUser -ExecutionPolicy UnRestricted -Force
         $ErrorActionPreference = 'Stop'
         cd $PSScriptRoot
 

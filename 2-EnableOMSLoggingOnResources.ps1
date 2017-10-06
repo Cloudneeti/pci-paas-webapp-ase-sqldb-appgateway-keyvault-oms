@@ -37,7 +37,7 @@ param (
 
 try {
     
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+    Set-Executionpolicy -Scope CurrentUser -ExecutionPolicy UnRestricted -Force
     
     # Creating a Login credential.
     $secpasswd = ConvertTo-SecureString $globalAdminPassword -AsPlainText -Force
