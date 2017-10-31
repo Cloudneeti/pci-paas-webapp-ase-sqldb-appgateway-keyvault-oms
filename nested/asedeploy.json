@@ -58,42 +58,6 @@
         "description": "Number of instances in the front-end pool.  Minimum of two."
       }
     },
-    "workerPoolOneInstanceSize": {
-      "type": "string",
-      "metadata": {
-        "description": "Instance size for worker pool one.  Maps to P1,P2,P3,P4."
-      }
-    },
-    "workerPoolOneInstanceCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of instances in worker pool one.  Minimum of two."
-      }
-    },
-    "workerPoolTwoInstanceSize": {
-      "type": "string",
-      "metadata": {
-        "description": "Instance size for worker pool two.  Maps to P1,P2,P3,P4."
-      }
-    },
-    "workerPoolTwoInstanceCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of instances in worker pool two.  Can be zero if not using worker pool two."
-      }
-    },
-    "workerPoolThreeInstanceSize": {
-      "type": "string",
-      "metadata": {
-        "description": "Instance size for worker pool three.  Maps to P1,P2,P3,P4."
-      }
-    },
-    "workerPoolThreeInstanceCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of instances in worker pool three.  Can be zero if not using worker pool three."
-      }
-    },
     "aseSubnetAddressPrefix": {
       "type": "string",
       "metadata": {
@@ -105,6 +69,12 @@
       "metadata": {
         "description": "Provide the Custom Host Name."
       }
+    },
+    "kind":{
+        "type": "string",
+        "metadata": {
+          "description": "Provide the ASE kind property"
+        }
     },
     "tagValues": {
       "type": "object"
@@ -123,13 +93,11 @@
       }
     },
     {
-      "apiVersion": "2015-08-01",
       "type": "Microsoft.Web/hostingEnvironments",
+      "kind": "[parameters('kind')]",
       "name": "[parameters('aseName')]",
+      "apiVersion": "2015-02-01",
       "location": "[parameters('aseLocation')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('existingVnetName'), '/subnets/', parameters('aseSubnetName'))]"
-      ],
       "tags": {
         "layer": "front-end",
         "environment": "[parameters('tagValues').environment]",
@@ -140,37 +108,19 @@
       },
       "properties": {
         "name": "[parameters('aseName')]",
-        "mode": "Incremental",
         "location": "[parameters('aseLocation')]",
         "ipSslAddressCount": "[parameters('ipSslAddressCount')]",
         "internalLoadBalancingMode": "[parameters('internalLoadBalancingMode')]",
         "dnsSuffix": "[concat('ase.', parameters('customHostName'))]",
-        "virtualNetwork": {
+        "VirtualNetwork": {
           "Id": "[parameters('existingVnetResourceId')]",
           "type": "Microsoft.Network/virtualNetworks",
           "Subnet": "[parameters('aseSubnetName')]"
-        },
-        "multiSize": "[parameters('frontEndSize')]",
-        "multiRoleCount": "[parameters('frontEndCount')]",
-        "clusterSettings": [],
-        "workerPools": [
-          {
-            "workerSizeId": 0,
-            "workerSize": "[parameters('workerPoolOneInstanceSize')]",
-            "workerCount": "[parameters('workerPoolOneInstanceCount')]"
-          },
-          {
-            "workerSizeId": 1,
-            "workerSize": "[parameters('workerPoolTwoInstanceSize')]",
-            "workerCount": "[parameters('workerPoolTwoInstanceCount')]"
-          },
-          {
-            "workerSizeId": 2,
-            "workerSize": "[parameters('workerPoolThreeInstanceSize')]",
-            "workerCount": "[parameters('workerPoolThreeInstanceCount')]"
-          }
-        ]
-      }
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('existingVnetName'), '/subnets/', parameters('aseSubnetName'))]"
+      ]
     }
   ],
   "outputs": {

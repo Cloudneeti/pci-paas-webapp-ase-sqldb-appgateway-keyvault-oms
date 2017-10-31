@@ -135,6 +135,29 @@
       "metadata": {
         "description": "The AD User password to use for the application's connections to the database server."
       }
+    },
+    "pricingTier": {
+      "type": "string",
+      "allowedValues": [
+        "1",
+        "2",
+        "3"
+      ],
+      "defaultValue": "1",
+      "metadata": {
+        "description": "Defines pricing tier for workers: 1 = Isolated 1, 2 = Isolated 2, 3 = Isolated 3."
+      }
+    },
+    "capacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Defines the number of instances that will be allocated to the app service plan."
+      }
+    },
+     "kind":{
+        "type": "string",
+        "defaultValue": "ASEV2"
     }
   },
   "variables": {
@@ -160,12 +183,6 @@
     "ipSslAddressCount": 0,
     "frontEndSize": "Medium",
     "frontEndCount": 2,
-    "workerPoolOneInstanceSize": "Large",
-    "workerPoolOneInstanceCount": 2,
-    "workerPoolTwoInstanceSize": "Small",
-    "workerPoolTwoInstanceCount": 0,
-    "workerPoolThreeInstanceSize": "Small",
-    "workerPoolThreeInstanceCount": 0,
     "skuName": "WAF_Medium",
     "capacity": 1,
     "retentionPolicy": 2,
@@ -566,29 +583,14 @@
           "frontEndCount": {
             "value": "[variables('frontEndCount')]"
           },
-          "workerPoolOneInstanceSize": {
-            "value": "[variables('workerPoolOneInstanceSize')]"
-          },
-          "workerPoolOneInstanceCount": {
-            "value": "[variables('workerPoolOneInstanceCount')]"
-          },
-          "workerPoolTwoInstanceSize": {
-            "value": "[variables('workerPoolTwoInstanceSize')]"
-          },
-          "workerPoolTwoInstanceCount": {
-            "value": "[variables('workerPoolTwoInstanceCount')]"
-          },
-          "workerPoolThreeInstanceSize": {
-            "value": "[variables('workerPoolThreeInstanceSize')]"
-          },
-          "workerPoolThreeInstanceCount": {
-            "value": "[variables('workerPoolThreeInstanceCount')]"
-          },
           "aseSubnetAddressPrefix": {
             "value": "[variables('aseSubnetAddressPrefix')]"
           },
           "customHostName": {
             "value": "[parameters('customHostName')]"
+          },
+          "kind":{
+            "value":"[parameters('kind')]"
           },
           "tagValues": {
             "value": "[variables('tagValues')]"
@@ -735,6 +737,12 @@
           },
           "customHostName": {
             "value": "[parameters('customHostName')]"
+          },
+          "pricingTier":{
+            "value":"[parameters('pricingTier')]"
+          },
+          "capacity":{
+            "value":"[parameters('capacity')]"
           }
         }
       }

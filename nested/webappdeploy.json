@@ -55,29 +55,50 @@
       "metadata": {
         "description": "Custom Host Name"
       }
+    },
+    "pricingTier": {
+      "type": "string",
+      "allowedValues": [
+        "1",
+        "2",
+        "3"
+      ],
+      "defaultValue": "1",
+      "metadata": {
+        "description": "Defines pricing tier for workers: 1 = Isolated 1, 2 = Isolated 2, 3 = Isolated 3."
+      }
+    },
+    "capacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Defines the number of instances that will be allocated to the app service plan."
+      }
     }
   },
   "variables": {
     "defaultSqlServerName": "[concat('sqlserver-', uniqueString(resourceGroup().id))]",
     "defaultSqlDatabaseName": "ContosoPayments",
-    "defaultAppServicePlanName": "[concat('contosoplan', uniqueString(resourceGroup().id))]",
-    "defaultAppServicePlanSku": "Basic",
-    "defaultAppServicePlanWorkerSize": "0"
+    "defaultAppServicePlanName": "[concat('contosoplan', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
-      "apiVersion": "2014-06-01",
+      "apiVersion": "2015-08-01",
       "name": "[variables('defaultAppServicePlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('location')]",
       "properties": {
         "name": "[variables('defaultAppServicePlanName')]",
-        "sku": "[variables('defaultAppServicePlanSku')]",
-        "workerSize": "[variables('defaultAppServicePlanWorkerSize')]",
-        "numberOfWorkers": 1,
         "hostingEnvironmentProfile": {
           "id": "[resourceId('Microsoft.Web/hostingEnvironments',parameters('aseName'))]"
         }
+      },
+      "sku": {
+        "name": "[concat('I',parameters('pricingTier'))]",
+        "tier": "Isolated",
+        "size": "[concat('I',parameters('pricingTier'))]",
+        "family": "I",
+        "capacity": "[parameters('capacity')]"
       }
     },
     {
