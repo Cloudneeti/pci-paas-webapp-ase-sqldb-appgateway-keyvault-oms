@@ -479,13 +479,30 @@ Process
             Write-Host -ForegroundColor Yellow "`t* Submitting deployment"
             Start-Process Powershell -ArgumentList "-NoExit", ".\1-click-deployment-nested\Initiate-TemplateDeployment.ps1 -subscriptionID $subscriptionID -globalAdminUserName $globalAdminUserName -globalAdminPassword $globalAdminPassword -deploymentName $deploymentName -resourceGroupName $resourceGroupName -location $location -templateFile '$scriptFolder\azuredeploy.json' -_artifactsLocation $_artifactsLocation -_artifactsLocationSasToken $_artifactsLocationSasToken -sslORnon_ssl $sslORnon_ssl -certData $certData -certPassword $certPassword -aseCertData $aseCertData -asePfxBlobString $asePfxBlobString -asePfxPassword $asePfxPassword -aseCertThumbprint $aseCertThumbprint -bastionHostAdministratorPassword $newPassword -sqlAdministratorLoginPassword $newPassword -sqlThreatDetectionAlertEmailAddress $SqlTDAlertEmailAddress -automationAccountName $automationaccname -customHostName $customHostName -azureAdApplicationClientId $azureAdApplicationClientId -azureAdApplicationClientSecret $newPassword -azureAdApplicationObjectId $azureAdApplicationObjectId -sqlAdAdminUserName $sqlAdAdminUserName -sqlAdAdminUserPassword $newPassword"
             Write-Host "`t`t-> Waiting for deployment $deploymentName to submit.. " -ForegroundColor Yellow
+            $count=0
+            $status=1
             do
             {
+                if($count -lt 2){                
                 Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
                 Start-sleep -seconds 60
+                $count +=1
+                }
+                else{
+                    $status=0
+                    Break
+                    
+                }
             }
             until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -ErrorAction SilentlyContinue) -ne $null)             
-            Write-Host -ForegroundColor Yellow "`t* Deployment has been submitted successfully."
+            if($status){
+                Write-Host -ForegroundColor Yellow "`t* Deployment has been submitted successfully."
+            }            
+            else{
+                throw "Deployment fail to submit. Please redeploy the solution."
+            
+            }
+            
         }
         catch {
             throw $_
