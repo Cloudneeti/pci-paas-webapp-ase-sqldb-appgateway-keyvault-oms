@@ -61,8 +61,53 @@ Begin{
         ('@','%','!','^' | Get-Random -Count 1) +`
         (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) + `
         ((10..99) | Get-Random -Count 1)
-	}
-    
+    }
+    Function Get-StringHash([String]$String, $HashName = "MD5") {
+        $StringBuilder = New-Object System.Text.StringBuilder
+        [System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))| 
+            ForEach-Object { [Void]$StringBuilder.Append($_.ToString("x2"))
+        }
+        $StringBuilder.ToString().Substring(0, 24)
+    }
+    function Install-RequiredModules {
+        param
+        (
+            # <!Provide modules name(s).!>
+            [Parameter(Mandatory=$true, 
+                ValueFromPipelineByPropertyName=$true,
+                Position=0)]
+            [ValidateNotNullOrEmpty()]
+            [hashtable]
+            $moduleNames
+        )
+        Process
+            {
+                try {
+                    $modules = $moduleNames.Keys
+                    foreach ($module in $modules){
+                        Write-Host "Verifying module $module." -ForegroundColor Yellow
+                        if (!(Get-InstalledModule $module -ErrorAction SilentlyContinue)){
+                            Write-Host "Module $module does not exist. Attempting to install the module." -ForegroundColor Yellow
+                            Install-Module $module -MinimumVersion $moduleNames[$module] -Force -AllowClobber
+                            Write-Host "Module $module installed successfully." -ForegroundColor Yellow
+                        }
+                        elseif((Get-InstalledModule $module).Version.ToString() -lt $moduleNames[$module]){
+                            Write-Host "Older version of Module found. Installing required version of module." -ForegroundColor Yellow
+                            if (Install-Module $module -MinimumVersion $moduleNames[$module] -Force -AllowClobber){
+                                Write-Host "Module $module installed successfully." -ForegroundColor Yellow
+                            }
+                        }
+                        else {
+                            Write-Host "Module $module with required version is already installed." -ForegroundColor Yellow
+                        }
+                    }
+                }
+                catch {
+                    Throw $_
+                    Break
+                }
+            }
+    }
     # Azure AD username
     $globalADAdminUserName = "admin"+(Get-Random -Maximum 99) +"@"+$azureADDomainName # e.g. admin45@contoso.com
 
@@ -80,35 +125,31 @@ Process
 {
     # Importing / Installing Powershell Modules
     Write-Host -ForegroundColor Green "`nStep 1: Importing / Installing Powershell Modules"
-    try {
-        # AzureRM Powershell Modules
-        Write-Host -ForegroundColor Yellow "`t* Checking if AzureRM module already exist."
-        If ((Get-Module -ListAvailable AzureRM).Version -contains '4.1.0') 
-        {   
-            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Import-Module -Name AzureRM -RequiredVersion '4.1.0'
-            if((Get-Module AzureRM).Version -contains '4.1.0') {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
-        }
-        Else
-        {
-            if ($installModules) {
-                # Installing AzureRM Module
-                Install-Module AzureRM -RequiredVersion 4.1.0 -AllowClobber; 
-                Start-Sleep -Seconds 10
-                if((Get-Module -ListAvailable AzureRM).Version -contains '4.1.0'){
-                    Write-Host -ForegroundColor Yellow "`t* AzureRM Module successfully installed"
-                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
-                    Import-Module -Name AzureRM -RequiredVersion '4.1.0'
-                    if((Get-Module AzureRM).Version -contains '4.1.0') {Write-Host -ForegroundColor Yellow "`t* AzureRM Module imported successfully."}
-                }
-            }else {
-                Write-Host -ForegroundColor Red "`t* AzureRM module 4.1.0 does not exist. "
-				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
+    try{
+          ### Install required powershell modules
+            $requiredModules=@{
+                'AzureRM' = '4.4.0';
+                'AzureAD' = '2.0.0.131';
+                'SqlServer' = '21.0.17178'
+            }
+        if ($installModules) {
+            Write-Host "Trying to install listed modules.." -ForegroundColor Yellow
+        $requiredModules
+        Install-RequiredModules -moduleNames $requiredModules
+        Write-Host "All the required modules are now installed. You can now re-run the script without 'installModules' switch." -ForegroundColor Yellow
+        #Break
+    }
+        $modules = $requiredModules.Keys
+        foreach ($module in $modules){
+            Write-Host "Importing module - $module with required version $($requiredModules[$module])." -ForegroundColor Yellow
+            Import-Module -Name $module -MinimumVersion $requiredModules[$module]
+            if (Get-Module -Name $module) {
+                Write-Host "Module - $module imported successfully." -ForegroundColor Yellow
             }
         }
 
         # MSOnline Powershell Modules
-        Write-Host -ForegroundColor Yellow "`t* Checking if MSOnline module already exist."
+        Write-Host -ForegroundColor Yellow "`t* Checking if MSOnline module already exist." 
         If (Get-Module -ListAvailable -Name MSOnline) 
         {   
             Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
@@ -132,32 +173,6 @@ Process
 				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }        
-
-        # AzureAD Powershell Modules
-        Write-Host -ForegroundColor Yellow "`t* Checking if AzureAD module already exist."
-        If (Get-Module -ListAvailable -Name AzureAD) 
-        {   
-            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Get-Module -ListAvailable -Name AzureAD | Import-Module -NoClobber -Force
-            if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`t* AzureAD Module imported successfully."}
-        }
-        Else
-        {
-            if ($installModules) {
-                # Installing AzureAD Module
-                Install-Module AzureAD -AllowClobber; 
-                Start-Sleep -Seconds 10
-                if(Get-Module -ListAvailable AzureAD ){
-                    Write-Host -ForegroundColor Yellow "`t* AzureAD Module successfully installed"
-                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
-                    Get-Module -ListAvailable -Name AzureAD | Import-Module -NoClobber -Force
-                    if(Get-Module -Name AzureAD) {Write-Host -ForegroundColor Yellow "`t* AzureAD Module imported successfully."}
-                }
-            }else {
-                Write-Host -ForegroundColor Red "`t* AzureAD module does not exist. "
-				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
-            }
-        }   
 
         <# This script takes a SubscriptionID, ResourceType, ResourceGroup and a workspace ID as parameters, analyzes the subscription or
             specific ResourceGroup defined for the resources specified in $Resources, and enables those resources for diagnostic metrics
@@ -206,31 +221,7 @@ Process
             }
         }   
 
-        # SqlServer Powershell Modules
-        Write-Host -ForegroundColor Yellow "`t* Checking if SqlServer module already exist."
-        If (Get-Module -ListAvailable -Name SqlServer) 
-        {   
-            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Get-Module -ListAvailable -Name SqlServer | Import-Module -NoClobber -Force
-            if(Get-Module -Name SqlServer) {Write-Host -ForegroundColor Yellow "`t* SqlServer Module imported successfully."}
-        }
-        Else
-        {
-            if ($installModules) {
-                # Installing SqlServer Module
-                Install-Module SqlServer -AllowClobber; 
-                Start-Sleep -Seconds 10
-                if(Get-Module -ListAvailable SqlServer ){
-                    Write-Host -ForegroundColor Yellow "`t* SqlServer Module successfully installed"
-                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
-                    Get-Module -ListAvailable -Name SqlServer | Import-Module -NoClobber -Force
-                    if(Get-Module -Name SqlServer) {Write-Host -ForegroundColor Yellow "`t* SqlServer Module imported successfully."}
-                }
-            }else {
-                Write-Host -ForegroundColor Red "`t* SqlServer module does not exist. "
-				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
-            }
-        }   
+           
     }
     catch {
         Throw $_
