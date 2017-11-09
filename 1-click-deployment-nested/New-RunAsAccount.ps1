@@ -33,7 +33,7 @@
  [int] $SelfSignedCertNoOfMonthsUntilExpired = 12
  )
 
- Set-Executionpolicy -Scope CurrentUser -ExecutionPolicy UnRestricted -Force
+
 
  function CreateSelfSignedCertificate([string] $keyVaultName, [string] $certificateName, [string] $selfSignedCertPlainPassword,
                                [string] $certPath, [string] $certPathCer, [string] $selfSignedCertNoOfMonthsUntilExpired ) {
@@ -49,7 +49,7 @@
  $keyValue = [System.Convert]::ToBase64String($PfxCert.GetRawCertData())
  $KeyId = (New-Guid).Guid
 
- $KeyCredential = New-Object  Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADKeyCredential
+ $KeyCredential = New-Object -TypeName Microsoft.Azure.Graph.RBAC.Version1_6.ActiveDirectory.PSADKeyCredential
  $KeyCredential.StartDate = $CurrentDate
  $KeyCredential.EndDate= Get-Date $PfxCert.GetExpirationDateString()
  $KeyCredential.EndDate = $KeyCredential.EndDate.AddDays(-1)
