@@ -33,7 +33,7 @@
  [int] $SelfSignedCertNoOfMonthsUntilExpired = 12
  )
 
-
+ Set-Executionpolicy -Scope CurrentUser -ExecutionPolicy UnRestricted -Force
 
  function CreateSelfSignedCertificate([string] $keyVaultName, [string] $certificateName, [string] $selfSignedCertPlainPassword,
                                [string] $certPath, [string] $certPathCer, [string] $selfSignedCertNoOfMonthsUntilExpired ) {
@@ -48,16 +48,12 @@
  $CurrentDate = Get-Date
  $keyValue = [System.Convert]::ToBase64String($PfxCert.GetRawCertData())
  $KeyId = (New-Guid).Guid
-
- $KeyCredential = New-Object -TypeName Microsoft.Azure.Graph.RBAC.Version1_6.ActiveDirectory.PSADKeyCredential
- $KeyCredential.StartDate = $CurrentDate
- $KeyCredential.EndDate= Get-Date $PfxCert.GetExpirationDateString()
- $KeyCredential.EndDate = $KeyCredential.EndDate.AddDays(-1)
- $KeyCredential.KeyId = $KeyId
- $KeyCredential.CertValue  = $keyValue
+ $startDate = Get-Date
+ $endDate = (Get-Date $PfxCert.GetExpirationDateString()).AddDays(-1)
 
  # Use key credentials and create an Azure AD application
- $Application = New-AzureRmADApplication -DisplayName $ApplicationDisplayName -HomePage ("http://" + $applicationDisplayName) -IdentifierUris ("http://" + $KeyId) -KeyCredentials $KeyCredential
+ $Application = New-AzureRmADApplication -DisplayName $ApplicationDisplayName -HomePage ("http://" + $applicationDisplayName) -IdentifierUris ("http://" + $KeyId)
+ $ApplicationCredential = New-AzureRmADAppCredential -ApplicationId $Application.ApplicationId -CertValue $keyValue -StartDate $startDate -EndDate $endDate  
  $ServicePrincipal = New-AzureRMADServicePrincipal -ApplicationId $Application.ApplicationId
  $GetServicePrincipal = Get-AzureRmADServicePrincipal -ObjectId $ServicePrincipal.Id
 

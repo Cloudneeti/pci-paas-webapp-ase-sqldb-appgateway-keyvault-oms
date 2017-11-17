@@ -175,7 +175,7 @@
     "bastionSubnetAddressPrefix": "10.0.2.0/24",
     "aseSubnetBaseAddress": "10.0.3",
     "aseSubnetAddressPrefix": "[concat(variables('aseSubnetBaseAddress'),'.0','/24')]",
-    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.8')]",
+    "aseBackendVirtualIp": "[concat(variables('aseSubnetBaseAddress'),'.11')]",
     "aseName": "[concat('ase-PCI-', uniqueString(resourceGroup().id))]",
     "aseLocation": "East US",
     "virtualNetworkName": "[substring(concat('vNet-pci-paas-', uniquestring(resourceGroup().id)),0,22)]",
@@ -786,7 +786,9 @@
               "ServiceMap",
               "Security",
               "AntiMalware",
-              "Updates"
+              "Updates",
+              "AzureWebAppsAnalytics",
+              "AzureSQLAnalytics"
             ]
           },
           "tagValues": {
