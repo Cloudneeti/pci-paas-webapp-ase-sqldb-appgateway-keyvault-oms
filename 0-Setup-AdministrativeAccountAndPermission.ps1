@@ -130,47 +130,24 @@ Process
             $requiredModules=@{
                 'AzureRM' = '4.4.0';
                 'AzureAD' = '2.0.0.131';
-                'SqlServer' = '21.0.17178'
+                'SqlServer' = '21.0.17178';
+                'MSOnline' = '1.1.166.0';
+                'AzureDiagnosticsAndLogAnalytics' = '0.1'
             }
         if ($installModules) {
             Write-Host "Trying to install listed modules.." -ForegroundColor Yellow
         $requiredModules
         Install-RequiredModules -moduleNames $requiredModules
-        Write-Host "All the required modules are now installed. You can now re-run the script without 'installModules' switch." -ForegroundColor Yellow
+        Write-Host "All the required modules are now installed. You can now re-run the script without 'installModules' switch." -ForegroundColor Yellow   
         #Break
     }
+    	Write-Host "Trying to import listed modules.." -ForegroundColor Cyan
         $modules = $requiredModules.Keys
         foreach ($module in $modules){
-            Write-Host "Importing module - $module with required version $($requiredModules[$module])." -ForegroundColor Yellow
+            Write-Host "Importing module - $module with required version $($requiredModules[$module])." -ForegroundColor Yellow 
             Import-Module -Name $module -MinimumVersion $requiredModules[$module]
             if (Get-Module -Name $module) {
                 Write-Host "Module - $module imported successfully." -ForegroundColor Yellow
-            }
-        }
-
-        # MSOnline Powershell Modules
-        Write-Host -ForegroundColor Yellow "`t* Checking if MSOnline module already exist." 
-        If (Get-Module -ListAvailable -Name MSOnline) 
-        {   
-            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Get-Module -ListAvailable -Name MSOnline | Import-Module -NoClobber -Force
-            if(Get-Module -Name MSOnline) {Write-Host -ForegroundColor Yellow "`t* MSOnline Module imported successfully."}
-        }
-        Else
-        {
-            if ($installModules) {
-                # Installing MSOnline Module
-                Install-Module MSOnline -AllowClobber; 
-                Start-Sleep -Seconds 10
-                if(Get-Module -ListAvailable MSOnline ){
-                    Write-Host -ForegroundColor Yellow "`t* MSOnline Module successfully installed"
-                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
-                    Get-Module -ListAvailable -Name MSOnline | Import-Module -NoClobber -Force
-                    if(Get-Module -Name MSOnline) {Write-Host -ForegroundColor Yellow "`t* MSOnline Module imported successfully."}
-                }
-            }else {
-                Write-Host -ForegroundColor Red "`t* MSOnline module does not exist. "
-				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }
         }        
 
@@ -194,34 +171,10 @@ Process
 				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
             }            
         }
-
-        # AzureDiagnosticsAndLogAnalytics Powershell Modules
-        Write-Host -ForegroundColor Yellow "`t* Checking if AzureDiagnosticsAndLogAnalytics module already exist."
-        If (Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics) 
-        {   
-            Write-Host -ForegroundColor Yellow "`t* Module has been found. Trying to import module."
-            Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics | Import-Module -NoClobber -Force
-            if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}
-        }
-        Else
+        If (Get-InstalledScript -Name Enable-AzureRMDiagnostics -ErrorAction SilentlyContinue)
         {
-            if ($installModules) {
-                # Installing AzureDiagnosticsAndLogAnalytics Module
-                Install-Module AzureDiagnosticsAndLogAnalytics -AllowClobber; 
-                Start-Sleep -Seconds 10
-                if(Get-Module -ListAvailable AzureDiagnosticsAndLogAnalytics ){
-                    Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module successfully installed"
-                    Write-Host -ForegroundColor Yellow "`t* Trying to import module."
-                    Get-Module -ListAvailable -Name AzureDiagnosticsAndLogAnalytics | Import-Module -NoClobber -Force
-                    if(Get-Module -Name AzureDiagnosticsAndLogAnalytics) {Write-Host -ForegroundColor Yellow "`t* AzureDiagnosticsAndLogAnalytics Module imported successfully."}
-                }
-            }else {
-                Write-Host -ForegroundColor Red "`t* AzureDiagnosticsAndLogAnalytics module does not exist. "
-				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
-            }
-        }   
-
-           
+            Write-Host "All the required modules are now installed and imported successfully." -ForegroundColor Green
+        }          
     }
     catch {
         Throw $_
