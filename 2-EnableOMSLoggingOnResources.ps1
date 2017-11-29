@@ -67,7 +67,7 @@ try {
     Write-Host ("`nEnabling diagnostics for each resource type." ) -ForegroundColor Yellow
     foreach($resourceType in $resourceTypes)
     {
-        Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -ResourceType $resourceType -Force -Update 
+        Enable-AzureRMDiagnostics -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId -WSID $omsWS.ResourceId -ResourceType $resourceType -Force -Update -EnableLogs -EnableMetrics 
     }
 
     $workspace = Find-AzureRmResource -ResourceType "Microsoft.OperationalInsights/workspaces" -ResourceNameContains $omsWS.Name -ResourceGroupNameEquals $resourceGroupName

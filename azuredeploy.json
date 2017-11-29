@@ -203,7 +203,6 @@
     "vmBastionTemplateFileName": "vmBastion.json",
     "omsTemplateFileName": "omsworkspace.json",
     "omsWorkspaceName": "[concat('oms-WS-pci-paas-', uniqueString(resourceGroup().id))]",
-    "automationAccountTemplateFileName": "automationAccount.json",
     "tagValues": {
       "layer": "dummy",
       "environment": "Pilot",
@@ -790,51 +789,6 @@
               "AzureWebAppsAnalytics",
               "AzureSQLAnalytics"
             ]
-          },
-          "tagValues": {
-            "value": "[variables('tagValues')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "deploy-AutomationAccount",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments', '/' , 'deploy-OMSWorkspaceSolutions')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplateFolder'), '/', variables('automationAccountTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "_artifactsLocation": {
-            "value": "[concat(parameters('_artifactsLocation'))]"
-          },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
-          },
-
-          "omsId": {
-            "value": "[reference('deploy-OMSWorkspaceSolutions').outputs.workspaceIdOutput.value]"
-          },
-          "omsKey": {
-            "value": "[reference('deploy-OMSWorkspaceSolutions').outputs.sharedKeyOutput.value]"
-          },
-          "omsWorkspaceName": {
-            "value": "[variables('omsWorkspaceName')]"
-          },
-          "automationAccountName": {
-            "value": "[parameters('automationAccountName')]"
-          },
-          "automationRegion": {
-            "value": "[variables('automationRegion')]"
-          },
-          "omsworkspaceRegion": {
-            "value": "[variables('omsRegion')]"
           },
           "tagValues": {
             "value": "[variables('tagValues')]"

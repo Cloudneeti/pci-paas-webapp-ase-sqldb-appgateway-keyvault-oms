@@ -278,11 +278,6 @@ Process
             # Copy files from the local storage staging location to the storage account container
             New-AzureStorageContainer -Name $storageContainerName -Context $StorageAccountContext -Permission Container -ErrorAction SilentlyContinue | Out-Null
 
-            $ArtifactFilePaths = Get-ChildItem $pwd\scripts -Recurse -File | ForEach-Object -Process {$_.FullName}
-            foreach ($SourcePath in $ArtifactFilePaths) {
-                $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
-                Set-AzureStorageBlobContent -File $SourcePath -Blob $BlobName -Container $storageContainerName -Context $StorageAccountContext -Force | Out-Null
-            }
             $ArtifactFilePaths = Get-ChildItem $pwd\nested -Recurse -File | ForEach-Object -Process {$_.FullName}
             foreach ($SourcePath in $ArtifactFilePaths) {
                 $BlobName = $SourcePath.Substring(($PWD.Path).Length + 1)
@@ -454,18 +449,6 @@ Process
             New-AzureRmResourceGroup -Name $resourceGroupName -location $location -Force | Out-Null
             Write-Host -ForegroundColor Yellow "`t* ResoureGroup - $resourceGroupName has been created successfully"
             Start-Sleep -Seconds 5
-
-            # Create Automation Account
-            Write-Host -ForegroundColor Yellow "`t* Creating an Automation Account -$automationaccname at $automationAcclocation"
-            New-AzureRmAutomationAccount -Name "$automationaccname" -location "$automationAcclocation" -resourceGroupName "$resourceGroupName" | Out-Null
-            Write-Host -ForegroundColor Yellow "`t* Automation Account has been created successfully"
-            Start-Sleep -Seconds 5
-
-            # Create Automation Run-As Account to execute runbooks
-            Write-Host -ForegroundColor Yellow "`t* Creating RunAs account for runbooks to execute."
-            .\1-click-deployment-nested\New-RunAsAccount.ps1 -ResourceGroup $resourceGroupName -AutomationAccountName $automationaccname -SubscriptionId $subscriptionID -ApplicationDisplayName $automationADApplication `
-            -SelfSignedCertPlainPassword $newPassword -CreateClassicRunAsAccount $false | Out-Null
-            Start-Sleep -Seconds 5
             }
 
         catch {
@@ -565,7 +548,7 @@ Process
             $status=1
             do
             {
-                if($count -lt 2){                
+                if($count -lt 5){                
                 Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
                 Start-sleep -seconds 60
                 $count +=1
