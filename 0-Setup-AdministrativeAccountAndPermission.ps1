@@ -135,12 +135,32 @@ Process
                 'AzureDiagnosticsAndLogAnalytics' = '0.1'
             }
         if ($installModules) {
-            Write-Host "Trying to install listed modules.." -ForegroundColor Yellow
+              Write-Host "Trying to install listed modules.." -ForegroundColor Yellow
         $requiredModules
         Install-RequiredModules -moduleNames $requiredModules
         Write-Host "All the required modules are now installed. You can now re-run the script without 'installModules' switch." -ForegroundColor Yellow   
         #Break
-    }
+        }
+        <# This script takes a SubscriptionID, ResourceType, ResourceGroup and a workspace ID as parameters, analyzes the subscription or
+        specific ResourceGroup defined for the resources specified in $Resources, and enables those resources for diagnostic metrics
+        also enabling the workspace ID for the OMS workspace to receive these metrics.#>
+            
+        Write-Host -ForegroundColor Yellow "Checking if Enable-AzureRMDiagnostics script is installed."
+        If (Get-InstalledScript -Name Enable-AzureRMDiagnostics -ErrorAction SilentlyContinue) 
+        {   
+            Write-Host -ForegroundColor Yellow "Enable-AzureRMDiagnostics script is already installed."
+        }else {
+            if ($installModules) {
+                Install-Script -Name Enable-AzureRMDiagnostics -Force
+                Start-Sleep -Seconds 10
+                if(Get-InstalledScript -Name Enable-AzureRMDiagnostics ){
+                    Write-Host -ForegroundColor Yellow "Script installed successfully"
+                }
+            }else {
+                Write-Host -ForegroundColor Red "Enable-AzureRMDiagnostics script does not exist. "
+                Write-Host -ForegroundColor Red "Please run script with -installModules switch to install modules."
+            }            
+        }
     	Write-Host "Trying to import listed modules.." -ForegroundColor Cyan
         $modules = $requiredModules.Keys
         foreach ($module in $modules){
@@ -150,27 +170,6 @@ Process
                 Write-Host "Module - $module imported successfully." -ForegroundColor Yellow
             }
         }        
-
-        <# This script takes a SubscriptionID, ResourceType, ResourceGroup and a workspace ID as parameters, analyzes the subscription or
-            specific ResourceGroup defined for the resources specified in $Resources, and enables those resources for diagnostic metrics
-            also enabling the workspace ID for the OMS workspace to receive these metrics.#>
-            
-        Write-Host -ForegroundColor Yellow "`t* Checking if Enable-AzureRMDiagnostics script is installed."
-        If (Get-InstalledScript -Name Enable-AzureRMDiagnostics -ErrorAction SilentlyContinue) 
-        {   
-            Write-Host -ForegroundColor Yellow "`t* Enable-AzureRMDiagnostics script is already installed."
-        }else {
-            if ($installModules) {
-                Install-Script -Name Enable-AzureRMDiagnostics -Force
-                Start-Sleep -Seconds 10
-                if(Get-InstalledScript -Name Enable-AzureRMDiagnostics ){
-                    Write-Host -ForegroundColor Yellow "`t* Script installed successfully"
-                }
-            }else {
-                Write-Host -ForegroundColor Red "`t* Enable-AzureRMDiagnostics script does not exist. "
-				Write-Host -ForegroundColor Red "`t Please run script with -installModules switch to install modules."
-            }            
-        }
         If (Get-InstalledScript -Name Enable-AzureRMDiagnostics -ErrorAction SilentlyContinue)
         {
             Write-Host "All the required modules are now installed and imported successfully." -ForegroundColor Green
