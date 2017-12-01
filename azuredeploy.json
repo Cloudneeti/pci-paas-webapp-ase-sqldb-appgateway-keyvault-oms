@@ -576,12 +576,6 @@
           "asesubnetName": {
             "value": "[variables('asesubnetName')]"
           },
-          "frontEndSize": {
-            "value": "[variables('frontEndSize')]"
-          },
-          "frontEndCount": {
-            "value": "[variables('frontEndCount')]"
-          },
           "aseSubnetAddressPrefix": {
             "value": "[variables('aseSubnetAddressPrefix')]"
           },
