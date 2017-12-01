@@ -46,18 +46,6 @@
         "description": "0 = public VIP only, 1 = only ports 80/443 are mapped to ILB VIP, 2 = only FTP ports are mapped to ILB VIP, 3 = both ports 80/443 and FTP ports are mapped to an ILB VIP."
       }
     },
-    "frontEndSize": {
-      "type": "string",
-      "metadata": {
-        "description": "Instance size for the front-end pool.  Maps to P2,P3,P4."
-      }
-    },
-    "frontEndCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of instances in the front-end pool.  Minimum of two."
-      }
-    },
     "aseSubnetAddressPrefix": {
       "type": "string",
       "metadata": {
@@ -96,7 +84,7 @@
       "type": "Microsoft.Web/hostingEnvironments",
       "kind": "[parameters('kind')]",
       "name": "[parameters('aseName')]",
-      "apiVersion": "2015-02-01",
+      "apiVersion": "2015-08-01",
       "location": "[parameters('aseLocation')]",
       "tags": {
         "layer": "front-end",
