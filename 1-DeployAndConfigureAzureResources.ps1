@@ -487,7 +487,7 @@ Process
                     
                 }
             }
-            until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -ErrorAction SilentlyContinue) -ne $null)             
+            until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName ) -ne $null)             
             if($status){
                 Write-Host -ForegroundColor Yellow "`t* Deployment has been submitted successfully."
             }            
