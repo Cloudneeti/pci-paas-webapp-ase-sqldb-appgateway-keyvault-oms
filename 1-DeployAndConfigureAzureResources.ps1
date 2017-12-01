@@ -476,7 +476,7 @@ Process
             $status=1
             do
             {
-                if($count -lt 5){                
+                if($count -lt 10){                
                 Write-Host "`t`t-> Checking deployment in 60 secs.." -ForegroundColor Yellow
                 Start-sleep -seconds 60
                 $count +=1
@@ -487,7 +487,7 @@ Process
                     
                 }
             }
-            until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName ) -ne $null)             
+            until ((Get-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -ErrorAction SilentlyContinue ) -ne $null)             
             if($status){
                 Write-Host -ForegroundColor Yellow "`t* Deployment has been submitted successfully."
             }            
