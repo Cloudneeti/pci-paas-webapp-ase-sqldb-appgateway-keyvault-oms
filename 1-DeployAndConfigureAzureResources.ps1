@@ -740,21 +740,22 @@ End
         $outputTable.Add('receptionistPassword',$newPassword)
         $outputTable.Add('passwordValidityPeriod',$passwordValidityPeriod)
         $outputTable | Sort-Object Name  | Format-Table -AutoSize -Wrap -Expand EnumOnly 
+
+        #Merging the Two Tables 
+        $MergedtemplateoutputTable = $templateInputTable + $outputTable
+
         Write-Host -ForegroundColor Green "`n########################### Other Deployment Details - End ###########################"
 
         ## Store deployment output to CloudDrive folder else to Output folder.
         if (Test-Path -Path "$HOME\CloudDrive") {
-            log "CloudDrive was found. Saving deploymentOutput.json & $logFileName to CloudDrive.."
-            $outputTable | ConvertTo-Json | Out-File -FilePath "$HOME\CloudDrive\deploymentOutput.json"
-            Get-ChildItem $outputFolderPath -File -Filter *.txt | Copy-Item -Destination  "$HOME\CloudDrive\"
-            log "Output file has been generated - $HOME\CloudDrive\deploymentOutput.json." Green
-            Get-Content "$HOME\CloudDrive\deploymentOutput.json"
+            Write-Host "CloudDrive was found. Saving deploymentOutput.json to CloudDrive.."
+            $MergedtemplateoutputTable | ConvertTo-Json | Out-File -FilePath "$HOME\CloudDrive\deploymentOutput.json"
+            Write-Host "Output file has been generated - $HOME\CloudDrive\deploymentOutput.json." Green
         }
         Else {
-            log "CloudDrive was not found. Saving deploymentOutput.json to Output folder.."
+            Write-Host "CloudDrive was not found. Saving deploymentOutput.json to Output folder.."
             $outputTable | ConvertTo-Json | Out-File -FilePath "$outputFolderPath\deploymentOutput.json"
-            log "Output file has been generated - $outputFolderPath\deploymentOutput.json." Green
-            Get-Content "$outputFolderPath\deploymentOutput.json"
+            Write-Host "Output file has been generated - $outputFolderPath\deploymentOutput.json." Green
         }
     }
 
