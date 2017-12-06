@@ -754,7 +754,7 @@ End
         }
         Else {
             Write-Host "CloudDrive was not found. Saving deploymentOutput.json to Output folder.."
-            $outputTable | ConvertTo-Json | Out-File -FilePath "$outputFolderPath\deploymentOutput.json"
+            $MergedtemplateoutputTable | ConvertTo-Json | Out-File -FilePath "$outputFolderPath\deploymentOutput.json"
             Write-Host "Output file has been generated - $outputFolderPath\deploymentOutput.json." Green
         }
     }
