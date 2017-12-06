@@ -88,12 +88,12 @@ Begin{
                         Write-Host "Verifying module $module." -ForegroundColor Yellow
                         if (!(Get-InstalledModule $module -ErrorAction SilentlyContinue)){
                             Write-Host "Module $module does not exist. Attempting to install the module." -ForegroundColor Yellow
-                            Install-Module $module -MinimumVersion $moduleNames[$module] -Force -AllowClobber
+                            Install-Module $module -RequiredVersion $moduleNames[$module] -Force -AllowClobber
                             Write-Host "Module $module installed successfully." -ForegroundColor Yellow
                         }
-                        elseif((Get-InstalledModule $module).Version.ToString() -lt $moduleNames[$module]){
-                            Write-Host "Older version of Module found. Installing required version of module." -ForegroundColor Yellow
-                            if (Install-Module $module -MinimumVersion $moduleNames[$module] -Force -AllowClobber){
+                        elseif((Get-InstalledModule $module).Version.ToString() -ne $moduleNames[$module]){
+                            Write-Host "Other version of Module found. Installing required version of module." -ForegroundColor Yellow
+                            if (Install-Module $module -RequiredVersion $moduleNames[$module] -Force -AllowClobber){
                                 Write-Host "Module $module installed successfully." -ForegroundColor Yellow
                             }
                         }
@@ -138,13 +138,12 @@ Process
               Write-Host "Trying to install listed modules.." -ForegroundColor Yellow
         $requiredModules
         Install-RequiredModules -moduleNames $requiredModules
-        Write-Host "All the required modules are now installed. You can now re-run the script without 'installModules' switch." -ForegroundColor Yellow   
-        #Break
+        Write-Host "All the required modules are now installed. You can now re-run the script without 'installModules' switch." -ForegroundColor Yellow
         }
+
         <# This script takes a SubscriptionID, ResourceType, ResourceGroup and a workspace ID as parameters, analyzes the subscription or
         specific ResourceGroup defined for the resources specified in $Resources, and enables those resources for diagnostic metrics
-        also enabling the workspace ID for the OMS workspace to receive these metrics.#>
-            
+        also enabling the workspace ID for the OMS workspace to receive these metrics.#>        
         Write-Host -ForegroundColor Yellow "Checking if Enable-AzureRMDiagnostics script is installed."
         If (Get-InstalledScript -Name Enable-AzureRMDiagnostics -ErrorAction SilentlyContinue) 
         {   
@@ -161,11 +160,19 @@ Process
                 Write-Host -ForegroundColor Red "Please run script with -installModules switch to install modules."
             }            
         }
-    	Write-Host "Trying to import listed modules.." -ForegroundColor Cyan
+
+        #Following script Removes the existing Module.
         $modules = $requiredModules.Keys
         foreach ($module in $modules){
+            Remove-Module -Name $module -ErrorAction SilentlyContinue
+        }
+        
+        #Following script Imports the Required Module into powershell.
+        Start-Sleep 5
+    	Write-Host "Trying to import listed modules.." -ForegroundColor Cyan
+        foreach ($module in $modules){
             Write-Host "Importing module - $module with required version $($requiredModules[$module])." -ForegroundColor Yellow 
-            Import-Module -Name $module -MinimumVersion $requiredModules[$module]
+            Import-Module -Name $module -RequiredVersion $requiredModules[$module]
             if (Get-Module -Name $module) {
                 Write-Host "Module - $module imported successfully." -ForegroundColor Yellow
             }

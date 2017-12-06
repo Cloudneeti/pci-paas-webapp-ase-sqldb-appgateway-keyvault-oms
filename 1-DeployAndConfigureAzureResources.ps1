@@ -365,7 +365,7 @@ Process
 
             # Create Active Directory Application
             Write-Host ("`t* Step 4.1: Attempting to Azure AD application") -ForegroundColor Yellow
-            $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $pciAppServiceURL -IdentifierUris $pciAppServiceURL -Password $secNewPasswd
+            $azureAdApplication = New-AzureRmADApplication -DisplayName $displayName -HomePage $pciAppServiceURL -IdentifierUris $pciAppServiceURL -Password $newPassword
             $azureAdApplicationClientId = $azureAdApplication.ApplicationId.Guid
             $azureAdApplicationObjectId = $azureAdApplication.ObjectId.Guid            
             Write-Host ("`t* Azure Active Directory apps creation successful. AppID is " + $azureAdApplication.ApplicationId) -ForegroundColor Yellow
