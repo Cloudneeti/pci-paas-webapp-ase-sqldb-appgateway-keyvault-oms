@@ -61,8 +61,7 @@ try {
                         "Microsoft.Sql/servers/databases",
                         "Microsoft.Compute/virtualMachines",
                         "Microsoft.Web/sites",
-                        "Microsoft.KeyVault/Vaults" ,
-                        "Microsoft.Automation/automationAccounts")
+                        "Microsoft.KeyVault/Vaults" )
 
     Write-Host ("`nEnabling diagnostics for each resource type." ) -ForegroundColor Yellow
     foreach($resourceType in $resourceTypes)

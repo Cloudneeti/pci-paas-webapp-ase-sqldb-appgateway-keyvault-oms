@@ -255,7 +255,6 @@ Process
             # Register RPs
             $resourceProviders = @(
                 "Microsoft.Storage",
-                "Microsoft.Automation",
                 "Microsoft.Compute",
                 "Microsoft.KeyVault",
                 "Microsoft.Network",
@@ -750,12 +749,12 @@ End
         if (Test-Path -Path "$HOME\CloudDrive") {
             Write-Host "CloudDrive was found. Saving deploymentOutput.json to CloudDrive.."
             $MergedtemplateoutputTable | ConvertTo-Json | Out-File -FilePath "$HOME\CloudDrive\deploymentOutput.json"
-            Write-Host "Output file has been generated - $HOME\CloudDrive\deploymentOutput.json." Green
+            Write-Host "Output file has been generated - $HOME\CloudDrive\deploymentOutput.json." -ForegroundColor Green
         }
         Else {
             Write-Host "CloudDrive was not found. Saving deploymentOutput.json to Output folder.."
             $MergedtemplateoutputTable | ConvertTo-Json | Out-File -FilePath "$outputFolderPath\deploymentOutput.json"
-            Write-Host "Output file has been generated - $outputFolderPath\deploymentOutput.json." Green
+            Write-Host "Output file has been generated - $outputFolderPath\deploymentOutput.json." -ForegroundColor Green
         }
     }
 

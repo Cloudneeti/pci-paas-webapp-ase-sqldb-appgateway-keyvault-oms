@@ -769,7 +769,6 @@
           },
           "solutionTypes": {
             "value": [
-              "AzureNetworking",
               "AzureNSGAnalytics",
               "AzureAppGatewayAnalytics",
               "KeyVaultAnalytics",
