@@ -626,12 +626,12 @@ Process
             Write-Host "" -ForegroundColor Yellow
             
             $azureRmProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
-            Write-Host "Checking AzureRM Context."
+            Write-Host "`t* Checking AzureRM Context." -ForegroundColor Yellow
             $currentAzureContext = Get-AzureRmContext
             $profileClient = New-Object Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient($azureRmProfile)
             
-            Write-Host "Getting Access Token and Setting Variables to Invoke REST-API." -ForegroundColor Yellow
-            Write-Host ("Getting access token for tenant" + $currentAzureContext.Subscription.TenantId) -ForegroundColor Yellow
+            Write-Host "`t* Getting Access Token and Setting Variables to Invoke REST-API." -ForegroundColor Yellow
+            Write-Host ("`t* Getting access token for tenant " + $currentAzureContext.Subscription.TenantId) -ForegroundColor Yellow
             $token = $profileClient.AcquireAccessToken($currentAzureContext.Subscription.TenantId)
             $token = $token.AccessToken
             $Script:asc_clientId = "1950a258-227b-4e31-a9cf-717495945fc2"              # Well-known client ID for Azure PowerShell
@@ -643,12 +643,12 @@ Process
             $asc_APIVersion = "?api-version=$asc_version" #Build version syntax.
             $asc_endpoint = 'policies' #Set endpoint.
             
-            Write-Host "Creating auth header." -ForegroundColor Yellow
+            Write-Host "`t* Creating auth header." -ForegroundColor Yellow
             Set-Variable -Name asc_requestHeader -Scope Script -Value @{"Authorization" = "Bearer $token"}
             Set-Variable -Name asc_subscriptionId -Scope Script -Value $currentAzureContext.Subscription.Id
             
             #Retrieve existing policy and build hashtable
-            Write-Host "Retrieving data for $PolicyName..." -ForegroundColor Yellow
+            Write-Host "`t* Retrieving data for $PolicyName..." -ForegroundColor Yellow
             $asc_uri = "https://$asc_url/subscriptions/$asc_subscriptionId/providers/microsoft.Security/$asc_endpoint/$PolicyName$asc_APIVersion"
             $asc_request = Invoke-RestMethod -Uri $asc_uri -Method Get -Headers $asc_requestHeader
             $a = $asc_request 
@@ -694,7 +694,7 @@ Process
             }
             Start-Sleep 5
             
-            Write-Host "Enabling ASC Policies.." -ForegroundColor Yellow
+            Write-Host "`t* Enabling ASC Policies.." -ForegroundColor Yellow
             $JSON = ($json_policy | ConvertTo-Json -Depth 3)
             $asc_uri = "https://$asc_url/subscriptions/$asc_subscriptionId/providers/microsoft.Security/$asc_endpoint/$PolicyName$asc_APIVersion"
             $result = Invoke-WebRequest -Uri $asc_uri -Method Put -Headers $asc_requestHeader -Body $JSON -UseBasicParsing -ContentType "application/json"
@@ -706,7 +706,7 @@ Process
     }
 End
     {
-        Write-Host -ForegroundColor Green "Common variables created for deployment"
+        Write-Host -ForegroundColor Green "`nCommon variables created for deployment"
 
         Write-Host -ForegroundColor Green "`n########################### Template Input Parameters - Start ###########################"
         $templateInputTable = New-Object -TypeName Hashtable
@@ -743,7 +743,7 @@ End
         #Merging the Two Tables 
         $MergedtemplateoutputTable = $templateInputTable + $outputTable
 
-        Write-Host -ForegroundColor Green "`n########################### Other Deployment Details - End ###########################"
+        Write-Host -ForegroundColor Green "`n########################### Other Deployment Details - End ###########################`n"
 
         ## Store deployment output to CloudDrive folder else to Output folder.
         if (Test-Path -Path "$HOME\CloudDrive") {
